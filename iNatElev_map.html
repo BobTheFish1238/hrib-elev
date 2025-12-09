@@ -601,6 +601,7 @@
       height: 40px;
       position: relative;
       margin-bottom: 16px;
+      flex-shrink: 0;
    }
    
    .loading-spinner:before {
@@ -633,6 +634,7 @@
       background: #e9ecef;
       border-radius: 3px;
       overflow: hidden;
+      flex-shrink: 0;
    }
    
    .loading-progress-bar {
@@ -696,6 +698,249 @@
 	  display: flex;
 	  align-items: center;
 	  font-size: 10px;
+	}
+
+	/* Elevation Histogram Loading State */
+	.elevation-histogram.loading {
+		height: 220px !important; /* Smaller height when loading */
+		transition: height 0.3s ease;
+	}
+
+	.elevation-histogram.loading .histogram-content {
+		height: calc(100% - 50px);
+		overflow: hidden;
+	}
+
+	.elevation-histogram.loading .loading-indicator {
+		padding: 0px 0;
+	}
+
+	.elevation-histogram.loading .histogram-container,
+	.elevation-histogram.loading .histogram-stats,
+	.elevation-histogram.loading .histogram-x-axis {
+		display: none !important;
+	}
+
+	/* Observation List Panel */
+	.observation-list-panel {
+		position: absolute;
+		top: 80px;
+		right: 10px;
+		width: 320px;
+		max-height: 80vh;
+		background: white;
+		border-radius: 8px;
+		box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+		z-index: 1000;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	}
+
+	.observation-list-panel.minimized {
+		top: 80px;
+		height: 20px;
+		max-height: 20px;
+		width: 20px;
+		background: white;
+		padding: 8px;
+	}
+
+	.observation-list-panel.minimized .observation-list-header {
+		background: transparent;
+		padding: 0;
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.observation-list-panel.minimized .observation-list-header h3,
+	.observation-list-panel.minimized .observation-list-controls button:first-child,
+	.observation-list-panel.minimized .observation-list-footer {
+		display: none;
+	}
+
+	.observation-list-panel.minimized .observation-list-controls button:last-child {
+		color: #666;
+	}
+
+	.observation-list-panel.minimized .observation-list-controls {
+		margin: 0;
+	}
+
+	.observation-list-header {
+		padding: 12px 16px;
+		background: linear-gradient(135deg, #2c3e50 0%, #4a6491 100%);
+		color: white;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		flex-shrink: 0;
+	}
+
+	.observation-list-header h3 {
+		margin: 0;
+		font-size: 14px;
+		font-weight: 600;
+	}
+
+	.observation-list-controls {
+		display: flex;
+		gap: 8px;
+	}
+
+	.observation-list-controls button {
+		background: rgba(255, 255, 255, 0.2);
+		border: none;
+		width: 24px;
+		height: 24px;
+		border-radius: 4px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		color: white;
+		font-size: 14px;
+		transition: all 0.2s ease;
+	}
+
+	.observation-list-controls button:hover {
+		background: rgba(255, 255, 255, 0.3);
+	}
+
+	.observation-list-content {
+		flex: 1;
+		overflow-y: auto;
+		padding: 0;
+		background: #f8f9fa;
+	}
+
+	.observation-list-items {
+		min-height: 200px;
+		max-height: 60vh;
+		overflow-y: auto;
+	}
+
+	.observation-list-footer {
+		padding: 12px 16px;
+		border-top: 1px solid #e9ecef;
+		background: white;
+		display: flex;
+		justify-content: center;
+		flex-shrink: 0;
+	}
+
+	.load-more-btn {
+		padding: 8px 16px;
+		background: #3498db;
+		color: white;
+		border: none;
+		border-radius: 4px;
+		cursor: pointer;
+		font-size: 12px;
+		font-weight: 500;
+		transition: all 0.2s ease;
+	}
+
+	.load-more-btn:hover {
+		background: #2980b9;
+	}
+
+	.load-more-btn:disabled {
+		background: #bdc3c7;
+		cursor: not-allowed;
+	}
+
+	.observation-item {
+		padding: 12px;
+		border-bottom: 1px solid #eee;
+		display: flex;
+		align-items: center;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		background: white;
+	}
+
+	.observation-item:hover {
+		background: #f8f9fa;
+	}
+
+	.observation-item.selected {
+		background: #e3f2fd;
+		border-left: 3px solid #2196f3;
+	}
+
+	.observation-item-photo {
+		width: 50px;
+		height: 50px;
+		flex-shrink: 0;
+		margin-right: 12px;
+		border-radius: 4px;
+		overflow: hidden;
+	}
+
+	.observation-item-photo img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.observation-item-photo.no-photo {
+		background: #e9ecef;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: #6c757d;
+		font-size: 10px;
+	}
+
+	.observation-item-details {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.observation-item-name {
+		font-weight: 600;
+		font-size: 13px;
+		color: #2c3e50;
+		margin-bottom: 2px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.observation-item-elevation {
+		font-size: 11px;
+		color: #4caf50;
+		font-weight: 500;
+		margin-bottom: 2px;
+	}
+
+	.observation-item-meta {
+		font-size: 10px;
+		color: #6c757d;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 4px;
+	}
+
+	.observation-item-meta span {
+		display: inline-block;
+	}
+
+	.no-observations {
+		padding: 40px 20px;
+		text-align: center;
+		color: #6c757d;
+		font-size: 13px;
+	}
+
+	/* Ensure elevation histogram doesn't overlap with observation list */
+	.elevation-histogram {
+		z-index: 999; /* One less than observation list */
 	}
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
@@ -1380,12 +1625,27 @@ L.gridLayer.utfGridCompare = function (options) {
 						<label><input type="radio" name="view" value="elevation" onchange="toggleView(this.value)"> Elevation View</label>
 					</div>
 
-					<!-- Add this checkbox below the Elevation View radio button -->
 					<div class="checkbox" id="elevation-histogram-toggle" style="display: none; margin-top: 5px; margin-left: 20px;">
 						<label class="checkbox-label">
 							<input type="checkbox" id="enable-histogram" onchange="toggleHistogramSearch()">
 							<span style="font-size: 10px;">Elevation histogram</span>
 						</label>
+					</div>
+					<div id="accuracy-slider-container" style="display: none; margin-top: 10px; margin-left: 20px;">
+						<div style="display: flex; justify-content: space-between; align-items: center;">
+							<label style="font-size: 10px; color: #666;">Accuracy Tolerance:</label>
+							<span id="zoom-level-display" style="font-size: 10px; color: #4caf50; font-weight: bold;">12</span>
+						</div>
+						<input type="range" id="accuracy-tolerance-slider" min="0" max="15" value="12" 
+							   style="width: 100%; margin-top: 5px;"
+							   oninput="updateZoomLevelDisplay(this.value)">
+						<div style="display: flex; justify-content: space-between; font-size: 9px; color: #888; margin-top: 2px;">
+							<span>Low Detail</span>
+							<span>High Detail</span>
+						</div>
+						<div style="font-size: 8px; color: #999; margin-top: 5px;">
+							Higher detail = slower loading
+						</div>
 					</div>
                   <div class="radio">
                      <label><input type="radio" name="view" value="heatmap" onchange="toggleView(this.value)"> Heatmap View</label>
@@ -1697,12 +1957,15 @@ function updateMonthFilter() {
 }
 
 function applyAllFilters() {
+    // Save slider value before applying filters
+    saveSliderValueToFilters();
+    
     let params = new URLSearchParams(window.location.search);
     
     // Clear existing filter params
     const currentView = filters.get('view') || params.get('view');
     ['captive', 'verifiable', 'quality_grade', 'on', 'd1', 'd2', 'month', 
-     'iconic_taxa', 'view', 'compare_exclude_param', 'taxon_name', 'place_name', 'place_id', 'histogram_enabled'].forEach(p => params.delete(p));
+     'iconic_taxa', 'view', 'compare_exclude_param', 'taxon_name', 'place_name', 'place_id', 'histogram_enabled', 'zoom_level'].forEach(p => params.delete(p));
     
     // Add current filters
     filters.forEach((value, key) => {
@@ -1823,8 +2086,7 @@ function initializeFilterValues() {
         }
     }
     
-    // Set histogram state from URL - BUT DON'T START HISTOGRAM HERE
-    // This function is called when opening filters, not just on page load
+    // Set histogram state from URL
     const histogramEnabled = params.get('histogram_enabled') === 'true';
     if (histogramEnabled) {
         histogramSearchEnabled = true;
@@ -1833,13 +2095,28 @@ function initializeFilterValues() {
         if (histogramCheckbox) {
             histogramCheckbox.checked = true;
         }
-        // DO NOT start histogram here - it's already running if enabled
+        
+        // Restore slider from URL
+        restoreSliderFromURL();
+        
+        // Show slider
+        const sliderContainer = document.getElementById('accuracy-slider-container');
+        if (sliderContainer) {
+            sliderContainer.style.display = 'block';
+        }
+        
     } else {
         histogramSearchEnabled = false;
         elevationSearchConfirmed = false;
         const histogramCheckbox = document.getElementById('enable-histogram');
         if (histogramCheckbox) {
             histogramCheckbox.checked = false;
+        }
+        
+        // Hide slider
+        const sliderContainer = document.getElementById('accuracy-slider-container');
+        if (sliderContainer) {
+            sliderContainer.style.display = 'none';
         }
     }
    
@@ -1910,6 +2187,21 @@ function initializeFilterValues() {
    }
    
    updateCategoryButtons();
+}
+
+// Simple function to get current zoom level for elevation collection
+function getCurrentZoomLevel() {
+    if (!histogramSearchEnabled) return 12;
+    
+    const accuracySlider = document.getElementById('accuracy-tolerance-slider');
+    const zoomLevel = accuracySlider ? parseInt(accuracySlider.value) : 12;
+    
+    // Validate range
+    if (isNaN(zoomLevel) || zoomLevel < 0 || zoomLevel > 15) {
+        return 12;
+    }
+    
+    return zoomLevel;
 }
 
 // Autocomplete functions with place_id support
@@ -2098,54 +2390,317 @@ function applySearch() {
    window.location.href = window.location.pathname + '?' + params.toString();
 }
 
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
-	// Initialize histogram state
-	histogramSearchEnabled = false;
-	elevationSearchConfirmed = false;
+// AWS Terrain Tiles Utility Functions
+function latLonToTile(lat, lon, zoom) {
+    const latRad = lat * Math.PI / 180;
+    const n = Math.pow(2, zoom);
 
-	// If we're in elevation view, don't auto-init histogram
-	if (view === 'elevation') {
-		const histogramToggle = document.getElementById('elevation-histogram-toggle');
-		if (histogramToggle) {
-			histogramToggle.style.display = 'block';
-		}
-		// Don't auto-show histogram - wait for user to enable it
-		const histogram = document.getElementById('elevationHistogram');
-		if (histogram) {
-			histogram.style.display = 'none';
-		}
+    const xTile = Math.floor((lon + 180) / 360 * n);
+    const yTile = Math.floor(
+        (1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * n
+    );
+
+    return { x: xTile, y: yTile, z: zoom };
+}
+
+function groupPointsByTile(points, zoom) {
+    const groups = {};
+
+    for (const p of points) {
+        const tile = latLonToTile(p.lat, p.lng, zoom);
+        const key = `${tile.z}/${tile.x}/${tile.y}`;
+
+        if (!groups[key]) groups[key] = [];
+        groups[key].push({ 
+            ...p, 
+            tile,
+            pixelX: null,
+            pixelY: null
+        });
+    }
+
+    return groups;
+}
+
+function getTileURL(z, x, y) {
+    return `https://s3.amazonaws.com/elevation-tiles-prod/terrarium/${z}/${x}/${y}.png`;
+}
+
+function latLonToPixelInTile(lat, lng, tile, zoom) {
+    const n = Math.pow(2, zoom);
+
+    const x = ((lng + 180) / 360 * n - tile.x) * 256;
+    const y =
+        ((1 -
+            Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) /
+            Math.PI) /
+            2 *
+            n -
+            tile.y) *
+        256;
+
+    return { 
+        x: Math.floor(x), 
+        y: Math.floor(y),
+        // Ensure within bounds
+        inBounds: x >= 0 && x < 256 && y >= 0 && y < 256
+    };
+}
+
+function readElevation(ctx, x, y) {
+    if (x < 0 || x >= 256 || y < 0 || y >= 256) return null;
+    
+    const p = ctx.getImageData(x, y, 1, 1).data;
+    return p[0] * 256 + p[1] + p[2] / 256 - 32768;
+}
+
+// Load tile image with error handling
+async function loadTileImage(url) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => resolve(img);
+        img.onerror = (err) => {
+            console.warn(`Failed to load tile: ${url}`, err);
+            reject(new Error(`Tile load failed: ${url}`));
+        };
+        img.src = url;
+    });
+}
+
+// Batch processor for AWS Terrain Tiles
+async function getElevationsForPoints(points, zoomLevel) {
+    // Make sure zoomLevel is a number
+    zoomLevel = parseInt(zoomLevel);
+    if (isNaN(zoomLevel) || zoomLevel < 0 || zoomLevel > 15) {
+        console.warn(`Invalid zoom level ${zoomLevel}, using default 12`);
+        zoomLevel = 12;
+    }
+    
+    console.log(`Processing ${points.length} points at zoom ${zoomLevel}`);
+    
+    const groups = groupPointsByTile(points, zoomLevel);
+    const results = [];
+    const failedTiles = new Set();
+    let processedTiles = 0;
+    const totalTiles = Object.keys(groups).length;
+
+    console.log(`Grouped into ${totalTiles} tiles at zoom ${zoomLevel}`);
+
+    // Track missing points for debugging
+    const missingPointsDebug = [];
+    const successfulPoints = [];
+    
+	let globalMissingPoints = [];
+	missingPointsDebug.forEach(point => {
+		globalMissingPoints.push({
+			...point,
+			zoomLevel: zoomLevel
+		});
+	});
+
+	// And after processing, if there are missing points, visualize them:
+	if (globalMissingPoints.length > 0) {
+		console.log(`Total missing points across all tiles: ${globalMissingPoints.length}`);
+		
+		// Visualize on map
+		setTimeout(() => {
+			visualizeMissingElevations(globalMissingPoints, zoomLevel);
+		}, 1000);
 	}
 
-   const params = new URLSearchParams(window.location.search);
-   const taxonName = params.get('taxon_name');
-   const placeName = params.get('place_name');
-   const placeId = params.get('place_id');
-   
-   if (taxonName) {
-      document.getElementById('taxon_name').value = taxonName;
-      updateClearButton('taxon_name');
-   }
-   
-   if (placeName) {
-      document.getElementById('place_name').value = placeName;
-      updateClearButton('place_name');
-   }
-   
-   if (placeId) {
-      document.getElementById('place_id').value = placeId;
-      selectedPlaceId = placeId;
-   }
-   
-   // Initialize month checkbox events
-   document.querySelectorAll('#date-month input[type="checkbox"]').forEach(cb => {
-      cb.addEventListener('change', updateMonthFilter);
-   });
-   
-   
-   // Hide filters initially
-   hideFilters();
-});
+    // Process tiles in parallel with concurrency limit
+    const concurrencyLimit = 6;
+    const tileKeys = Object.keys(groups);
+    
+    for (let i = 0; i < tileKeys.length; i += concurrencyLimit) {
+        const batch = tileKeys.slice(i, i + concurrencyLimit);
+        const batchPromises = batch.map(async (key) => {
+            try {
+                const [z, x, y] = key.split("/").map(Number);
+                const url = getTileURL(z, x, y);
+                
+                // Update loading progress
+                processedTiles++;
+                const progressPercent = 40 + (processedTiles / totalTiles * 40);
+                updateLoadingProgress(
+                    progressPercent,
+                    `Loading tile ${processedTiles}/${totalTiles} (zoom ${zoomLevel})`
+                );
+
+                const img = await loadTileImage(url);
+                const canvas = document.createElement("canvas");
+                canvas.width = 256;
+                canvas.height = 256;
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0);
+
+                // Process all points in this tile
+				for (const p of groups[key]) {
+					const pix = latLonToPixelInTile(p.lat, p.lng, p.tile, zoomLevel);
+					
+					if (pix.inBounds) {
+						const elev = readElevation(ctx, pix.x, pix.y);
+						if (elev !== null) {
+							// Check if elevation is reasonable
+							if (elev > -1000 && elev < 9000) {
+								results.push({
+									id: p.id,
+									lat: p.lat,  // Use the ORIGINAL lat/lng from the point
+									lng: p.lng,  // Not from the pixel calculation
+									elevation: elev * 3.28084,
+									observation: p.obs,
+									originalLat: p.lat,  // Debug: store original
+									originalLng: p.lng   // Debug: store original
+								});
+								
+                                successfulPoints.push({
+                                    lat: p.lat,
+                                    lng: p.lng,
+                                    elevation: elev,
+                                    tile: key,
+                                    pixel: pix
+                                });
+                            } else {
+                                // Invalid elevation range
+                                missingPointsDebug.push({
+                                    type: 'invalid_elevation',
+                                    lat: p.lat,
+                                    lng: p.lng,
+                                    elevation: elev,
+                                    tile: key,
+                                    pixel: pix,
+                                    reason: `Elevation ${elev} outside reasonable range (-1000 to 9000m)`
+                                });
+                                console.debug(`Invalid elevation ${elev} for point ${p.lat},${p.lng} in tile ${key}`);
+                            }
+                        } else {
+                            // Couldn't read elevation
+                            missingPointsDebug.push({
+                                type: 'null_elevation',
+                                lat: p.lat,
+                                lng: p.lng,
+                                tile: key,
+                                pixel: pix,
+                                reason: 'Elevation read returned null'
+                            });
+                            console.debug(`Null elevation for point ${p.lat},${p.lng} in tile ${key}`);
+                        }
+                    } else {
+                        // Point out of tile bounds
+                        missingPointsDebug.push({
+                            type: 'out_of_bounds',
+                            lat: p.lat,
+                            lng: p.lng,
+                            tile: key,
+                            pixel: pix,
+                            reason: `Point at pixel (${pix.x},${pix.y}) outside tile bounds (0-255)`
+                        });
+                        console.debug(`Point ${p.lat},${p.lng} out of tile bounds in tile ${key}`);
+                    }
+                }
+                
+                return { success: true, tile: key, points: groups[key].length };
+            } catch (error) {
+                console.warn(`Failed to process tile ${key}:`, error);
+                failedTiles.add(key);
+                
+                // Add all points in this tile to missing debug
+                if (groups[key]) {
+                    groups[key].forEach(p => {
+                        missingPointsDebug.push({
+                            type: 'tile_load_failed',
+                            lat: p.lat,
+                            lng: p.lng,
+                            tile: key,
+                            reason: `Tile load failed: ${error.message}`
+                        });
+                    });
+                }
+                
+                return { success: false, tile: key, error: error.message };
+            }
+        });
+
+        const batchResults = await Promise.allSettled(batchPromises);
+        const successful = batchResults.filter(r => r.status === 'fulfilled' && r.value?.success === true).length;
+        
+        // Log tile failures if any
+        batchResults.forEach((result, index) => {
+            if (result.status === 'fulfilled' && result.value?.success === false) {
+                console.warn(`Tile ${batch[index]} failed:`, result.value.error);
+            }
+        });
+        
+        // Small delay between batches to be polite to the API
+        if (i + concurrencyLimit < tileKeys.length) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+    }
+
+    console.log(`Successfully processed ${results.length} points, failed tiles: ${failedTiles.size}`);
+    
+    // Debug output for missing points
+    if (missingPointsDebug.length > 0) {
+        console.group('Missing Elevations Analysis');
+        console.log(`Total missing: ${missingPointsDebug.length}`);
+        
+        // Group by reason
+        const byReason = missingPointsDebug.reduce((acc, point) => {
+            acc[point.type] = (acc[point.type] || 0) + 1;
+            return acc;
+        }, {});
+        
+        console.log('Missing by reason:', byReason);
+        
+        // Show sample of missing points
+        if (missingPointsDebug.length <= 20) {
+            console.log('All missing points:', missingPointsDebug);
+        } else {
+            console.log('Sample of missing points (first 10):', missingPointsDebug.slice(0, 10));
+        }
+        
+        // Check if missing points are clustered geographically
+        const missingByTile = missingPointsDebug.reduce((acc, point) => {
+            if (point.tile) {
+                acc[point.tile] = (acc[point.tile] || 0) + 1;
+            }
+            return acc;
+        }, {});
+        
+        console.log('Missing by tile:', missingByTile);
+        
+        console.groupEnd();
+    }
+    
+    // Show successful points summary
+    if (successfulPoints.length > 0) {
+        console.group('Successful Elevations Summary');
+        console.log(`Successfully retrieved ${successfulPoints.length} elevations`);
+        
+        // Calculate elevation statistics
+        const elevations = successfulPoints.map(p => p.elevation);
+        const minElev = Math.min(...elevations);
+        const maxElev = Math.max(...elevations);
+        const avgElev = elevations.reduce((a, b) => a + b, 0) / elevations.length;
+        
+        console.log(`Elevation range: ${minElev.toFixed(1)}m to ${maxElev.toFixed(1)}m`);
+        console.log(`Average elevation: ${avgElev.toFixed(1)}m`);
+        
+        // Show distribution across tiles
+        const byTile = successfulPoints.reduce((acc, point) => {
+            acc[point.tile] = (acc[point.tile] || 0) + 1;
+            return acc;
+        }, {});
+        
+        console.log('Successful points per tile (sample):', 
+            Object.entries(byTile).slice(0, 5).map(([tile, count]) => `${tile}: ${count}`));
+        
+        console.groupEnd();
+    }
+    
+    return results;
+}
 
 // Elevation Histogram Variables
 let elevationHistogramVisible = true;
@@ -2155,54 +2710,68 @@ let isCollectingData = false;
 let elevationRequestQueue = [];
 let isCancellingElevation = false;
 let nextRequestTime = 0;
-let requestsRemaining = 1000; // OpenTopoData daily limit
 let openTopoDataEnabled = true;
 let delayTimer = null;
 // Elevation histogram search toggle
 let histogramSearchEnabled = false;
 let elevationSearchConfirmed = false;
 
+// Function to update zoom level display
+function updateZoomLevelDisplay(value) {
+    const display = document.getElementById('zoom-level-display');
+    if (display) {
+        display.textContent = value;
+    }
+}
+
 function toggleHistogramSearch() {
     const checkbox = document.getElementById('enable-histogram');
+    const sliderContainer = document.getElementById('accuracy-slider-container');
     
     if (checkbox.checked) {
-        // Show warning with alert
         const warningMessage = `⚠️ Elevation Search Warning ⚠️
 
-Elevation data collection is resource-intensive:
-
-Rate Limits:
-• Open Topo Data: 100 locations per request, 1 request per second, 1000 requests per day
-• Open-Elevation (fallback): Individual requests with delays between calls
-
-Daily Limit: ~100,000 elevation lookups per day
-
-Recommendation: Use elevation search only when necessary. For large datasets, consider filtering observations first.
+Elevation data will be fetched from AWS Terrain Tiles:
+• Higher accuracy (zoom) = more detailed elevation
+• Higher zoom = more tiles to download = slower
+• Recommended zoom: 10-12 for most use cases
 
 Click OK to enable elevation histogram search, or Cancel to keep it disabled.`;
         
         const userConfirmed = confirm(warningMessage);
         
         if (userConfirmed) {
-            // User clicked OK - enable the checkbox
             histogramSearchEnabled = true;
             elevationSearchConfirmed = true;
             checkbox.checked = true;
             
-            // DO NOT start histogram here - wait for Update Search
-            // Just update the filter state
+            // Show accuracy slider
+            if (sliderContainer) {
+                sliderContainer.style.display = 'block';
+            }
+            
             updateFilter('histogram_enabled', 'true', true);
         } else {
-            // User clicked Cancel or closed the dialog
             histogramSearchEnabled = false;
             elevationSearchConfirmed = false;
             checkbox.checked = false;
+            
+            // Hide accuracy slider
+            if (sliderContainer) {
+                sliderContainer.style.display = 'none';
+            }
+            
             updateFilter('histogram_enabled', 'false', true);
         }
     } else {
-        // User is disabling it
         histogramSearchEnabled = false;
         elevationSearchConfirmed = false;
+        
+        // Hide accuracy slider
+        if (sliderContainer) {
+            sliderContainer.style.display = 'none';
+        }
+        
         updateFilter('histogram_enabled', 'false', true);
         
         // Hide histogram if visible
@@ -2213,16 +2782,45 @@ Click OK to enable elevation histogram search, or Cancel to keep it disabled.`;
     }
 }
 
+// Save slider value to filters when applying search
+function saveSliderValueToFilters() {
+    const accuracySlider = document.getElementById('accuracy-tolerance-slider');
+    if (accuracySlider && histogramSearchEnabled) {
+        filters.set('zoom_level', accuracySlider.value);
+    } else {
+        filters.delete('zoom_level');
+    }
+}
+
+// Restore slider value from URL
+function restoreSliderFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    const zoomLevel = params.get('zoom_level');
+    const histogramEnabled = params.get('histogram_enabled') === 'true';
+    
+    if (zoomLevel && histogramEnabled) {
+        const accuracySlider = document.getElementById('accuracy-tolerance-slider');
+        const zoomDisplay = document.getElementById('zoom-level-display');
+        
+        if (accuracySlider) {
+            accuracySlider.value = zoomLevel;
+        }
+        if (zoomDisplay) {
+            zoomDisplay.textContent = zoomLevel;
+        }
+    }
+}
+
 function checkLargeDatasetWarning(observationCount) {
     if (observationCount > 10000 && histogramSearchEnabled) {
-        const warningMessage = `⚠️ Large Dataset Detected ⚠️
+		const warningMessage = `⚠️ Large Dataset Detected ⚠️
 
 Found ${observationCount.toLocaleString()} observations with coordinates.
 
 This will use approximately:
 • ${Math.ceil(observationCount / 100)} Open Topo Data API calls
 • ${Math.ceil(observationCount / 100)} seconds minimum processing time
-• May use ${Math.ceil(observationCount / 100000 * 100)}% of daily API limit
+• May trigger rate limits with extensive usage
 
 Consider filtering observations before elevation lookup.
 
@@ -2279,15 +2877,13 @@ function initElevationHistogram() {
     // Mark as started
     histogramStarted = true;
     
-    // Create histogram container
+    // Create histogram container WITH LOADING CLASS
     const histogramDiv = document.createElement('div');
-    histogramDiv.className = 'elevation-histogram';
+    histogramDiv.className = 'elevation-histogram loading';
     histogramDiv.id = 'elevationHistogram';
     histogramDiv.innerHTML = `
         <div class="histogram-header">
-            <div class="histogram-controls">
-                <h3 class="histogram-title">Elevation Distribution (ft)</h3>
-            </div>
+            <h3 class="histogram-title">Loading...</h3>
             <div class="histogram-controls">
                 <button class="close-btn minimize" onclick="toggleElevationHistogram()" title="Minimize">−</button>
             </div>
@@ -2304,7 +2900,7 @@ function initElevationHistogram() {
                 <div class="histogram-y-axis" id="histogramYAxis"></div>
                 <div class="histogram-chart" id="histogramChart"></div>
             </div>
-            <div class="histogram-x-axis" id="histogramXAxis">Number of Observations</div>
+            <div class="histogram-x-axis" id="histogramXAxis"></div>
             <div class="histogram-stats" id="histogramStats"></div>
         </div>
     `;
@@ -2346,15 +2942,16 @@ function updateLoadingProgress(percentage, text) {
     }
 }
 
-// Function to collect elevation data using bulk lookup
+// Function to collect elevation data using AWS Terrain Tiles
 async function collectElevationData() {
     // Check if histogram search is enabled
     if (!histogramSearchEnabled) {
-        // Show message and return
+        // If histogram exists, hide it
         const histogram = document.getElementById('elevationHistogram');
         if (histogram) {
             histogram.style.display = 'none';
         }
+        histogramStarted = false;
         return;
     }
     
@@ -2362,12 +2959,19 @@ async function collectElevationData() {
     isCollectingData = true;
     isCancellingElevation = false;
     
-    // Reset daily limit at start of new collection
-    requestsRemaining = 1000;
-    openTopoDataEnabled = true;
-    
+    const histogram = document.getElementById('elevationHistogram');
     const loadingIndicator = document.getElementById('loadingIndicator');
     const histogramContainer = document.getElementById('histogramContainer');
+    
+    // Ensure histogram has loading class
+    if (histogram) {
+        histogram.classList.add('loading');
+        // Update title to show loading
+        const title = histogram.querySelector('.histogram-title');
+        if (title) {
+            title.textContent = 'Loading...';
+        }
+    }
     
     // Reset UI
     if (loadingIndicator) {
@@ -2387,7 +2991,12 @@ async function collectElevationData() {
     
     if (histogramContainer) histogramContainer.style.display = 'none';
     
-    updateLoadingProgress(0, 'Fetching observations...');
+    // Get current zoom level
+    const zoomLevel = getCurrentZoomLevel();
+    console.log("Collecting elevation data with zoom level:", zoomLevel);
+    
+    updateLoadingProgress(0, `Fetching observations (Zoom: ${zoomLevel})...`);
+    
     elevationData = [];
     
     try {
@@ -2404,24 +3013,24 @@ async function collectElevationData() {
         const countData = await countResponse.json();
         totalObservations = countData.total_results || 0;
 
-		const shouldContinue = checkLargeDatasetWarning(totalObservations);
-		if (!shouldContinue) {
-			isCollectingData = false;
-			
-			// Update histogram to show disabled state
-			const histogram = document.getElementById('elevationHistogram');
-			if (histogram) {
-				histogram.style.display = 'none';
-			}
-			return;
-		}
+        const shouldContinue = checkLargeDatasetWarning(totalObservations);
+        if (!shouldContinue) {
+            isCollectingData = false;
+            
+            // Update histogram to show disabled state
+            const histogram = document.getElementById('elevationHistogram');
+            if (histogram) {
+                histogram.style.display = 'none';
+            }
+            return;
+        }
         
         if (totalObservations === 0) {
             showNoObservationsMessage();
             return;
         }
         
-        updateLoadingProgress(5, `Found ${totalObservations} total observations...`);
+        updateLoadingProgress(5, `Found ${totalObservations} total observations (Zoom: ${zoomLevel})...`);
         
         // Fetch observations in batches
         while (hasMore && !isCancellingElevation) {
@@ -2445,9 +3054,6 @@ async function collectElevationData() {
                 hasMore = false;
             }
             page++;
-            
-            // Optional: limit for testing, remove in production
-            // if (allObservations.length >= 2000) break; // Test with fewer
         }
         
         if (isCancellingElevation) {
@@ -2465,7 +3071,7 @@ async function collectElevationData() {
             obs.geojson && obs.geojson.coordinates
         );
         
-        updateLoadingProgress(30, `Processing ${validObservations.length} observations with coordinates...`);
+        updateLoadingProgress(30, `Processing ${validObservations.length} observations with coordinates (Zoom: ${zoomLevel})...`);
         
         if (validObservations.length === 0) {
             showNoObservationsMessage();
@@ -2479,9 +3085,9 @@ async function collectElevationData() {
             obs: obs
         }));
         
-        updateLoadingProgress(35, `Getting elevations for ${coordsToLookup.length} locations...`);
+        updateLoadingProgress(35, `Getting elevations for ${coordsToLookup.length} locations using AWS Terrain Tiles (Zoom: ${zoomLevel})...`);
         
-        // Use bulk elevation lookup with Open Topo Data
+        // Use AWS Terrain Tiles for elevation lookup
         const elevations = await getBulkElevation(coordsToLookup);
         
         if (isCancellingElevation) {
@@ -2504,6 +3110,16 @@ async function collectElevationData() {
             }
         });
         
+        // Remove loading class and expand
+        if (histogram) {
+            histogram.classList.remove('loading');
+            // Update title
+            const title = histogram.querySelector('.histogram-title');
+            if (title) {
+                title.textContent = 'Elevation Distribution (ft)';
+            }
+        }
+        
         // Hide loading, show histogram
         if (loadingIndicator) loadingIndicator.style.display = 'none';
         if (histogramContainer) histogramContainer.style.display = 'flex';
@@ -2520,6 +3136,12 @@ async function collectElevationData() {
     } catch (error) {
         console.error('Error collecting elevation data:', error);
         showErrorMessage('Error loading elevation data');
+        
+        // Ensure loading class is removed even on error
+        const histogram = document.getElementById('elevationHistogram');
+        if (histogram) {
+            histogram.classList.remove('loading');
+        }
     } finally {
         isCollectingData = false;
         if (delayTimer) {
@@ -2537,6 +3159,17 @@ function cancelElevationLookup() {
     if (delayTimer) {
         clearTimeout(delayTimer);
         delayTimer = null;
+    }
+    
+    // Remove loading class
+    const histogram = document.getElementById('elevationHistogram');
+    if (histogram) {
+        histogram.classList.remove('loading');
+        // Update title
+        const title = histogram.querySelector('.histogram-title');
+        if (title) {
+            title.textContent = 'Elevation Distribution (ft)';
+        }
     }
     
     // Update UI to show cancellation
@@ -2572,8 +3205,272 @@ function showCancellationMessage() {
     }
 }
 
-// Function for bulk elevation lookup
+// Function for bulk elevation lookup using AWS Terrain Tiles
 async function getBulkElevation(coordinates) {
+    if (coordinates.length === 0) return [];
+    
+    // Get current zoom level
+    const zoomLevel = getCurrentZoomLevel();
+    console.log(`Using zoom level ${zoomLevel} for ${coordinates.length} coordinates`);
+    
+    // Convert coordinates to the format needed
+    const points = coordinates.map((coord, index) => ({
+        id: `coord-${index}`,
+        lat: coord.lat,
+        lng: coord.lng,
+        obs: coord.obs,
+        originalIndex: index  // Keep track of original position
+    }));
+    
+    try {
+        updateLoadingProgress(40, `Getting elevations using AWS Terrain Tiles (zoom ${zoomLevel})...`);
+        
+        // Use AWS Terrain Tiles
+        const awsResults = await getElevationsForPoints(points, zoomLevel);
+        
+        console.log(`AWS returned ${awsResults.length} elevation results`);
+        
+        // Initialize all elevations as null
+        const elevations = new Array(coordinates.length).fill(null);
+        
+        // Track which AWS results have been used
+        const usedAwsResults = new Array(awsResults.length).fill(false);
+        // Track which coordinates have been matched
+        const matchedCoordinates = new Array(coordinates.length).fill(false);
+        
+        let matchedCount = 0;
+        
+        // First pass: Exact matching with small tolerance
+        const EXACT_TOLERANCE = 0.00001; // ~1 meter
+        
+        awsResults.forEach((awsResult, awsIndex) => {
+            // Find the closest unmatched coordinate
+            let bestMatchIndex = -1;
+            let bestDistance = Infinity;
+            
+            for (let coordIndex = 0; coordIndex < coordinates.length; coordIndex++) {
+                if (matchedCoordinates[coordIndex]) continue; // Skip already matched
+                
+                const coord = coordinates[coordIndex];
+                const latDiff = Math.abs(coord.lat - awsResult.lat);
+                const lngDiff = Math.abs(coord.lng - awsResult.lng);
+                
+                // Calculate simple Euclidean distance (good enough for small distances)
+                const distance = Math.sqrt(latDiff * latDiff + lngDiff * lngDiff);
+                
+                if (distance < bestDistance && distance < EXACT_TOLERANCE) {
+                    bestDistance = distance;
+                    bestMatchIndex = coordIndex;
+                }
+            }
+            
+            if (bestMatchIndex !== -1) {
+                elevations[bestMatchIndex] = awsResult.elevation;
+                matchedCoordinates[bestMatchIndex] = true;
+                usedAwsResults[awsIndex] = true;
+                matchedCount++;
+                
+            }
+        });
+        
+        console.log(`First pass: ${matchedCount} exact matches`);
+        
+        // Second pass: More relaxed matching for remaining
+        const RELAXED_TOLERANCE = 0.001; // ~100 meters
+        let relaxedMatches = 0;
+        
+        awsResults.forEach((awsResult, awsIndex) => {
+            if (usedAwsResults[awsIndex]) return; // Skip already used
+            
+            let bestMatchIndex = -1;
+            let bestDistance = Infinity;
+            
+            for (let coordIndex = 0; coordIndex < coordinates.length; coordIndex++) {
+                if (matchedCoordinates[coordIndex]) continue;
+                
+                const coord = coordinates[coordIndex];
+                const latDiff = Math.abs(coord.lat - awsResult.lat);
+                const lngDiff = Math.abs(coord.lng - awsResult.lng);
+                const distance = Math.sqrt(latDiff * latDiff + lngDiff * lngDiff);
+                
+                if (distance < bestDistance && distance < RELAXED_TOLERANCE) {
+                    bestDistance = distance;
+                    bestMatchIndex = coordIndex;
+                }
+            }
+            
+            if (bestMatchIndex !== -1) {
+                elevations[bestMatchIndex] = awsResult.elevation;
+                matchedCoordinates[bestMatchIndex] = true;
+                usedAwsResults[awsIndex] = true;
+                matchedCount++;
+                relaxedMatches++;
+                
+                console.debug(`Relaxed match: AWS result ${awsIndex} → coordinate ${bestMatchIndex} (distance: ${bestDistance.toFixed(6)})`);
+            }
+        });
+        
+        console.log(`Second pass: ${relaxedMatches} relaxed matches`);
+        console.log(`Total matched: ${matchedCount} out of ${awsResults.length} AWS results`);
+        
+        // Check for unused AWS results
+        const unusedAwsResults = awsResults.filter((_, index) => !usedAwsResults[index]);
+        if (unusedAwsResults.length > 0) {
+            console.warn(`${unusedAwsResults.length} AWS results not matched to any coordinate:`);
+            unusedAwsResults.forEach((result, i) => {
+                console.warn(`  ${i}: ${result.lat.toFixed(6)}, ${result.lng.toFixed(6)} = ${result.elevation?.toFixed(1)}ft`);
+            });
+        }
+        
+        // Check for unmatched coordinates
+        const missingIndices = [];
+        matchedCoordinates.forEach((matched, index) => {
+            if (!matched) {
+                missingIndices.push(index);
+                const coord = coordinates[index];
+                console.warn(`Unmatched coordinate ${index}: ${coord.lat.toFixed(6)}, ${coord.lng.toFixed(6)}`);
+            }
+        });
+        
+        console.log(`Unmatched coordinates: ${missingIndices.length}`);
+        
+        if (missingIndices.length > 0 && !isCancellingElevation) {
+            console.log(`Missing ${missingIndices.length} elevations, attempting fallback`);
+            
+            // Only use fallback if we have significant missing data
+            if (missingIndices.length < coordinates.length * 0.1) { // Less than 10% missing
+                console.log(`Only ${missingIndices.length} missing (${(missingIndices.length/coordinates.length*100).toFixed(1)}%), skipping fallback`);
+            } else {
+                updateLoadingProgress(80, `Using fallback for ${missingIndices.length} missing elevations...`);
+                
+                // Use fallback for missing points
+                const fallbackBatchSize = 10;
+                for (let i = 0; i < missingIndices.length; i += fallbackBatchSize) {
+                    if (isCancellingElevation) break;
+                    
+                    const batchIndices = missingIndices.slice(i, i + fallbackBatchSize);
+                    const batchPromises = batchIndices.map(async (index) => {
+                        const coord = coordinates[index];
+                        const elevation = await getElevationForCoordinate(coord.lat, coord.lng);
+                        elevations[index] = elevation;
+                        
+                        updateLoadingProgress(
+                            80 + (i / missingIndices.length * 15),
+                            `Fallback: ${Math.min(i + batchIndices.length, missingIndices.length)}/${missingIndices.length}...`
+                        );
+                    });
+                    
+                    await Promise.all(batchPromises);
+                    
+                    if (i + fallbackBatchSize < missingIndices.length && !isCancellingElevation) {
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                    }
+                }
+            }
+        }
+        
+        // Final statistics
+        const validElevations = elevations.filter(e => e !== null).length;
+        console.log(`Final result: ${validElevations} valid elevations out of ${coordinates.length} total (${(validElevations/coordinates.length*100).toFixed(1)}%)`);
+        
+        // Debug: Show distribution of elevations
+        const elevationValues = elevations.filter(e => e !== null).map(e => e);
+        if (elevationValues.length > 0) {
+            const min = Math.min(...elevationValues);
+            const max = Math.max(...elevationValues);
+            const avg = elevationValues.reduce((a, b) => a + b, 0) / elevationValues.length;
+            console.log(`Elevation stats: min=${min.toFixed(1)}ft, max=${max.toFixed(1)}ft, avg=${avg.toFixed(1)}ft`);
+        }
+        
+        return elevations;
+        
+    } catch (error) {
+        console.error('AWS Terrain Tiles processing failed:', error);
+        
+        // Fall back to original method
+        console.warn('Falling back to original elevation lookup method');
+        return await getBulkElevationFallback(coordinates);
+    }
+}
+
+// Function to visualize missing elevations on the map
+function visualizeMissingElevations(missingPoints, zoomLevel) {
+    if (!missingPoints || missingPoints.length === 0) return;
+    
+    console.group('Visualizing Missing Elevations');
+    
+    // Create a layer group for visualization
+    if (window.missingElevationsLayer) {
+        mymap.removeLayer(window.missingElevationsLayer);
+    }
+    
+    window.missingElevationsLayer = L.layerGroup().addTo(mymap);
+    
+    // Different colors for different failure reasons
+    const colorMap = {
+        'invalid_elevation': '#ff0000', // Red
+        'null_elevation': '#ff9900',    // Orange
+        'out_of_bounds': '#ffff00',     // Yellow
+        'tile_load_failed': '#9900ff',  // Purple
+        'no_match': '#00ffff'           // Cyan
+    };
+    
+    missingPoints.forEach(point => {
+        const marker = L.circleMarker([point.lat, point.lng], {
+            radius: 6,
+            fillColor: colorMap[point.type] || '#000000',
+            color: '#ffffff',
+            weight: 2,
+            opacity: 0.8,
+            fillOpacity: 0.6
+        });
+        
+        const popupContent = `
+            <div style="font-size: 12px;">
+                <strong>Missing Elevation</strong><br>
+                <strong>Type:</strong> ${point.type}<br>
+                <strong>Reason:</strong> ${point.reason}<br>
+                <strong>Location:</strong> ${point.lat.toFixed(6)}, ${point.lng.toFixed(6)}<br>
+                <strong>Tile:</strong> ${point.tile || 'N/A'}<br>
+                <strong>Zoom:</strong> ${zoomLevel}<br>
+                ${point.pixel ? `<strong>Pixel:</strong> (${point.pixel.x},${point.pixel.y}) inBounds: ${point.pixel.inBounds}` : ''}
+            </div>
+        `;
+        
+        marker.bindPopup(popupContent);
+        marker.addTo(window.missingElevationsLayer);
+    });
+    
+    console.log(`Added ${missingPoints.length} markers for missing elevations`);
+    console.log('Legend:');
+    Object.entries(colorMap).forEach(([type, color]) => {
+        console.log(`%c${type}`, `color: ${color}; font-weight: bold;`);
+    });
+    console.groupEnd();
+    
+    // Add a control to remove the layer
+    const controlDiv = document.createElement('div');
+    controlDiv.innerHTML = `
+        <button onclick="removeMissingElevationsLayer()" 
+                style="padding: 5px 10px; background: #ff4444; color: white; border: none; border-radius: 3px; cursor: pointer;">
+            Clear Missing Points
+        </button>
+    `;
+    
+    L.control({position: 'bottomright'}).onAdd = function() {
+        return controlDiv;
+    }.addTo(mymap);
+}
+
+function removeMissingElevationsLayer() {
+    if (window.missingElevationsLayer) {
+        mymap.removeLayer(window.missingElevationsLayer);
+        window.missingElevationsLayer = null;
+    }
+}
+
+// Fallback to original method if AWS fails
+async function getBulkElevationFallback(coordinates) {
     if (coordinates.length === 0) return [];
     
     const elevations = new Array(coordinates.length).fill(null);
@@ -2582,9 +3479,9 @@ async function getBulkElevation(coordinates) {
     isCancellingElevation = false;
     
     // Check if Open Topo Data is available (within daily limits)
-    if (openTopoDataEnabled && requestsRemaining > 0) {
+    if (openTopoDataEnabled) {
         try {
-            // Split coordinates into chunks of 100 (OpenTopoData limit)
+            // Split coordinates into chunks (100 max) (OpenTopoData limit)
 			const chunkSize = 100;
 			const coordinateChunks = [];
 
@@ -2608,10 +3505,8 @@ async function getBulkElevation(coordinates) {
 					break;
 				}
 				
-				// Check daily limit
-				if (requestsRemaining <= 0) {
-					console.warn(`Open Topo Data daily limit reached. Processed ${chunkIndex * chunkSize} of ${coordinates.length} coordinates.`);
-					openTopoDataEnabled = false;
+				// Check if open topo data is still enabled
+				if (!openTopoDataEnabled) {
 					break;
 				}
 				
@@ -2630,7 +3525,7 @@ async function getBulkElevation(coordinates) {
 				if (delay > 0) {
 					updateLoadingProgress(
 						40 + (chunkIndex / chunksToProcess * 40),
-						`Getting elevations: ${chunkIndex * chunkSize + 1}-${Math.min((chunkIndex + 1) * chunkSize, coordinates.length)} of ${coordinates.length} (Waiting ${(delay / 1000).toFixed(1)}s)`
+						`Getting elevations: ${chunkIndex * chunkSize + 1}-${Math.min((chunkIndex + 1) * chunkSize, coordinates.length)} of ${coordinates.length}`
 					);
 					
 					await new Promise(resolve => {
@@ -2668,16 +3563,8 @@ async function getBulkElevation(coordinates) {
                                 }
                             });
                             
-                            // Update rate limiting
-                            requestsRemaining--;
-                            nextRequestTime = Date.now() + 1000; // 1 second delay between requests
-                            
-                            // Check daily limit
-                            if (requestsRemaining <= 0) {
-                                openTopoDataEnabled = false;
-                                console.warn('Open Topo Data daily limit reached, switching to fallback');
-                                break;
-                            }
+							// Update rate limiting - add delay between requests
+							nextRequestTime = Date.now() + 1500; // 1.5 second delay between requests
                         } else {
                             console.warn('Open Topo Data returned unexpected response format');
                         }
@@ -2955,7 +3842,7 @@ function createHorizontalHistogram() {
       }
       xAxis.innerHTML = `
          <div class="histogram-x-labels" style="justify-content: space-between;">
-            ${xLabels.map(val => `<span>${val}</span>`).join('')}
+            ${xLabels.map(val => '<span>' + val + '</span>').join('')}
          </div>
       `;
    } else {
@@ -2972,7 +3859,7 @@ function createHorizontalHistogram() {
       
       xAxis.innerHTML = `
          <div class="histogram-x-labels">
-            ${uniqueLabels.map(val => `<span>${val}</span>`).join('')}
+            ${uniqueLabels.map(val => '<span>' + val + '</span>').join('')}
          </div>
       `;
    }
@@ -3011,133 +3898,373 @@ function createHorizontalHistogram() {
    }
 }
 
-// Update the showObservationsInRange function to match
+// Variables for observation list
+let observationListPanel = null;
+let currentObservations = [];
+let currentRange = null;
+let selectedObservationIndex = -1;
+let itemsPerPage = 15;
+let currentPage = 1;
+
 function showObservationsInRange(minElev, maxElev) {
-   const observationsInRange = elevationData.filter(d => 
-      d.elevation >= minElev && d.elevation < maxElev
-   );
-   
-   // Create popup with observations in this range
-   let popupContent = `<h4 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: #2c3e50;">${minElev}-${maxElev} ft (${observationsInRange.length})</h4>`;
-   popupContent += `<div style="max-height: 300px; overflow-y: auto; max-width: 320px;">`;
-   
-   if (observationsInRange.length === 0) {
-      popupContent += `
-         <div style="text-align: center; padding: 30px; color: #95a5a6;">
-            <div style="font-size: 40px; margin-bottom: 12px; opacity: 0.3;">🏔️</div>
-            <div style="font-size: 13px; margin-bottom: 6px;">No observations</div>
-            <div style="font-size: 11px;">in this elevation range</div>
-         </div>
-      `;
-   } else {
-      observationsInRange.slice(0, 12).forEach((obsData, index) => {
-         const obs = obsData.observation;
-         const taxonName = obs.taxon?.preferred_common_name || obs.taxon?.name || 'Unknown';
-         const observer = obs.user?.login || 'Unknown';
-         const photoUrl = obs.photos?.[0]?.square_url || obs.photos?.[0]?.url || '';
-         
-         popupContent += `
-            <div style="margin-bottom: 6px; padding: 10px; border-radius: 6px; display: flex; align-items: center; 
-                       background: ${index % 2 === 0 ? '#f8f9fa' : 'white'}; border: 1px solid #e9ecef;">
-               ${photoUrl ? 
-                 `<img src="${photoUrl}" style="width: 42px; height: 42px; object-fit: cover; margin-right: 12px; border-radius: 4px; border: 1px solid #dee2e6;">` : 
-                 `<div style="width: 42px; height: 42px; margin-right: 12px; background: linear-gradient(135deg, #e9ecef, #dee2e6); 
-                      display: flex; align-items: center; justify-content: center; border-radius: 4px; color: #adb5bd; font-size: 12px; font-weight: 600;">📷</div>`}
-               <div style="flex: 1;">
-                 <div style="font-size: 12px; font-weight: 600; color: #2c3e50; margin-bottom: 2px; line-height: 1.3;">${taxonName}</div>
-                 <div style="font-size: 10px; color: #6c757d; margin-bottom: 3px;">
-                    <span style="font-weight: 600; color: #3498db;">${Math.round(obsData.elevation)} ft</span> • By: ${observer}
-                 </div>
-                 <a href="https://www.inaturalist.org/observations/${obs.id}" target="_blank" 
-                    style="font-size: 11px; color: #3498db; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center;">
-                    View <span style="margin-left: 2px;">→</span>
-                 </a>
-               </div>
-            </div>
-         `;
-      });
-      
-      if (observationsInRange.length > 12) {
-         popupContent += `
-            <div style="text-align: center; padding: 10px; font-size: 11px; color: #6c757d; background: #f8f9fa; border-radius: 4px; margin-top: 4px;">
-               ... and ${observationsInRange.length - 12} more observations
-            </div>
-         `;
-      }
-   }
-   
-   popupContent += `</div>`;
-   
-   // Show popup at center of map
-   L.popup()
-      .setLatLng(mymap.getCenter())
-      .setContent(popupContent)
-      .openOn(mymap);
+    const observationsInRange = elevationData.filter(d => 
+        d.elevation >= minElev && d.elevation < maxElev
+    );
+    
+    currentObservations = observationsInRange;
+    currentRange = { minElev, maxElev };
+    currentPage = 1;
+    
+    // First, clear any existing markers from previous range selections
+    clearObservationMarkers();
+    
+    // Create observation list panel if it doesn't exist
+    createObservationListPanel();
+    
+    // Update the panel title with elevation range and count
+    updateObservationListTitle(minElev, maxElev, observationsInRange.length);
+    
+    // Load first page of observations
+    loadObservationListPage();
+    
+    // Create markers for first page
+    createMarkersForCurrentPage();
+    
+    // Show the panel
+    observationListPanel.style.display = 'flex';
 }
 
-// Function to show observations in a specific elevation range
-function showObservationsInRange(minElev, maxElev) {
-   const observationsInRange = elevationData.filter(d => 
-      d.elevation >= minElev && d.elevation < maxElev // Use < instead of <= for exclusive upper bound
-   );
-   
-   // Create popup with observations in this range
-   let popupContent = `<h4 style="margin: 0 0 10px 0; font-size: 14px;">${minElev}-${maxElev} ft (${observationsInRange.length})</h4>`;
-   popupContent += `<div style="max-height: 300px; overflow-y: auto; max-width: 300px;">`;
-   
-   if (observationsInRange.length === 0) {
-      popupContent += `<div style="text-align: center; padding: 20px; color: #666;">No observations in this elevation range</div>`;
-   } else {
-      observationsInRange.slice(0, 15).forEach((obsData, index) => {
-         const obs = obsData.observation;
-         const taxonName = obs.taxon?.preferred_common_name || obs.taxon?.name || 'Unknown';
-         const observer = obs.user?.login || 'Unknown';
-         const photoUrl = obs.photos?.[0]?.square_url || obs.photos?.[0]?.url || '';
-         
-         popupContent += `
-            <div style="margin-bottom: 8px; padding: 8px; border-bottom: 1px solid #eee; display: flex; align-items: center; background: ${index % 2 === 0 ? '#f9f9f9' : 'white'};">
-               ${photoUrl ? `<img src="${photoUrl}" style="width: 40px; height: 40px; object-fit: cover; margin-right: 10px; border-radius: 3px;">` : 
-                 `<div style="width: 40px; height: 40px; margin-right: 10px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 3px; color: #999; font-size: 12px;">No photo</div>`}
-               <div style="flex: 1;">
-                 <strong style="font-size: 12px; display: block; margin-bottom: 2px;">${taxonName}</strong>
-                 <div style="font-size: 10px; color: #666; margin-bottom: 2px;">${Math.round(obsData.elevation)} ft</div>
-                 <div style="font-size: 10px; color: #666; margin-bottom: 3px;">By: ${observer}</div>
-                 <a href="https://www.inaturalist.org/observations/${obs.id}" target="_blank" 
-                    style="font-size: 10px; color: #4caf50; text-decoration: none;">View observation →</a>
-               </div>
+function createObservationListPanel() {
+    if (observationListPanel) return;
+    
+    observationListPanel = document.createElement('div');
+    observationListPanel.className = 'observation-list-panel';
+    observationListPanel.id = 'observationListPanel';
+	observationListPanel.innerHTML = `
+		<div class="observation-list-header">
+			<h3 id="observationListTitle">Observations</h3>
+			<div class="observation-list-controls">
+				<button onclick="clearObservationMarkers()" title="Clear Markers">🗑️</button>
+				<button onclick="toggleObservationList()" title="Minimize">−</button>
+			</div>
+		</div>
+		<div class="observation-list-content">
+			<div class="observation-list-items" id="observationListItems"></div>
+		</div>
+		<div class="observation-list-footer">
+			<button class="load-more-btn" onclick="loadMoreObservations()" id="loadMoreBtn">
+				Load More Observations
+			</button>
+		</div>
+	`;
+    
+    document.body.appendChild(observationListPanel);
+}
+
+function updateObservationListTitle(minElev, maxElev, count) {
+    const title = document.getElementById('observationListTitle');
+    if (title) {
+        title.textContent = `${minElev}-${maxElev} ft (${count})`;
+    }
+}
+
+function loadObservationListPage() {
+    const itemsContainer = document.getElementById('observationListItems');
+    if (!itemsContainer) return;
+    
+    // Clear existing items
+    itemsContainer.innerHTML = '';
+    
+    // Calculate start and end indices
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, currentObservations.length);
+    const pageObservations = currentObservations.slice(startIndex, endIndex);
+    
+    if (pageObservations.length === 0) {
+        itemsContainer.innerHTML = `
+            <div class="no-observations">
+                No observations in this elevation range
             </div>
-         `;
-      });
-      
-      if (observationsInRange.length > 15) {
-         popupContent += `<div style="text-align: center; padding: 10px; font-size: 11px; color: #666;">... and ${observationsInRange.length - 15} more observations</div>`;
-      }
-   }
-   
-   popupContent += `</div>`;
-   
-   // Show popup at center of map
-   L.popup()
-      .setLatLng(mymap.getCenter())
-      .setContent(popupContent)
-      .openOn(mymap);
+        `;
+        return;
+    }
+    
+    // Create items for each observation
+    pageObservations.forEach((obsData, index) => {
+        const globalIndex = startIndex + index;
+        const obs = obsData.observation;
+        const taxonName = obs.taxon?.preferred_common_name || obs.taxon?.name || 'Unknown';
+        const observer = obs.user?.login || 'Unknown';
+        const photoUrl = obs.photos?.[0]?.square_url || obs.photos?.[0]?.url || '';
+        
+        // Get elevation color
+        const elevationColor = getElevationColor(obsData.elevation);
+        
+        const item = document.createElement('div');
+        item.className = `observation-item ${selectedObservationIndex === globalIndex ? 'selected' : ''}`;
+        item.onclick = () => highlightObservationFromList(globalIndex);
+        
+        item.innerHTML = `
+            <div class="observation-item-photo ${!photoUrl ? 'no-photo' : ''}">
+                ${photoUrl ? `<img src="${photoUrl}" alt="${taxonName}">` : 'No Photo'}
+            </div>
+            <div class="observation-item-details">
+                <div class="observation-item-name" title="${taxonName}">${taxonName}</div>
+                <div class="observation-item-elevation" style="color: ${elevationColor}">
+                    ${Math.round(obsData.elevation)} ft
+                </div>
+                <div class="observation-item-meta">
+                    <span>By: ${observer}</span>
+                    <span>•</span>
+                    <span>${obs.observed_on?.substring(0, 10) || 'Unknown date'}</span>
+                </div>
+            </div>
+        `;
+        
+        itemsContainer.appendChild(item);
+    });
+    
+    // Update load more button
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    if (loadMoreBtn) {
+        if (endIndex >= currentObservations.length) {
+            loadMoreBtn.disabled = true;
+            loadMoreBtn.textContent = 'All observations loaded';
+        } else {
+            loadMoreBtn.disabled = false;
+            loadMoreBtn.textContent = `Load More (${endIndex}/${currentObservations.length})`;
+        }
+    }
+}
+
+function getElevationColor(elevation) {
+    if (!currentRange) return '#3498db';
+    
+    // Calculate position in current range
+    const rangeSize = currentRange.maxElev - currentRange.minElev;
+    const positionInRange = (elevation - currentRange.minElev) / rangeSize;
+    
+    // Use same color gradient as histogram (blue to purple)
+    const hue = 210 - (positionInRange * 120);
+    return `hsl(${hue}, 75%, 60%)`;
+}
+
+function createMarkersForCurrentPage() {
+    // Calculate start and end indices for current page
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, currentObservations.length);
+    const pageObservations = currentObservations.slice(startIndex, endIndex);
+    
+    // Create a layer group for all markers
+    observationMarkers = L.layerGroup();
+    
+    pageObservations.forEach((obsData, index) => {
+        const globalIndex = startIndex + index;
+        const elevationColor = getElevationColor(obsData.elevation);
+        
+        // Create marker with elevation-based color
+        const marker = L.circleMarker([obsData.lat, obsData.lng], {
+            radius: 8,
+            fillColor: elevationColor,
+            color: '#ffffff',
+            weight: 2,
+            opacity: 0.8,
+            fillOpacity: 0.7
+        });
+        
+        // Store the global index with the marker
+        marker.observationIndex = globalIndex;
+        
+        const obs = obsData.observation;
+        const taxonName = obs.taxon?.preferred_common_name || obs.taxon?.name || 'Unknown';
+        const observer = obs.user?.login || 'Unknown';
+        const photoUrl = obs.photos?.[0]?.square_url || obs.photos?.[0]?.url || '';
+        
+        const markerPopupContent = `
+            <div style="max-width: 250px;">
+                <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                    ${photoUrl ? '<img src="' + photoUrl + '" style="width: 60px; height: 60px; object-fit: cover; margin-right: 10px; border-radius: 3px;">' : 
+                      '<div style="width: 60px; height: 60px; margin-right: 10px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 3px; color: #999; font-size: 12px;">No photo</div>'}
+                    <div style="flex: 1;">
+                        <strong style="font-size: 14px; display: block; margin-bottom: 3px;">${taxonName}</strong>
+                        <div style="font-size: 11px; color: #666; margin-bottom: 3px;">${Math.round(obsData.elevation)} ft</div>
+                        <div style="font-size: 11px; color: #666; margin-bottom: 5px;">By: ${observer}</div>
+                    </div>
+                </div>
+                <div style="font-size: 11px; margin-bottom: 8px;">
+                    <strong>Location:</strong> ${obsData.lat.toFixed(6)}, ${obsData.lng.toFixed(6)}<br>
+                    <strong>Observed:</strong> ${obs.observed_on || 'Unknown date'}
+                </div>
+                <a href="https://www.inaturalist.org/observations/${obs.id}" target="_blank" 
+                   style="display: block; text-align: center; background: #4caf50; color: white; padding: 6px; border-radius: 4px; text-decoration: none; font-size: 12px;">
+                    View observation on iNaturalist
+                </a>
+            </div>
+        `;
+        
+        marker.bindPopup(markerPopupContent);
+        marker.addTo(observationMarkers);
+        
+        // Add click handler to highlight in list
+        marker.on('click', () => {
+            highlightObservationFromList(globalIndex);
+        });
+        
+        // Store marker reference
+        observationMarkersList.push(marker);
+    });
+    
+    // Add the marker layer to the map
+    observationMarkers.addTo(mymap);
+    
+    // Fit map to show all markers from this page
+    if (observationMarkersList.length > 0) {
+        const group = new L.featureGroup(observationMarkersList);
+        mymap.fitBounds(group.getBounds().pad(0.1)); // Add 10% padding
+    }
+}
+
+function highlightObservationFromList(index) {
+    selectedObservationIndex = index;
+    
+    // Update list selection
+    const items = document.querySelectorAll('.observation-item');
+    items.forEach((item, i) => {
+        // Calculate the actual index for this item
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const actualIndex = startIndex + i;
+        item.classList.toggle('selected', actualIndex === index);
+    });
+    
+    // Find and highlight the corresponding marker
+    if (observationMarkersList[index]) {
+        // Reset all markers to their original colors
+        observationMarkersList.forEach((marker, i) => {
+            if (marker.observationIndex !== undefined) {
+                const obsData = currentObservations[marker.observationIndex];
+                if (obsData) {
+                    const elevationColor = getElevationColor(obsData.elevation);
+                    marker.setStyle({
+                        fillColor: i === index ? elevationColor : elevationColor,
+                        color: i === index ? '#ffeb3b' : '#ffffff', // Yellow border for selected
+                        radius: i === index ? 10 : 8,
+                        weight: i === index ? 3 : 2
+                    });
+                }
+            }
+        });
+        
+        // Open the popup for the selected marker
+        observationMarkersList[index].openPopup();
+        
+        // Pan to the selected marker
+        mymap.panTo(observationMarkersList[index].getLatLng());
+    }
+}
+
+function loadMoreObservations() {
+    currentPage++;
+    
+    // Load next page of observations into the list
+    loadObservationListPage();
+    
+    // Create markers for the new page
+    createMarkersForCurrentPage();
+}
+
+function toggleObservationList() {
+    if (!observationListPanel) return;
+    
+    const minimizeBtn = observationListPanel.querySelector('.observation-list-controls button:last-child');
+    
+    if (observationListPanel.classList.contains('minimized')) {
+        observationListPanel.classList.remove('minimized');
+        if (minimizeBtn) {
+            minimizeBtn.textContent = '−';
+            minimizeBtn.title = "Minimize";
+        }
+    } else {
+        observationListPanel.classList.add('minimized');
+        if (minimizeBtn) {
+            minimizeBtn.textContent = '☶';
+            minimizeBtn.title = "Expand";
+        }
+    }
+}
+
+// Variables to track observation markers
+let observationMarkers = null;
+let observationMarkersList = [];
+
+// Function to clear observation markers from map
+function clearObservationMarkers() {
+    if (observationMarkers) {
+        mymap.removeLayer(observationMarkers);
+        observationMarkers = null;
+    }
+    observationMarkersList = [];
+    selectedObservationIndex = -1;
+    
+    // Clear the observation list
+    const itemsContainer = document.getElementById('observationListItems');
+    if (itemsContainer) {
+        itemsContainer.innerHTML = `
+            <div class="no-observations">
+                Select an elevation range from the histogram
+            </div>
+        `;
+    }
+    
+    // Reset title
+    const title = document.getElementById('observationListTitle');
+    if (title) {
+        title.textContent = 'Observations';
+    }
 }
 
 // Function to show message when no elevation data is available
 function showNoElevationDataMessage() {
-   const loadingIndicator = document.getElementById('loadingIndicator');
-   const histogramContainer = document.getElementById('histogramContainer');
-   
-   if (loadingIndicator) {
-      loadingIndicator.innerHTML = `
-         <div class="empty-state">
-            <div class="empty-state-icon">🗺️</div>
-            <div style="font-size: 13px; margin-bottom: 5px;">No elevation data available</div>
-            <div style="font-size: 11px; color: #888;">Elevation data is primarily available for locations in the USA.</div>
-         </div>
-      `;
-   }
-   if (histogramContainer) histogramContainer.style.display = 'none';
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const histogramContainer = document.getElementById('histogramContainer');
+    const histogram = document.getElementById('elevationHistogram');
+    
+    // Remove loading class
+    if (histogram) {
+        histogram.classList.remove('loading');
+    }
+    
+    if (loadingIndicator) {
+        loadingIndicator.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">🗺️</div>
+                <div style="font-size: 13px; margin-bottom: 5px;">No elevation data available</div>
+                <div style="font-size: 11px; color: #888;">Elevation data is primarily available for locations in the USA.</div>
+            </div>
+        `;
+    }
+    if (histogramContainer) histogramContainer.style.display = 'none';
+}
+
+function showErrorMessage(message) {
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const histogramContainer = document.getElementById('histogramContainer');
+    const histogram = document.getElementById('elevationHistogram');
+    
+    // Remove loading class
+    if (histogram) {
+        histogram.classList.remove('loading');
+    }
+    
+    if (loadingIndicator) {
+        loadingIndicator.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon" style="color: #d32f2f;">❌</div>
+                <div style="font-size: 13px; color: #d32f2f; margin-bottom: 5px;">Error</div>
+                <div style="font-size: 11px; color: #888;">${message}</div>
+            </div>
+        `;
+    }
+    if (histogramContainer) histogramContainer.style.display = 'none';
 }
 
 // Function to show message when no observations found
@@ -3177,24 +4304,33 @@ function showErrorMessage(message) {
 // Function to update histogram when map view changes
 function updateHistogramOnViewChange(newView) {
     const histogram = document.getElementById('elevationHistogram');
+    const histogramToggle = document.getElementById('elevation-histogram-toggle');
+    const sliderContainer = document.getElementById('accuracy-slider-container');
     
     if (newView === 'elevation') {
         // Show the histogram toggle
-        const histogramToggle = document.getElementById('elevation-histogram-toggle');
         if (histogramToggle) {
             histogramToggle.style.display = 'block';
         }
         
-        // Only show histogram if search is enabled AND we're reloading the page
-        // (histogram will be started via initializeFilterValues on page reload)
+        // Show/hide slider based on histogram state
+        if (histogramSearchEnabled && sliderContainer) {
+            sliderContainer.style.display = 'block';
+        } else if (sliderContainer) {
+            sliderContainer.style.display = 'none';
+        }
+        
+        // Only show histogram if search is enabled
         if (histogramSearchEnabled && histogram) {
             histogram.style.display = 'block';
         }
     } else {
-        // Hide histogram toggle for other views
-        const histogramToggle = document.getElementById('elevation-histogram-toggle');
+        // Hide histogram toggle and slider for other views
         if (histogramToggle) {
             histogramToggle.style.display = 'none';
+        }
+        if (sliderContainer) {
+            sliderContainer.style.display = 'none';
         }
         
         // Hide histogram if visible
@@ -3242,7 +4378,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize histogram state
     histogramSearchEnabled = false;
     elevationSearchConfirmed = false;
-    histogramStarted = false; // Reset flag
+    histogramStarted = false;
     
     // If we're in elevation view, show the toggle
     if (view === 'elevation') {
@@ -3261,20 +4397,65 @@ document.addEventListener('DOMContentLoaded', function() {
                 histogramCheckbox.checked = true;
             }
             
-            // Start histogram after a short delay
-            setTimeout(() => {
-                initElevationHistogram();
-            }, 1000);
+            // Restore slider immediately
+            restoreSliderFromURL();
+
+			// Start histogram if not already running
+			if (!histogramStarted) {
+				setTimeout(() => {
+					initElevationHistogram();
+				}, 500);
+			}
         }
     }
+
+    // Initialize observation list panel (hidden by default)
+    setTimeout(() => {
+        createObservationListPanel();
+        if (observationListPanel) {
+            observationListPanel.style.display = 'none';
+        }
+    }, 100);
     
     // Hide filters initially
     hideFilters();
 });
 
+// Simple verification function
+function verifySliderState() {
+    const params = new URLSearchParams(window.location.search);
+    const accuracySlider = document.getElementById('accuracy-tolerance-slider');
+    const zoomDisplay = document.getElementById('zoom-level-display');
+    
+    console.log('Slider State Verification:', {
+        urlHasZoomLevel: params.has('zoom_level'),
+        urlZoomValue: params.get('zoom_level'),
+        sliderValue: accuracySlider ? accuracySlider.value : 'no slider',
+        displayValue: zoomDisplay ? zoomDisplay.textContent : 'no display',
+        histogramEnabled: histogramSearchEnabled,
+        matches: accuracySlider && params.get('zoom_level') ? 
+                 accuracySlider.value === params.get('zoom_level') : 
+                 'N/A'
+    });
+}
+
+// Call verification after page loads
+setTimeout(verifySliderState, 1000);
+
 // Refresh function
 function refreshElevationHistogram() {
     if (view === 'elevation' && !isCollectingData) {
+        // Add loading class
+        const histogram = document.getElementById('elevationHistogram');
+        if (histogram) {
+            histogram.classList.add('loading');
+            // Update title to show loading
+            const title = histogram.querySelector('.histogram-title');
+            if (title) {
+                title.textContent = 'Loading...';
+            }
+        }
+        
         histogramStarted = false; // Allow fresh start
         collectElevationData();
     }
@@ -3282,16 +4463,6 @@ function refreshElevationHistogram() {
 
 // Expose refresh function globally
 window.refreshElevationHistogram = refreshElevationHistogram;
-
-// Add keyboard shortcut (Alt+H to toggle histogram)
-document.addEventListener('keydown', function(e) {
-   if (e.altKey && e.key === 'h') {
-      const histogram = document.getElementById('elevationHistogram');
-      if (histogram) {
-         toggleElevationHistogram();
-      }
-   }
-});
 
 // Get parameters from the url
 let winurlstr = window.location.href;
