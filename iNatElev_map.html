@@ -993,11 +993,6 @@
 	}
 
 	/* Monthly View Styles */
-	.month-cluster {
-		/* Smaller cluster icons */
-		transform: translate(-50%, -50%);
-	}
-
 	.month-legend {
 		background: white;
 		border-radius: 5px;
@@ -2435,22 +2430,22 @@ function createClusteredElevationMarkers() {
                 return L.divIcon({
                     html: `<div style="
                         background-color: ${color};
-                        width: 30px;
-                        height: 30px;
+                        width: 15px;
+                        height: 15px;
                         border-radius: 50%;
-                        border: 2px solid white;
+                        border: 1px solid white;
                         box-shadow: 0 2px 5px rgba(0,0,0,0.3);
                         display: flex;
                         align-items: center;
                         justify-content: center;
                         color: ${getContrastColor(color)};
                         font-weight: bold;
-                        font-size: 12px;
+                        font-size: 9px;
                     ">
                         ${count}
                     </div>`,
                     className: 'elevation-marker-cluster',
-                    iconSize: [30, 30]
+                    iconSize: [15, 15]
                 });
             }
         });
@@ -2707,22 +2702,22 @@ function createClusteredAspectMarkers() {
                 return L.divIcon({
                     html: `<div style="
                         background-color: ${color};
-                        width: 30px;
-                        height: 30px;
+                        width: 15px;
+                        height: 15px;
                         border-radius: 50%;
-                        border: 2px solid white;
+                        border: 1px solid white;
                         box-shadow: 0 2px 5px rgba(0,0,0,0.3);
                         display: flex;
                         align-items: center;
                         justify-content: center;
                         color: ${getContrastColor(color)};
                         font-weight: bold;
-                        font-size: 12px;
+                        font-size: 9px;
                     ">
                         ${count}
                     </div>`,
                     className: 'aspect-marker-cluster',
-                    iconSize: [30, 30]
+                    iconSize: [15, 15]
                 });
             }
         });
@@ -3293,8 +3288,8 @@ function createMonthlyMarkers(observations) {
                         return L.divIcon({
                             html: `<div style="
                                 background-color: ${getMonthColor(monthNum)};
-                                width: 16px;
-                                height: 16px;
+                                width: 15px;
+                                height: 15px;
                                 border-radius: 50%;
                                 border: 1px solid white;
                                 box-shadow: 0 2px 5px rgba(0,0,0,0.3);
@@ -3308,7 +3303,7 @@ function createMonthlyMarkers(observations) {
                                 ${count}
                             </div>`,
                             className: `month-cluster month-${monthNum}`,
-                            iconSize: [30, 30]
+                            iconSize: [15, 15]
                         });
                     }
                 });
@@ -4465,22 +4460,22 @@ function showObservationsByAspect(aspect) {
                 return L.divIcon({
                     html: `<div style="
                         background-color: ${color};
-                        width: 30px;
-                        height: 30px;
+                        width: 15px;
+                        height: 15px;
                         border-radius: 50%;
-                        border: 2px solid white;
+                        border: 1px solid white;
                         box-shadow: 0 2px 5px rgba(0,0,0,0.3);
                         display: flex;
                         align-items: center;
                         justify-content: center;
                         color: ${getContrastColor(color)};
                         font-weight: bold;
-                        font-size: 12px;
+                        font-size: 9px;
                     ">
                         ${count}
                     </div>`,
                     className: 'aspect-marker-cluster',
-                    iconSize: [30, 30]
+                    iconSize: [15, 15]
                 });
             }
         });
@@ -6633,23 +6628,23 @@ function createClusteredObservationMarkers() {
             return L.divIcon({
                 html: `<div style="
                     background-color: ${elevationColor};
-                    width: 30px;
-                    height: 30px;
+                    width: 15px;
+                    height: 15px;
                     border-radius: 50%;
-                    border: 2px solid white;
+                    border: 1px solid white;
                     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     color: ${getContrastColor(elevationColor)};
                     font-weight: bold;
-                    font-size: 12px;
+                    font-size: 9px;
                     cursor: pointer;
                 ">
                     ${count}
                 </div>`,
                 className: 'observation-marker-cluster',
-                iconSize: [30, 30]
+                iconSize: [15, 15]
             });
         }
     });
