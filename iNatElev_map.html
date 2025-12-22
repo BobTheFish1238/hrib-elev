@@ -1064,6 +1064,153 @@
 		border-left: 3px solid #4caf50;
 	}
 
+	/* Month Slider Control */
+	.month-slider-control {
+		margin-top: 10px;
+		padding-top: 10px;
+		border-top: 1px solid #eee;
+	}
+
+	.month-slider-toggle {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 8px;
+		cursor: pointer;
+	}
+
+	.month-slider-toggle label {
+		font-size: 11px;
+		color: #495057;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		gap: 5px;
+	}
+
+	.month-slider-toggle input[type="checkbox"] {
+		width: 14px;
+		height: 14px;
+		cursor: pointer;
+	}
+
+	.month-slider-container {
+		display: none;
+		margin-top: 8px;
+		width: 150px;
+	}
+
+	.month-slider-container.active {
+		display: block;
+	}
+
+	.no-map-drag {
+		pointer-events: auto !important;
+	}
+
+	.month-slider {
+		width: 100%;
+		height: 6px;
+		-webkit-appearance: none;
+		appearance: none;
+		background: #e9ecef;
+		border-radius: 3px;
+		outline: none;
+		margin: 8px 0;
+		cursor: pointer;
+		touch-action: none;
+	}
+
+	.month-slider:active {
+		cursor: grabbing;
+	}
+
+	.month-slider::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		appearance: none;
+		width: 20px;
+		height: 20px;
+		border-radius: 50%;
+		background: #4caf50;
+		cursor: grab;
+		border: 2px solid white;
+		box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+		transition: all 0.2s ease;
+	}
+
+	.month-slider::-webkit-slider-thumb:active {
+		cursor: grabbing;
+		transform: scale(1.1);
+		background: #45a049;
+	}
+
+	.month-slider::-moz-range-thumb {
+		width: 20px;
+		height: 20px;
+		border-radius: 50%;
+		background: #4caf50;
+		cursor: grab;
+		border: 2px solid white;
+		box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+		transition: all 0.2s ease;
+	}
+
+	.month-slider::-moz-range-thumb:active {
+		cursor: grabbing;
+		transform: scale(1.1);
+		background: #45a049;
+	}
+
+	.month-slider-container.active {
+		display: block;
+		z-index: 1000; /* Ensure it's above map */
+		position: relative;
+	}
+
+	.month-slider-display {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-top: 5px;
+	}
+
+	.current-month {
+		font-size: 12px;
+		font-weight: 600;
+		color: #2c3e50;
+		text-align: center;
+		flex: 1;
+	}
+
+	.month-nav-btn {
+		background: none;
+		border: none;
+		width: 24px;
+		height: 24px;
+		border-radius: 4px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		color: #6c757d;
+		font-size: 14px;
+		transition: all 0.2s ease;
+	}
+
+	.month-nav-btn:hover {
+		background: #f8f9fa;
+		color: #2c3e50;
+	}
+
+	.month-nav-btn:disabled {
+		color: #dee2e6;
+		cursor: not-allowed;
+	}
+
+	.month-nav-btn:disabled:hover {
+		background: none;
+	}
+
 	/* Slope Aspect Compass Container */
 	.slope-aspect-compass {
 		position: absolute;
@@ -2964,7 +3111,11 @@ function createMonthlyMarkers(observations) {
             const monthNum = parseInt(month);
             const monthObservations = observationsByMonth[monthNum];
             
-            if (monthObservations.length === 0) return;
+            if (monthObservations.length === 0) {
+                // Create empty layer for months with no observations
+                monthlyClusters[monthNum] = L.layerGroup();
+                return;
+            }
             
             // Create a layer group for this month
             const monthLayer = L.layerGroup();
@@ -2995,26 +3146,37 @@ function createMonthlyMarkers(observations) {
             // Store the layer
             monthlyClusters[monthNum] = monthLayer;
             
-            // Add to map
-            monthLayer.addTo(mymap);
-            
             console.log(`Month ${monthNum}: ${monthObservations.length} observations`);
         });
         
         // Update legend to show completion
         addMonthlyLegend(false);
         
-        // Fit map to show all markers if we have any
-        const bounds = L.latLngBounds();
+        // Check if we should start in single month mode
+        const params = new URLSearchParams(window.location.search);
+        const singleMonthMode = params.get('single_month_mode') === 'true';
+        const selectedMonth = parseInt(params.get('selected_month')) || 1;
         
-        Object.values(monthlyClusters).forEach(layer => {
-            if (layer.getBounds && layer.getBounds().isValid()) {
-                bounds.extend(layer.getBounds());
+        if (!singleMonthMode) {
+            // Show all months by default
+            Object.values(monthlyClusters).forEach(layer => {
+                if (layer && layer.getLayers().length > 0) {
+                    layer.addTo(mymap);
+                }
+            });
+            
+            // Fit map to show all markers if we have any
+            const bounds = L.latLngBounds();
+            
+            Object.values(monthlyClusters).forEach(layer => {
+                if (layer.getBounds && layer.getBounds().isValid()) {
+                    bounds.extend(layer.getBounds());
+                }
+            });
+            
+            if (bounds.isValid()) {
+                mymap.fitBounds(bounds.pad(0.1));
             }
-        });
-        
-        if (bounds.isValid()) {
-            mymap.fitBounds(bounds.pad(0.1));
         }
         
     }, 100);
@@ -3086,8 +3248,8 @@ function addMonthlyLegend(loading = true) {
             border-radius: 5px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             font-size: 12px;
-            max-width: 180px;
-            min-height: 120px;
+            max-width: 200px;
+            min-height: ${loading ? '120px' : '150px'};
         `;
         
         if (loading) {
@@ -3130,7 +3292,21 @@ function addMonthlyLegend(loading = true) {
                         `;
                     }).join('')}
                 </div>
-                <div style="margin-top: 8px; font-size: 9px; color: #666; border-top: 1px solid #eee; padding-top: 5px;">
+                <div class="month-slider-control">
+                    <div class="month-slider-toggle">
+                        <label>
+                            <input type="checkbox" id="month-slider-toggle" onchange="toggleMonthSlider()">
+                            <span>Month Slider</span>
+                        </label>
+                    </div>
+                    <div class="month-slider-container" id="month-slider-container">
+                        <input type="range" class="month-slider" id="month-slider" min="1" max="12" value="1">
+                        <div class="month-slider-display">
+                            <button class="month-nav-btn" id="prev-month-btn" onclick="navigateMonth(-1)" title="Previous month">←</button>
+                            <div class="current-month" id="current-month-display">January</div>
+                            <button class="month-nav-btn" id="next-month-btn" onclick="navigateMonth(1)" title="Next month">→</button>
+                        </div>
+                    </div>
                 </div>
             `;
         }
@@ -3140,6 +3316,358 @@ function addMonthlyLegend(loading = true) {
     
     legend.addTo(mymap);
     window.monthlyLegendControl = legend;
+    
+    // If not loading, initialize the month slider state and event handlers
+    if (!loading) {
+        // Check if we should restore slider state from URL
+        const params = new URLSearchParams(window.location.search);
+        const singleMonthMode = params.get('single_month_mode') === 'true';
+        const selectedMonth = parseInt(params.get('selected_month')) || 1;
+        
+        // Set up slider event handlers
+        setTimeout(() => {
+            setupSliderEventHandlers();
+            
+            if (singleMonthMode) {
+                // Enable slider and show selected month
+                const toggle = document.getElementById('month-slider-toggle');
+                if (toggle) {
+                    toggle.checked = true;
+                    toggleMonthSlider();
+                    
+                    // Set slider to selected month
+                    const slider = document.getElementById('month-slider');
+                    if (slider) {
+                        slider.value = selectedMonth;
+                        updateMonthDisplay(selectedMonth);
+                        showSingleMonth(selectedMonth, true);
+                    }
+                }
+            }
+        }, 100);
+    }
+}
+
+// Month Slider Variables
+let singleMonthMode = false;
+let currentSelectedMonth = null;
+let isSliderDragging = false;
+let sliderUpdateTimeout = null;
+
+// Function to toggle month slider
+function toggleMonthSlider() {
+    const toggle = document.getElementById('month-slider-toggle');
+    const sliderContainer = document.getElementById('month-slider-container');
+    const slider = document.getElementById('month-slider');
+    
+    singleMonthMode = toggle.checked;
+    
+    if (singleMonthMode) {
+        sliderContainer.classList.add('active');
+        
+        // RESET SLIDER TO JANUARY (value = 1)
+        if (slider) {
+            slider.value = 1;
+        }
+        
+        // Update display to show January
+        updateMonthDisplay(1);
+        
+        // Update URL to remember slider state
+        updateMonthSliderURL(true, 1);
+        
+        // Show first month by default (immediately)
+        showSingleMonth(1, true);
+    } else {
+        sliderContainer.classList.remove('active');
+        
+        // Update URL to remove slider state
+        updateMonthSliderURL(false, null);
+        
+        // Show all months
+        showAllMonths();
+    }
+}
+
+// Function to update month display
+function updateMonthDisplay(month) {
+    const monthNames = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    
+    const display = document.getElementById('current-month-display');
+    if (display) {
+        display.textContent = monthNames[month - 1];
+    }
+    
+    // Update navigation button states
+    updateMonthNavigationButtons(month);
+}
+
+// Function to show single month
+function showSingleMonth(month, immediate = false) {
+    if (!singleMonthMode) return;
+    
+    const monthNum = parseInt(month);
+    currentSelectedMonth = monthNum;
+    
+    // Clear any pending timeout
+    if (sliderUpdateTimeout) {
+        clearTimeout(sliderUpdateTimeout);
+    }
+    
+    // If immediate update is requested (from slider change event), update now
+    if (immediate) {
+        updateMonthLayers(monthNum);
+    } else {
+        // Debounce the update for smoother dragging
+        sliderUpdateTimeout = setTimeout(() => {
+            updateMonthLayers(monthNum);
+        }, 50); // 50ms debounce for smooth updates
+    }
+}
+
+// Function to actually update the month layers (separated for debouncing)
+function updateMonthLayers(monthNum) {
+    // Hide all month layers
+    Object.keys(monthlyClusters).forEach(monthKey => {
+        const monthLayer = monthlyClusters[monthKey];
+        if (monthLayer) {
+            if (parseInt(monthKey) === monthNum) {
+                // Show selected month
+                if (!mymap.hasLayer(monthLayer)) {
+                    monthLayer.addTo(mymap);
+                }
+            } else {
+                // Hide other months
+                if (mymap.hasLayer(monthLayer)) {
+                    mymap.removeLayer(monthLayer);
+                }
+            }
+        }
+    });
+    
+    // Update URL to remember selected month
+    updateMonthSliderURL(true, monthNum);
+    
+    // Update month display
+    updateMonthDisplay(monthNum);
+    
+    // Fit map to show markers of selected month if we have any
+    const selectedLayer = monthlyClusters[monthNum];
+    if (selectedLayer && selectedLayer.getBounds && selectedLayer.getBounds().isValid()) {
+        mymap.fitBounds(selectedLayer.getBounds().pad(0.1));
+    }
+}
+
+// Function to handle slider input (real-time updates while dragging)
+function handleSliderInput(value) {
+    if (!singleMonthMode) return;
+    
+    const monthNum = parseInt(value);
+    
+    // Update display immediately
+    updateMonthDisplay(monthNum);
+    
+    // Update layers with debouncing for smoother performance
+    showSingleMonth(monthNum, false); // false = use debouncing
+    
+    // Update URL parameter but don't push to history until change event
+    const params = new URLSearchParams(window.location.search);
+    params.set('selected_month', monthNum.toString());
+    
+    // Update URL without pushing to history (to avoid too many history entries)
+    const newUrl = window.location.pathname + '?' + params.toString();
+    window.history.replaceState({}, '', newUrl);
+}
+
+// Function to handle slider change (when user releases)
+function handleSliderChange(value) {
+    if (!singleMonthMode) return;
+    
+    const monthNum = parseInt(value);
+    
+    // Final update with immediate rendering
+    showSingleMonth(monthNum, true); // true = immediate update
+    
+    // Update URL with full state
+    updateMonthSliderURL(true, monthNum);
+}
+
+// Function to show all months
+function showAllMonths() {
+    currentSelectedMonth = null;
+    isSliderDragging = false;
+    
+    // Clear any pending timeout
+    if (sliderUpdateTimeout) {
+        clearTimeout(sliderUpdateTimeout);
+        sliderUpdateTimeout = null;
+    }
+    
+    // Show all month layers
+    Object.keys(monthlyClusters).forEach(monthKey => {
+        const monthLayer = monthlyClusters[monthKey];
+        if (monthLayer && !mymap.hasLayer(monthLayer)) {
+            monthLayer.addTo(mymap);
+        }
+    });
+    
+    // Update URL to remove slider state
+    updateMonthSliderURL(false, null);
+    
+    // Uncheck the toggle
+    const toggle = document.getElementById('month-slider-toggle');
+    if (toggle) {
+        toggle.checked = false;
+    }
+    
+    // Hide slider container and remove no-map-drag class
+    const sliderContainer = document.getElementById('month-slider-container');
+    if (sliderContainer) {
+        sliderContainer.classList.remove('active');
+        sliderContainer.classList.remove('no-map-drag');
+    }
+    
+    singleMonthMode = false;
+    
+    // Fit map to show all markers
+    const bounds = L.latLngBounds();
+    Object.values(monthlyClusters).forEach(layer => {
+        if (layer.getBounds && layer.getBounds().isValid()) {
+            bounds.extend(layer.getBounds());
+        }
+    });
+    
+    if (bounds.isValid()) {
+        mymap.fitBounds(bounds.pad(0.1));
+    }
+}
+
+// Function to navigate between months
+function navigateMonth(direction) {
+    if (!singleMonthMode) return;
+    
+    const slider = document.getElementById('month-slider');
+    if (!slider) return;
+    
+    let currentMonth = parseInt(slider.value);
+    let newMonth = currentMonth + direction;
+    
+    // Clamp to valid range (1-12)
+    if (newMonth < 1) newMonth = 12;
+    if (newMonth > 12) newMonth = 1;
+    
+    // Update slider and display
+    slider.value = newMonth;
+    updateMonthDisplay(newMonth);
+    showSingleMonth(newMonth, true);
+}
+
+// Function to update month navigation buttons
+function updateMonthNavigationButtons(month) {
+    const prevBtn = document.getElementById('prev-month-btn');
+    const nextBtn = document.getElementById('next-month-btn');
+    
+    if (prevBtn && nextBtn) {
+        // Always enable both buttons for circular navigation
+        prevBtn.disabled = false;
+        nextBtn.disabled = false;
+    }
+}
+
+// Function to update URL with slider state
+function updateMonthSliderURL(enabled, month) {
+    const params = new URLSearchParams(window.location.search);
+    
+    if (enabled && month) {
+        params.set('single_month_mode', 'true');
+        params.set('selected_month', month.toString());
+    } else {
+        params.delete('single_month_mode');
+        params.delete('selected_month');
+    }
+    
+    // Update URL without reloading page
+    const newUrl = window.location.pathname + '?' + params.toString();
+    window.history.replaceState({}, '', newUrl);
+}
+
+// Function to handle slider events to prevent map dragging
+function setupSliderEventHandlers() {
+    const slider = document.getElementById('month-slider');
+    const sliderContainer = document.getElementById('month-slider-container');
+    
+    if (!slider || !sliderContainer) return;
+    
+    // Prevent map dragging when interacting with slider
+    slider.addEventListener('mousedown', function(e) {
+        isSliderDragging = true;
+        e.stopPropagation(); // Prevent event from bubbling to map
+        sliderContainer.classList.add('no-map-drag');
+        
+        // Temporarily disable map dragging
+        if (mymap && mymap.dragging) {
+            mymap.dragging.disable();
+        }
+    });
+    
+    slider.addEventListener('touchstart', function(e) {
+        isSliderDragging = true;
+        e.stopPropagation(); // Prevent event from bubbling to map
+        sliderContainer.classList.add('no-map-drag');
+        
+        // Temporarily disable map dragging
+        if (mymap && mymap.dragging) {
+            mymap.dragging.disable();
+        }
+    }, { passive: false });
+    
+    // Re-enable map dragging when slider interaction ends
+    const enableMapDragging = function(e) {
+        if (isSliderDragging) {
+            isSliderDragging = false;
+            sliderContainer.classList.remove('no-map-drag');
+            
+            // Re-enable map dragging
+            if (mymap && mymap.dragging) {
+                mymap.dragging.enable();
+            }
+            
+            // Trigger final update
+            handleSliderChange(slider.value);
+        }
+    };
+    
+    slider.addEventListener('mouseup', enableMapDragging);
+    slider.addEventListener('touchend', enableMapDragging);
+    slider.addEventListener('touchcancel', enableMapDragging);
+    
+    // Also handle mouse leaving the slider
+    slider.addEventListener('mouseleave', function(e) {
+        if (isSliderDragging) {
+            enableMapDragging(e);
+        }
+    });
+    
+    // Handle input events for real-time updates
+    slider.addEventListener('input', function(e) {
+        e.stopPropagation();
+        handleSliderInput(this.value);
+    });
+    
+    // Handle change events for final update
+    slider.addEventListener('change', function(e) {
+        e.stopPropagation();
+        handleSliderChange(this.value);
+    });
+    
+    // Prevent wheel events on slider (would zoom map)
+    slider.addEventListener('wheel', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+    }, { passive: false });
 }
 
 // Function to update loading progress in legend
@@ -3305,6 +3833,11 @@ function applyAllFilters() {
     // Preserve view if it was previously set
     if (currentView && !filters.has('view')) {
         params.set('view', currentView);
+    }
+
+    // Add histogram state if enabled
+    if (histogramSearchEnabled) {
+        params.set('histogram_enabled', 'true');
     }
     
     // Add date filters if set
