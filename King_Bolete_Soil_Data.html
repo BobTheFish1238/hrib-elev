@@ -264,24 +264,30 @@
         }
         
         /* NDJSON Directory Styles */
-        .ndjson-directory {
-            background-color: #fff;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            height: fit-content;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
+		.ndjson-directory {
+			background-color: #fff;
+			border-radius: 10px;
+			padding: 20px;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+			height: 100%;
+			max-height: 325px;
+			overflow-y: auto;
+			display: flex;
+			flex-direction: column;
+		}
         
-        .directory-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #8B4513;
-        }
+		.directory-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 20px;
+			padding-bottom: 15px;
+			border-bottom: 2px solid #8B4513;
+			position: sticky;
+			top: 0;
+			background-color: #fff;
+			z-index: 10;
+		}
         
         .directory-title {
             color: #8B4513;
@@ -289,25 +295,19 @@
             font-weight: 600;
         }
         
-        .toggle-btn {
-            background: none;
-            border: none;
-            color: #8B4513;
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 5px;
-        }
-        
-        .directory-content {
-            max-height: 1000px;
-            overflow-y: auto;
-            transition: max-height 0.3s ease;
-        }
-        
-        .directory-content.collapsed {
-            max-height: 0;
-            overflow: hidden;
-        }
+		.directory-content {
+			flex-grow: 1;
+			overflow-y: auto;
+		}
+
+		.toggle-btn {
+			background: none;
+			border: none;
+			color: #8B4513;
+			font-size: 1.2rem;
+			cursor: pointer;
+			padding: 5px;
+		}
         
         .folder {
             margin-bottom: 15px;
@@ -408,8 +408,10 @@
 			background-color: #fff;
 			border-radius: 10px;
 			padding: 20px;
-			margin-bottom: 25px;
 			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+			height: 100%;
+			display: flex;
+			flex-direction: column;
 		}
         
         .settings-title {
@@ -419,21 +421,40 @@
         }
         
         .setting-group {
-            margin-bottom: 20px;
+            flex-grow: 1;
         }
         
-        .setting-row {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-        
-        .setting-label {
-            min-width: 150px;
-            font-weight: 600;
-            color: #555;
-        }
+		.setting-row {
+			display: flex;
+			align-items: center;
+			gap: 15px;
+			margin-bottom: 15px;
+		}
+
+		.setting-label {
+			min-width: 150px;
+			font-weight: 600;
+			color: #555;
+			flex-shrink: 0;
+		}
+
+		#apply-settings {
+			margin-top: auto;
+		}
+
+		/* Side-by-side container */
+		.side-by-side-container {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 25px;
+			margin-bottom: 25px;
+		}
+
+		@media (max-width: 1200px) {
+			.side-by-side-container {
+				grid-template-columns: 1fr;
+			}
+		}
         
         /* New styles for map controls */
         .map-controls {
@@ -672,65 +693,65 @@
     </header>
     
     <div class="description">
-        <p>This interactive dashboard explores environmental factors associated with King Bolete (Boletus edulis) observations in Washington State. The scatter plots below show relationships between elevation, soil temperature, soil moisture, and time of year. Click on any point to view detailed information about that observation.</p>
+        <p>This interactive dashboard explores environmental factors associated with King Bolete observations in Washington State using only open (non-obscured) observation data. The scatter plots below show relationships between elevation, soil temperature, soil moisture, and time of year. Click on any point to view detailed information about that observation.</p>
     </div>
     
-    <div class="main-container">    
-        <!-- Main content area -->
+	<div class="main-container">    
+		<!-- Main content area -->
 		<div>
-			<!-- NDJSON Data Files container -->
-			<div class="ndjson-directory" style="margin-bottom: 25px;">
-				<div class="directory-header">
-					<div class="directory-title">NDJSON Data Files</div>
-					<button class="toggle-btn" id="toggle-directory">
-						<i class="fas fa-chevron-up"></i>
-					</button>
-				</div>
-				<div class="directory-content" id="directory-content">
-					<!-- Directory content will be populated by JavaScript -->
-					<div class="loading" id="directory-loading">Loading NDJSON directory...</div>
-					<div id="ndjson-folder-structure"></div>
-				</div>
-			</div>
-			
-			<!-- Data Settings container - SEPARATE from NDJSON directory -->
-			<div class="settings-section" style="margin-bottom: 25px;">
-				<h3 class="settings-title">Data Settings</h3>
-				
-				<div class="setting-group">
-					<div class="setting-row">
-						<div class="setting-label">Average Days:</div>
-						<select id="average-days">
-							<option value="1">1 day</option>
-							<option value="3">3 days</option>
-							<option value="7" selected>7 days</option>
-							<option value="10">10 days</option>
-							<option value="14">14 days</option>
-						</select>
+			<!-- Side-by-side containers -->
+			<div class="side-by-side-container">
+				<!-- NDJSON Data Files container -->
+				<div class="ndjson-directory">
+					<div class="directory-header">
+						<div class="directory-title">Data Files</div>
 					</div>
-					
-					<div class="setting-row">
-						<div class="setting-label">Soil Temp Depth:</div>
-						<select id="temp-depth">
-							<option value="0_to_7cm">0-7 cm</option>
-							<option value="7_to_28cm" selected>7-28 cm</option>
-							<option value="28_to_100cm">28-100 cm</option>
-							<option value="0_to_100cm">0-100 cm</option>
-						</select>
-					</div>
-					
-					<div class="setting-row">
-						<div class="setting-label">Soil Moisture Depth:</div>
-						<select id="moisture-depth">
-							<option value="0_to_7cm">0-7 cm</option>
-							<option value="7_to_28cm" selected>7-28 cm</option>
-							<option value="28_to_100cm">28-100 cm</option>
-							<option value="0_to_100cm">0-100 cm</option>
-						</select>
+					<div class="directory-content" id="directory-content">
+						<!-- Directory content will be populated by JavaScript -->
+						<div class="loading" id="directory-loading">Loading NDJSON directory...</div>
+						<div id="ndjson-folder-structure"></div>
 					</div>
 				</div>
 				
-				<button id="apply-settings" style="width: 100%;">Apply Settings</button>
+				<!-- Data Settings container - SEPARATE from NDJSON directory -->
+				<div class="settings-section">
+					<h3 class="settings-title">Data Settings</h3>
+					
+					<div class="setting-group">
+						<div class="setting-row">
+							<div class="setting-label">Average Days:</div>
+							<select id="average-days">
+								<option value="1">1 day</option>
+								<option value="3">3 days</option>
+								<option value="7" selected>7 days</option>
+								<option value="10">10 days</option>
+								<option value="14">14 days</option>
+							</select>
+						</div>
+						
+						<div class="setting-row">
+							<div class="setting-label">Soil Temp Depth:</div>
+							<select id="temp-depth">
+								<option value="0_to_7cm">0-7 cm</option>
+								<option value="7_to_28cm" selected>7-28 cm</option>
+								<option value="28_to_100cm">28-100 cm</option>
+								<option value="0_to_100cm">0-100 cm</option>
+							</select>
+						</div>
+						
+						<div class="setting-row">
+							<div class="setting-label">Soil Moisture Depth:</div>
+							<select id="moisture-depth">
+								<option value="0_to_7cm">0-7 cm</option>
+								<option value="7_to_28cm" selected>7-28 cm</option>
+								<option value="28_to_100cm">28-100 cm</option>
+								<option value="0_to_100cm">0-100 cm</option>
+							</select>
+						</div>
+					</div>
+					
+					<button id="apply-settings" style="width: 100%;">Apply Settings</button>
+				</div>
 			</div>
 			
 			<div class="input-section">
@@ -833,12 +854,12 @@
                 <div class="info-content" id="info-content">
                     <!-- Details will be populated here when a point is clicked -->
                 </div>
-                <div class="soil-temp-chart-container" style="margin-top: 20px; display: none;" id="soil-temp-chart-container">
-                    <h4 style="color: #8B4513; margin-bottom: 15px;">Soil Temperature Trend</h4>
-                    <div class="chart-wrapper" style="height: 200px;">
-                        <canvas id="soil-temp-chart"></canvas>
-                    </div>
-                </div>
+				<div class="soil-temp-chart-container" style="margin-top: 20px; display: none;" id="soil-temp-chart-container">
+					<h4 style="color: #8B4513; margin-bottom: 15px;">Soil Temperature & Moisture Trend</h4>
+					<div class="chart-wrapper" style="height: 200px;">
+						<canvas id="soil-temp-chart"></canvas>
+					</div>
+				</div>
             </div>
         </div>
     </div>
@@ -871,6 +892,19 @@
         let averageDays = 7;
         let tempDepth = '7_to_28cm';
         let moistureDepth = '7_to_28cm';
+
+		// Debouncer function
+		function debounce(func, wait) {
+			let timeout;
+			return function executedFunction(...args) {
+				const later = () => {
+					clearTimeout(timeout);
+					func(...args);
+				};
+				clearTimeout(timeout);
+				timeout = setTimeout(later, wait);
+			};
+		}
         
         // Color scales
         const elevationColorScale = d3.scaleLinear()
@@ -928,83 +962,90 @@
         ];
         
         // Initialize NDJSON directory
-        function initNdjsonDirectory() {
-            const directoryContent = document.getElementById('ndjson-folder-structure');
-            directoryContent.innerHTML = '';
-            
-            let colorIndex = 0;
-            
-            Object.keys(ndjsonStructure).forEach(folderName => {
-                const folderDiv = document.createElement('div');
-                folderDiv.className = 'folder';
-                
-                const folderHeader = document.createElement('div');
-                folderHeader.className = 'folder-header';
-                folderHeader.innerHTML = `
-                    <div class="folder-name">
-                        <i class="fas fa-folder"></i>
-                        ${folderName}
-                    </div>
-                    <button class="toggle-btn folder-toggle">
-                        <i class="fas fa-chevron-up"></i>
-                    </button>
-                `;
-                
-                const folderContent = document.createElement('div');
-                folderContent.className = 'folder-content';
-                
-                ndjsonStructure[folderName].forEach(fileName => {
-                    const filePath = `ndjson/${folderName}/${fileName}`;
-                    const fileId = filePath.replace(/\//g, '_').replace(/\./g, '_');
-                    
-                    // Generate a color for this file
-                    const fileColor = defaultColors[colorIndex % defaultColors.length];
-                    colorIndex++;
-                    
-                    // Store initial state
-                    activeDatasets[fileId] = {
-                        active: false,
-                        color: fileColor,
-                        filePath: filePath,
-                        fileName: fileName,
-                        folderName: folderName,
-                        data: []
-                    };
-                    
-                    const fileDiv = document.createElement('div');
-                    fileDiv.className = 'ndjson-file';
-                    fileDiv.dataset.fileId = fileId;
-                    
-                    fileDiv.innerHTML = `
-                        <div class="file-toggle" data-file-id="${fileId}">
-                            <i class="fas fa-check" style="font-size: 10px; display: none;"></i>
-                        </div>
-                        <div class="file-name" title="${fileName}">${fileName}</div>
-                        <div class="file-count">0</div>
+		function initNdjsonDirectory() {
+			const directoryContent = document.getElementById('ndjson-folder-structure');
+			directoryContent.innerHTML = '';
+			
+			let colorIndex = 0;
+			
+			Object.keys(ndjsonStructure).forEach(folderName => {
+				const folderDiv = document.createElement('div');
+				folderDiv.className = 'folder';
+				
+				const folderHeader = document.createElement('div');
+				folderHeader.className = 'folder-header';
+				folderHeader.innerHTML = `
+					<div class="folder-name">
+						<i class="fas fa-folder"></i>
+						${folderName}
+					</div>
+					<button class="toggle-btn folder-toggle">
+						<i class="fas fa-chevron-down"></i> <!-- Changed to down for collapsed -->
+					</button>
+				`;
+				
+				const folderContent = document.createElement('div');
+				folderContent.className = 'folder-content collapsed'; // Added 'collapsed' class by default
+				
+				ndjsonStructure[folderName].forEach(fileName => {
+					const filePath = `ndjson/${folderName}/${fileName}`;
+					const fileId = filePath.replace(/\//g, '_').replace(/\./g, '_');
+					
+					// Generate a color for this file
+					const fileColor = defaultColors[colorIndex % defaultColors.length];
+					colorIndex++;
+					
+					// Check if this is Washington_Boletus_edulis.ndjson to enable by default
+					const isWashingtonEdulis = fileName === 'Washington_Boletus_edulis.ndjson';
+					
+					// Store initial state - enable Washington_Boletus_edulis.ndjson by default
+					activeDatasets[fileId] = {
+						active: isWashingtonEdulis, // Enable only Washington_Boletus_edulis.ndjson
+						color: fileColor,
+						filePath: filePath,
+						fileName: fileName,
+						folderName: folderName,
+						data: []
+					};
+					
+					const fileDiv = document.createElement('div');
+					fileDiv.className = 'ndjson-file';
+					fileDiv.dataset.fileId = fileId;
+					
+					// Set up toggle with checkmark if active by default
+					const toggleActiveClass = isWashingtonEdulis ? 'active' : '';
+					const checkmarkDisplay = isWashingtonEdulis ? 'block' : 'none';
+					
+					fileDiv.innerHTML = `
+						<div class="file-toggle ${toggleActiveClass}" data-file-id="${fileId}">
+							<i class="fas fa-check" style="font-size: 10px; display: ${checkmarkDisplay};"></i>
+						</div>
+						<div class="file-name" title="${fileName}">${fileName}</div>
+						<div class="file-count">0</div>
 						<div style="display: flex; align-items: center; gap: 5px;">
 							<input type="color" class="color-picker" value="${fileColor.substring(0, 7)}" data-file-id="${fileId}" style="width: 24px; height: 24px;">
 							<input type="range" class="alpha-slider" min="0" max="100" value="100" data-file-id="${fileId}" style="width: 60px;">
 							<span class="alpha-percent" data-file-id="${fileId}" style="font-size: 11px; min-width: 25px;">100%</span>
 						</div>
-                    `;
-                    
-                    folderContent.appendChild(fileDiv);
-                });
-                
-                folderDiv.appendChild(folderHeader);
-                folderDiv.appendChild(folderContent);
-                directoryContent.appendChild(folderDiv);
-                
-                // Add toggle event for folder
-                folderHeader.querySelector('.folder-toggle').addEventListener('click', function() {
-                    const icon = this.querySelector('i');
-                    folderContent.classList.toggle('collapsed');
-                    icon.classList.toggle('fa-chevron-up');
-                    icon.classList.toggle('fa-chevron-down');
-                });
-            });
-            
-            // Add event listeners for file toggles and color pickers
+					`;
+					
+					folderContent.appendChild(fileDiv);
+				});
+				
+				folderDiv.appendChild(folderHeader);
+				folderDiv.appendChild(folderContent);
+				directoryContent.appendChild(folderDiv);
+				
+				// Add toggle event for folder
+				folderHeader.querySelector('.folder-toggle').addEventListener('click', function() {
+					const icon = this.querySelector('i');
+					folderContent.classList.toggle('collapsed');
+					icon.classList.toggle('fa-chevron-up');
+					icon.classList.toggle('fa-chevron-down');
+				});
+			});
+			
+			// Add event listeners for file toggles and color pickers
 			document.querySelectorAll('.file-toggle').forEach(toggle => {
 				toggle.addEventListener('click', function() {
 					const fileId = this.dataset.fileId;
@@ -1019,37 +1060,43 @@
 						loadNdjsonFile(fileId, fileData.filePath);
 					} else {
 						// Just toggle visibility - visual update only
-						updateDataDisplay(true); // true = visual update only
+						updateDataDisplay(false); // Changed to false to reprocess data
 					}
 				});
 			});
-            
+			
+			const debouncedUpdate = debounce((fileId) => {
+				const colorPicker = document.querySelector(`.color-picker[data-file-id="${fileId}"]`);
+				const alphaSlider = document.querySelector(`.alpha-slider[data-file-id="${fileId}"]`);
+				const alphaPercent = document.querySelector(`.alpha-percent[data-file-id="${fileId}"]`);
+				
+				if (!colorPicker || !alphaSlider) return;
+				
+				const rgb = colorPicker.value;
+				const alpha = parseInt(alphaSlider.value);
+				const alphaHex = alpha === 100 ? '' : Math.round(alpha * 2.55).toString(16).padStart(2, '0');
+				
+				// Update only the color in activeDatasets
+				activeDatasets[fileId].color = rgb + alphaHex;
+				
+				if (alphaPercent) {
+					alphaPercent.textContent = alpha + '%';
+				}
+				
+				// Only update visual elements, not reprocess data
+				updateDataDisplay(true); // true = visual update only
+			}, 150); // 150ms debounce delay
+
 			document.querySelectorAll('.color-picker, .alpha-slider').forEach(input => {
 				input.addEventListener('input', function() {
 					const fileId = this.dataset.fileId;
-					const colorPicker = document.querySelector(`.color-picker[data-file-id="${fileId}"]`);
-					const alphaSlider = document.querySelector(`.alpha-slider[data-file-id="${fileId}"]`);
-					const alphaPercent = document.querySelector(`.alpha-percent[data-file-id="${fileId}"]`);
-					
-					const rgb = colorPicker.value;
-					const alpha = parseInt(alphaSlider.value);
-					const alphaHex = alpha === 100 ? '' : Math.round(alpha * 2.55).toString(16).padStart(2, '0');
-					
-					// Update only the color in activeDatasets
-					activeDatasets[fileId].color = rgb + alphaHex;
-					
-					if (alphaPercent) {
-						alphaPercent.textContent = alpha + '%';
-					}
-					
-					// Only update visual elements, not reprocess data
-					updateDataDisplay(true); // true = visual update only
+					debouncedUpdate(fileId);
 				});
 			});
-            
-            // Hide loading message
-            document.getElementById('directory-loading').style.display = 'none';
-        }
+			
+			// Hide loading message
+			document.getElementById('directory-loading').style.display = 'none';
+		}
         
         // Load NDJSON file
         async function loadNdjsonFile(fileId, filePath) {
@@ -1170,7 +1217,7 @@
         
         // Initialize map
         function initMap() {
-            map = L.map('map').setView([46.744487, -121.812952], 7);
+            map = L.map('map').setView([46.744487, -121.812952], 6);
             
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -1663,6 +1710,13 @@
             const commonOptions = {
                 responsive: true,
                 maintainAspectRatio: false,
+				elements: {
+					point: {
+						radius: 3,
+						hoverRadius: 5,
+						hitRadius: 10
+					}
+				},
                 onClick: (evt, elements) => {
                     if (elements.length > 0) {
                         const index = elements[0].index;
@@ -1823,7 +1877,11 @@
                                     }
                                     return '';
                                 },
-                                stepSize: 1
+                                stepSize: 1,
+								autoSkip: false,
+								maxRotation: 45,
+								minRotation: 0,
+								padding: 5
                             },
                             grid: {
                                 color: 'rgba(0, 0, 0, 0.05)'
@@ -1877,7 +1935,11 @@
                                     }
                                     return '';
                                 },
-                                stepSize: 1
+                                stepSize: 1,
+								autoSkip: false,
+								maxRotation: 45,
+								minRotation: 0,
+								padding: 5
                             },
                             grid: {
                                 color: 'rgba(0, 0, 0, 0.05)'
@@ -1929,7 +1991,11 @@
                                     }
                                     return '';
                                 },
-                                stepSize: 1
+                                stepSize: 1,
+								autoSkip: false,
+								maxRotation: 45,
+								minRotation: 0,
+								padding: 5
                             },
                             grid: {
                                 color: 'rgba(0, 0, 0, 0.05)'
@@ -2100,10 +2166,10 @@
 					data: userData,
 					backgroundColor: '#FF6B6B',
 					borderColor: '#FF3838',
-					borderWidth: 3,
-					pointRadius: 8,
+					borderWidth: 2,
+					pointRadius: 5,
 					pointHoverRadius: 10,
-					z: 9999,
+					order: 0,
 					datasetId: 'user_data'
 				});
 			}
@@ -2131,10 +2197,14 @@
 					
 					return {
 						...dataset,
-						data: filteredData
+						data: filteredData,
+						// Ensure user data has larger points and renders on top
+						pointRadius: dataset.datasetId === 'user_data' ? 5 : 3,
+						pointHoverRadius: dataset.datasetId === 'user_data' ? 10 : 5,
+						order: dataset.datasetId === 'user_data' ? 0 : 1
 					};
 				});
-				config.chart.update('none'); // Use 'none' for faster updates
+				config.chart.update('none');
 			});
 		}
         
@@ -2170,160 +2240,326 @@
         }
         
         // Show point information in the info panel
-        async function showPointInfo(point) {
-            const infoPanel = document.getElementById('info-panel');
-            const infoContent = document.getElementById('info-content');
-            const soilTempChartContainer = document.getElementById('soil-temp-chart-container');
-            
-            soilTempChartContainer.style.display = 'none';
-            
-            const observationLink = point.observationUrl || '#';
-            const apiUrl = point.rawData ? point.rawData.open_meteo_api_url : point.openMeteoApiUrl || '#';
-            const docsUrl = point.rawData ? point.rawData.open_meteo_docs_url : point.openMeteoDocsUrl || '#';
-            
-            infoContent.innerHTML = `
-                <div class="info-item">
-                    <span class="info-label">Dataset:</span> ${point.datasetName || 'User Data'}
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Date:</span> ${point.date || 'N/A'}
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Coordinates:</span> ${point.coordinates}
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Elevation:</span> ${point.elevationFt} ft
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Avg Soil Temp (${averageDays} days):</span> ${point.soilTemp ? point.soilTemp.toFixed(1) : 'N/A'} °F (${tempDepth})
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Avg Soil Moisture (${averageDays} days):</span> ${point.soilMoisture ? point.soilMoisture.toFixed(3) : 'N/A'} (${moistureDepth})
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Observation Link:</span> 
-                    <a href="${observationLink}" target="_blank" class="link">${observationLink}</a>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Open-Meteo Docs:</span> 
-                    <a href="${docsUrl}" target="_blank" class="link">${docsUrl}</a>
-                </div>
-            `;
-            
-            infoPanel.classList.add('active');
-            
-            // Fetch and display the soil temperature chart if API URL is available
-            if (apiUrl && apiUrl !== '#') {
-                try {
-                    const response = await fetch(apiUrl);
-                    if (response.ok) {
-                        const data = await response.json();
-                        displaySoilTempChart(data);
-                        soilTempChartContainer.style.display = 'block';
-                    }
-                } catch (error) {
-                    console.error('Error fetching soil temperature data:', error);
-                }
-            }
-            
-            infoPanel.scrollIntoView({ behavior: 'smooth' });
-        }
+		async function showPointInfo(point) {
+			const infoPanel = document.getElementById('info-panel');
+			const infoContent = document.getElementById('info-content');
+			const soilTempChartContainer = document.getElementById('soil-temp-chart-container');
+			
+			const observationLink = point.observationUrl || '#';
+			const apiUrl = point.rawData ? point.rawData.open_meteo_api_url : point.openMeteoApiUrl || '#';
+			const docsUrl = point.rawData ? point.rawData.open_meteo_docs_url : point.openMeteoDocsUrl || '#';
+			
+			infoContent.innerHTML = `
+				<div class="info-item">
+					<span class="info-label">Dataset:</span> ${point.datasetName || 'User Data'}
+				</div>
+				<div class="info-item">
+					<span class="info-label">Date:</span> ${point.date || 'N/A'}
+				</div>
+				<div class="info-item">
+					<span class="info-label">Coordinates:</span> ${point.coordinates}
+				</div>
+				<div class="info-item">
+					<span class="info-label">Elevation:</span> ${point.elevationFt} ft
+				</div>
+				<div class="info-item">
+					<span class="info-label">Avg Soil Temp (${averageDays} days):</span> ${point.soilTemp ? point.soilTemp.toFixed(1) : 'N/A'} °F (${tempDepth})
+				</div>
+				<div class="info-item">
+					<span class="info-label">Avg Soil Moisture (${averageDays} days):</span> ${point.soilMoisture ? point.soilMoisture.toFixed(3) : 'N/A'} (${moistureDepth})
+				</div>
+				<div class="info-item">
+					<span class="info-label">Observation Link:</span> 
+					<a href="${observationLink}" target="_blank" class="link">${observationLink}</a>
+				</div>
+				<div class="info-item">
+					<span class="info-label">Open-Meteo Docs:</span> 
+					<a href="${docsUrl}" target="_blank" class="link">${docsUrl}</a>
+				</div>
+			`;
+			
+			infoPanel.classList.add('active');
+			
+			// Display soil temperature and moisture chart from NDJSON data if available
+			if (point.rawData && point.rawData.dates && point.rawData.soil_temperature && point.rawData.soil_moisture) {
+				displaySoilTempMoistureChart(point.rawData, point);
+			} else if (apiUrl && apiUrl !== '#') {
+				// Fall back to API for user-added points
+				try {
+					const response = await fetch(apiUrl);
+					if (response.ok) {
+						const data = await response.json();
+						displaySoilTempMoistureChart(data, point);
+					}
+				} catch (error) {
+					console.error('Error fetching soil temperature data:', error);
+				}
+			}
+			
+			infoPanel.scrollIntoView({ behavior: 'smooth' });
+		}
         
-        // Create the soil temperature chart
-        function displaySoilTempChart(apiData) {
-            const ctx = document.getElementById('soil-temp-chart').getContext('2d');
-            
-            if (window.soilTempChart) {
-                window.soilTempChart.destroy();
-            }
-            
-            const dates = apiData.daily.time;
-            let temps;
-            
-            // Get temperature data for the selected depth
-            switch(tempDepth) {
-                case '0_to_7cm':
-                    temps = apiData.daily.soil_temperature_0_to_7cm_mean;
-                    break;
-                case '7_to_28cm':
-                    temps = apiData.daily.soil_temperature_7_to_28cm_mean;
-                    break;
-                case '28_to_100cm':
-                    temps = apiData.daily.soil_temperature_28_to_100cm_mean;
-                    break;
-                case '0_to_100cm':
-                    temps = apiData.daily.soil_temperature_0_to_100cm_mean;
-                    break;
-                default:
-                    temps = apiData.daily.soil_temperature_7_to_28cm_mean;
-            }
-            
-            const formattedDates = dates.map(date => {
-                const d = new Date(date);
-                return `${d.getMonth() + 1}/${d.getDate()}`;
-            });
-            
-            const avgTemp = temps.reduce((sum, temp) => sum + temp, 0) / temps.length;
-            
-            window.soilTempChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: formattedDates,
-                    datasets: [
-                        {
-                            label: `Soil Temperature (${tempDepth}) °F`,
-                            data: temps,
-                            borderColor: '#8B4513',
-                            backgroundColor: 'rgba(139, 69, 19, 0.1)',
-                            borderWidth: 2,
-                            fill: true,
-                            tension: 0.3
-                        },
-                        {
-                            label: 'Average',
-                            data: temps.map(() => avgTemp),
-                            borderColor: '#FF6B6B',
-                            borderWidth: 1,
-                            borderDash: [5, 5],
-                            fill: false,
-                            pointRadius: 0
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top'
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `Temp: ${context.parsed.y.toFixed(1)}°F`;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Date'
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Temperature (°F)'
-                            },
-                            beginAtZero: false
-                        }
-                    }
-                }
-            });
-        }
+        // Create the soil temperature and moisture chart from NDJSON data
+		function displaySoilTempMoistureChart(data, point) {
+			const ctx = document.getElementById('soil-temp-chart').getContext('2d');
+			const soilTempChartContainer = document.getElementById('soil-temp-chart-container');
+			
+			// Update the chart title to show the current average days
+			const chartTitle = soilTempChartContainer.querySelector('h4');
+			if (chartTitle) {
+				chartTitle.textContent = `Soil Temperature & Moisture Trend (Last ${averageDays} Days)`;
+			}
+			
+			if (window.soilTempChart) {
+				window.soilTempChart.destroy();
+			}
+			
+			let dates, temps, moistures;
+			
+			// Check if this is NDJSON data (has dates array) or API data (has daily.time)
+			if (data.dates && data.soil_temperature && data.soil_moisture) {
+				// NDJSON data structure
+				dates = data.dates;
+				
+				// Get temperature data for the selected depth
+				switch(tempDepth) {
+					case '0_to_7cm':
+						temps = data.soil_temperature['0_to_7cm'];
+						break;
+					case '7_to_28cm':
+						temps = data.soil_temperature['7_to_28cm'];
+						break;
+					case '28_to_100cm':
+						temps = data.soil_temperature['28_to_100cm'];
+						break;
+					case '0_to_100cm':
+						temps = data.soil_temperature['0_to_100cm'];
+						break;
+					default:
+						temps = data.soil_temperature['7_to_28cm'];
+				}
+				
+				// Get moisture data for the selected depth
+				switch(moistureDepth) {
+					case '0_to_7cm':
+						moistures = data.soil_moisture['0_to_7cm'];
+						break;
+					case '7_to_28cm':
+						moistures = data.soil_moisture['7_to_28cm'];
+						break;
+					case '28_to_100cm':
+						moistures = data.soil_moisture['28_to_100cm'];
+						break;
+					case '0_to_100cm':
+						moistures = data.soil_moisture['0_to_100cm'];
+						break;
+					default:
+						moistures = data.soil_moisture['7_to_28cm'];
+				}
+				
+			} else if (data.daily) {
+				// API data structure
+				dates = data.daily.time;
+				
+				// Get temperature data for the selected depth
+				switch(tempDepth) {
+					case '0_to_7cm':
+						temps = data.daily.soil_temperature_0_to_7cm_mean;
+						break;
+					case '7_to_28cm':
+						temps = data.daily.soil_temperature_7_to_28cm_mean;
+						break;
+					case '28_to_100cm':
+						temps = data.daily.soil_temperature_28_to_100cm_mean;
+						break;
+					case '0_to_100cm':
+						temps = data.daily.soil_temperature_0_to_100cm_mean;
+						break;
+					default:
+						temps = data.daily.soil_temperature_7_to_28cm_mean;
+				}
+				
+				// Get moisture data for the selected depth
+				switch(moistureDepth) {
+					case '0_to_7cm':
+						moistures = data.daily.soil_moisture_0_to_7cm_mean;
+						break;
+					case '7_to_28cm':
+						moistures = data.daily.soil_moisture_7_to_28cm_mean;
+						break;
+					case '28_to_100cm':
+						moistures = data.daily.soil_moisture_28_to_100cm_mean;
+						break;
+					case '0_to_100cm':
+						moistures = data.daily.soil_moisture_0_to_100cm_mean;
+						break;
+					default:
+						moistures = data.daily.soil_moisture_7_to_28cm_mean;
+				}
+			} else {
+				console.error('Unknown data structure:', data);
+				return;
+			}
+			
+			// LIMIT DATA TO ONLY THE LAST averageDays
+			const daysToShow = Math.min(averageDays, dates.length);
+			const startIdx = dates.length - daysToShow;
+			
+			// Slice the arrays to only show the specified number of days
+			dates = dates.slice(startIdx);
+			temps = temps.slice(startIdx);
+			moistures = moistures.slice(startIdx);
+			
+			// Format dates
+			const formattedDates = dates.map(dateStr => {
+				const d = new Date(dateStr);
+				return `${d.getMonth() + 1}/${d.getDate()}`;
+			});
+			
+			// Calculate averages based on the sliced data
+			const avgTemp = temps.reduce((sum, temp) => sum + temp, 0) / temps.length;
+			const avgMoisture = moistures.reduce((sum, moisture) => sum + moisture, 0) / moistures.length;
+			
+			// Make sure container is visible before creating chart
+			soilTempChartContainer.style.display = 'block';
+			
+			// Create chart with two Y-axes
+			window.soilTempChart = new Chart(ctx, {
+				type: 'line',
+				data: {
+					labels: formattedDates,
+					datasets: [
+						{
+							label: `Soil Temperature (${tempDepth}) °F`,
+							data: temps,
+							borderColor: '#8B4513',
+							backgroundColor: 'rgba(139, 69, 19, 0.1)',
+							borderWidth: 2,
+							fill: true,
+							tension: 0.3,
+							yAxisID: 'y-temp'
+						},
+						{
+							label: `Soil Moisture (${moistureDepth})`,
+							data: moistures,
+							borderColor: '#1E90FF',
+							backgroundColor: 'rgba(30, 144, 255, 0.1)',
+							borderWidth: 2,
+							fill: true,
+							tension: 0.3,
+							yAxisID: 'y-moisture'
+						},
+						{
+							label: 'Avg Temp',
+							data: temps.map(() => avgTemp),
+							borderColor: '#8B4513',
+							borderWidth: 1,
+							borderDash: [5, 5],
+							fill: false,
+							pointRadius: 0,
+							yAxisID: 'y-temp'
+						},
+						{
+							label: 'Avg Moisture',
+							data: moistures.map(() => avgMoisture),
+							borderColor: '#1E90FF',
+							borderWidth: 1,
+							borderDash: [5, 5],
+							fill: false,
+							pointRadius: 0,
+							yAxisID: 'y-moisture'
+						}
+					]
+				},
+				options: {
+					responsive: true,
+					maintainAspectRatio: false,
+					plugins: {
+						legend: {
+							display: true,
+							position: 'top',
+							labels: {
+								boxWidth: 12,
+								padding: 10,
+								font: {
+									size: 11
+								}
+							}
+						},
+						tooltip: {
+							mode: 'index',
+							intersect: false,
+							callbacks: {
+								label: function(context) {
+									let label = context.dataset.label || '';
+									if (label) {
+										label += ': ';
+									}
+									if (context.dataset.label.includes('Temperature')) {
+										label += context.parsed.y.toFixed(1) + '°F';
+									} else if (context.dataset.label.includes('Moisture')) {
+										label += context.parsed.y.toFixed(3);
+									} else {
+										label += context.parsed.y.toFixed(2);
+									}
+									return label;
+								}
+							}
+						}
+					},
+					scales: {
+						x: {
+							title: {
+								display: true,
+								text: `Date`
+							},
+							grid: {
+								color: 'rgba(0, 0, 0, 0.05)'
+							}
+						},
+						'y-temp': {
+							type: 'linear',
+							display: true,
+							position: 'left',
+							title: {
+								display: true,
+								text: 'Temperature (°F)',
+								color: '#8B4513'
+							},
+							ticks: {
+								color: '#8B4513'
+							},
+							grid: {
+								drawOnChartArea: false
+							}
+						},
+						'y-moisture': {
+							type: 'linear',
+							display: true,
+							position: 'right',
+							title: {
+								display: true,
+								text: 'Soil Moisture',
+								color: '#1E90FF'
+							},
+							ticks: {
+								color: '#1E90FF'
+							},
+							grid: {
+								drawOnChartArea: false
+							}
+						}
+					}
+				}
+			});
+			
+			// Force chart to update after a tiny delay to ensure container is visible
+			setTimeout(() => {
+				if (window.soilTempChart) {
+					window.soilTempChart.update();
+				}
+			}, 50);
+		}
         
         // Fetch data from Open-Meteo API for user-added points
         async function fetchOpenMeteoData(latitude, longitude, date) {
@@ -2408,18 +2644,6 @@
                 // Update charts with new data
                 updateDataDisplay();
                 
-                // Update map with new marker
-                if (marker) {
-                    map.removeLayer(marker);
-                }
-                marker = L.marker([latitude, longitude], {
-                    icon: L.divIcon({
-                        className: 'user-marker',
-                        html: '<div style="background-color: #FF6B6B; width: 10px; height: 10px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 3px rgba(0,0,0,0.5);"></div>',
-                        iconSize: [10, 10]
-                    })
-                }).addTo(map);
-                
                 // Show info for the new point
                 showPointInfo(newPoint);
                 
@@ -2432,82 +2656,85 @@
         }
         
         // Initialize the application
-        document.addEventListener('DOMContentLoaded', async function() {
-            try {
-                // Initialize NDJSON directory
-                initNdjsonDirectory();
-                
-                // Initialize the rest of the application
-                initMap();
-                initCharts();
-                
-                // Add event listener for the fetch data button
-                document.getElementById('fetch-data').addEventListener('click', function() {
-                    const latitude = parseFloat(document.getElementById('latitude').value);
-                    const longitude = parseFloat(document.getElementById('longitude').value);
-                    const date = document.getElementById('date').value;
-                    
-                    if (isNaN(latitude) || isNaN(longitude)) {
-                        alert('Please enter valid latitude and longitude values.');
-                        return;
-                    }
-                    
-                    if (!date) {
-                        alert('Please select a date.');
-                        return;
-                    }
-                    
-                    fetchOpenMeteoData(latitude, longitude, date);
-                });
-                
-                // Add event listener for Enter key in input fields
-                document.getElementById('latitude').addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        document.getElementById('fetch-data').click();
-                    }
-                });
-                
-                document.getElementById('longitude').addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        document.getElementById('fetch-data').click();
-                    }
-                });
-                
-                // Set default date to current date
-                const today = new Date();
-                const todayFormatted = today.toISOString().split('T')[0];
-                document.getElementById('date').value = todayFormatted;
-                
-                // Directory toggle
-                document.getElementById('toggle-directory').addEventListener('click', function() {
-                    const content = document.getElementById('directory-content');
-                    const icon = this.querySelector('i');
-                    content.classList.toggle('collapsed');
-                    icon.classList.toggle('fa-chevron-up');
-                    icon.classList.toggle('fa-chevron-down');
-                });
-                
-                // Apply settings button
+		document.addEventListener('DOMContentLoaded', async function() {
+			try {
+				// Initialize NDJSON directory
+				initNdjsonDirectory();
+				
+				// Initialize the rest of the application
+				initMap();
+				initCharts();
+				
+				// Load Washington_Boletus_edulis.ndjson automatically since it's enabled by default
+				setTimeout(() => {
+					// Find the Washington_Boletus_edulis.ndjson file
+					const washingtonEdulisId = Object.keys(activeDatasets).find(key => 
+						activeDatasets[key].fileName === 'Washington_Boletus_edulis.ndjson'
+					);
+					
+					if (washingtonEdulisId && activeDatasets[washingtonEdulisId].active) {
+						loadNdjsonFile(washingtonEdulisId, activeDatasets[washingtonEdulisId].filePath);
+					}
+				}, 500); // Small delay to ensure everything is initialized
+				
+				// Add event listener for the fetch data button
+				document.getElementById('fetch-data').addEventListener('click', function() {
+					const latitude = parseFloat(document.getElementById('latitude').value);
+					const longitude = parseFloat(document.getElementById('longitude').value);
+					const date = document.getElementById('date').value;
+					
+					if (isNaN(latitude) || isNaN(longitude)) {
+						alert('Please enter valid latitude and longitude values.');
+						return;
+					}
+					
+					if (!date) {
+						alert('Please select a date.');
+						return;
+					}
+					
+					fetchOpenMeteoData(latitude, longitude, date);
+				});
+				
+				// Add event listener for Enter key in input fields
+				document.getElementById('latitude').addEventListener('keypress', function(e) {
+					if (e.key === 'Enter') {
+						document.getElementById('fetch-data').click();
+					}
+				});
+				
+				document.getElementById('longitude').addEventListener('keypress', function(e) {
+					if (e.key === 'Enter') {
+						document.getElementById('fetch-data').click();
+					}
+				});
+				
+				// Set default date to current date
+				const today = new Date();
+				const todayFormatted = today.toISOString().split('T')[0];
+				document.getElementById('date').value = todayFormatted;
+				
+				// Apply settings button
 				document.getElementById('apply-settings').addEventListener('click', function() {
 					averageDays = parseInt(document.getElementById('average-days').value);
 					tempDepth = document.getElementById('temp-depth').value;
 					moistureDepth = document.getElementById('moisture-depth').value;
 					updateDataDisplay(false); // false = full reprocessing needed
 				});
-                
-                // Initialize with default settings
-                updateMonthLegend();
-                setTimeout(() => {
-                    if (typeof updateMapPoints === 'function') {
-                        updateMapPoints();
-                    }
-                }, 200);
-                
-            } catch (error) {
-                console.error('Error initializing application:', error);
-                alert('Error initializing application. Please check the console for details.');
-            }
-        });
+				
+				// Initialize with default settings
+				updateMonthLegend();
+				setTimeout(() => {
+					if (typeof updateMapPoints === 'function') {
+						updateMapPoints();
+					}
+				}, 200);
+				
+			} catch (error) {
+				console.error('Error initializing application:', error);
+				alert('Error initializing application. Please check the console for details.');
+			}
+		});
     </script>
 </body>
 </html>
