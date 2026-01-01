@@ -122,6 +122,72 @@
             height: 400px;
             width: 100%;
         }
+
+		/* Chart header and controls */
+		.chart-header {
+			display: flex;
+			flex-direction: column;
+			margin-bottom: 20px;
+		}
+
+		.chart-controls {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 15px;
+			margin-top: 10px;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.chart-selector, .axis-selectors {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+
+		.axis-selectors {
+			display: flex;
+			gap: 20px;
+		}
+
+		.axis-selector {
+			display: flex;
+			align-items: center;
+			gap: 5px;
+		}
+
+		.chart-selector label, .axis-selector label {
+			margin-bottom: 0;
+			min-width: 80px;
+			text-align: right;
+			font-size: 14px;
+			font-weight: 600;
+		}
+
+		.chart-selector select, .axis-selector select {
+			padding: 8px 12px;
+			font-size: 14px;
+			border: 1px solid #ddd;
+			border-radius: 4px;
+			min-width: 150px;
+		}
+
+		.histogram-controls {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 10px;
+			margin-top: 10px;
+		}
+
+		.histogram-controls select {
+			padding: 8px 12px;
+			font-size: 14px;
+			border: 1px solid #ddd;
+			border-radius: 4px;
+			min-width: 50px;
+			max-width: 30%;
+		}
         
         .input-section {
             background-color: #fff;
@@ -839,69 +905,58 @@
                 <div class="loading" id="loading">Fetching data from Open-Meteo API...</div>
             </div>
             
-            <div class="content-container">
-                <div class="graph-container">
-                    <h3 class="graph-title">Elevation vs Soil Temperature</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="elevationTempChart"></canvas>
-                    </div>
-                </div>
-                
-                <div class="graph-container">
-                    <h3 class="graph-title">Elevation vs Soil Moisture</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="elevationMoistureChart"></canvas>
-                    </div>
-                </div>
-                
-                <div class="graph-container">
-                    <h3 class="graph-title">Elevation vs Date</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="elevationDateChart"></canvas>
-                    </div>
-                </div>
-                
-                <div class="graph-container">
-                    <h3 class="graph-title">Soil Temperature vs Date</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="tempDateChart"></canvas>
-                    </div>
-                </div>
-                
-                <div class="graph-container">
-                    <h3 class="graph-title">Soil Moisture vs Date</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="moistureDateChart"></canvas>
-                    </div>
-                </div>
-                
-                <div class="graph-container">
-                    <h3 class="graph-title">Soil Temperature vs Soil Moisture</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="tempMoistureChart"></canvas>
-                    </div>
-                </div>
-                
-				<div class="graph-container" style="grid-column: 1 / -1; width: 100%; margin-top: 25px;">
-					<h3 class="graph-title">Data Table</h3>
-					<div id="data-table-container" style="overflow-x: auto;">
-						<table id="data-table" style="width: 100%; border-collapse: collapse;">
-							<thead>
-								<tr style="background-color: #8B4513; color: white; position: sticky; top: 0;">
-									<th style="padding: 10px; text-align: center;">Dataset</th>
-									<th style="padding: 10px; text-align: center;">Date</th>
-									<th style="padding: 10px; text-align: center;">Elevation (ft)</th>
-									<th style="padding: 10px; text-align: center;">Soil Temp (°F)</th>
-									<th style="padding: 10px; text-align: center;">Soil Moisture</th>
-								</tr>
-							</thead>
-							<tbody id="table-body">
-								<!-- Data will be populated here -->
-							</tbody>
-						</table>
+			<div class="content-container">
+				<div class="graph-container">
+					<div class="chart-header">
+						<h3 class="graph-title">Data Visualization</h3>
+						<div class="chart-controls">
+							<div class="axis-selectors">
+								<div class="axis-selector">
+									<label for="y-axis">Y-Axis:</label>
+									<select id="y-axis">
+										<option value="elevationFt">Elevation (ft)</option>
+										<option value="soilTemp">Soil Temperature (°F)</option>
+										<option value="soilMoisture">Soil Moisture</option>
+										<option value="monthFraction">Date</option>
+									</select>
+								</div>
+								<div class="axis-selector">
+									<label for="x-axis">X-Axis:</label>
+									<select id="x-axis">
+										<option value="soilTemp">Soil Temperature (°F)</option>
+										<option value="soilMoisture">Soil Moisture</option>
+										<option value="monthFraction">Date</option>
+										<option value="elevationFt">Elevation (ft)</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="chart-wrapper">
+						<canvas id="mainChart"></canvas>
 					</div>
 				</div>
-            </div>
+				
+				<div class="graph-container">
+					<div class="chart-header">
+						<h3 class="graph-title">Distribution Histogram</h3>
+						<div class="histogram-controls">
+							<select id="histogram-dimension">
+								<option value="elevationFt">Elevation</option>
+								<option value="soilTemp">Soil Temperature</option>
+								<option value="soilMoisture">Soil Moisture</option>
+								<option value="month">Month</option>
+								<option value="yearMonth">Year-Month</option>
+							</select>
+							<input type="number" id="bin-count" min="5" max="50" value="15" style="width: 100px; margin-left: 10px;">
+							<label for="bin-count" style="font-size: 16px; margin-left: 5px;">Bins</label>
+						</div>
+					</div>
+					<div class="chart-wrapper">
+						<canvas id="histogramChart"></canvas>
+					</div>
+				</div>
+			</div>
             
             <div class="info-panel" id="info-panel">
                 <h3 class="info-title">Observation Details</h3>
@@ -915,6 +970,25 @@
 					</div>
 				</div>
             </div>
+			<div class="graph-container" style="grid-column: 1 / -1; width: 100%; margin-top: 25px;">
+				<h3 class="graph-title">Data Table</h3>
+				<div id="data-table-container" style="overflow-x: auto;">
+					<table id="data-table" style="width: 100%; border-collapse: collapse;">
+						<thead>
+							<tr style="background-color: #8B4513; color: white; position: sticky; top: 0;">
+								<th style="padding: 10px; text-align: center;">Dataset</th>
+								<th style="padding: 10px; text-align: center;">Date</th>
+								<th style="padding: 10px; text-align: center;">Elevation (ft)</th>
+								<th style="padding: 10px; text-align: center;">Soil Temp (°F)</th>
+								<th style="padding: 10px; text-align: center;">Soil Moisture</th>
+							</tr>
+						</thead>
+						<tbody id="table-body">
+							<!-- Data will be populated here -->
+						</tbody>
+					</table>
+				</div>
+			</div>
         </div>
     </div>
     
@@ -931,8 +1005,8 @@
         let allData = []; // Combined data from all sources
         let chartData = []; // Processed data for charts
         
-        // Chart instances
-        let elevationTempChart, elevationMoistureChart, elevationDateChart, tempDateChart, moistureDateChart, tempMoistureChart;
+		// Chart instances
+		let mainChart, histogramChart;
         
         // Initialize map
         let map, marker, mapPoints = [];
@@ -956,28 +1030,21 @@
 		function clearUserPoints() {
 			userData = [];
 			
-			// Remove user data dataset from all charts
-			const charts = [elevationTempChart, elevationMoistureChart, elevationDateChart, 
-							tempDateChart, moistureDateChart, tempMoistureChart];
-			
-			charts.forEach(chart => {
-				if (chart && chart.data && chart.data.datasets) {
-					// Find and remove the user data dataset
-					const userDatasetIndex = chart.data.datasets.findIndex(ds => ds.datasetId === 'user_data');
-					if (userDatasetIndex > -1) {
-						chart.data.datasets.splice(userDatasetIndex, 1);
-						chart.update('none');
-					}
-				}
-			});
+			// Update all charts
+			if (mainChart && histogramChart) {
+				updateCharts();
+			}
 			
 			// Remove user points from map
 			mapPoints.forEach((marker, index) => {
 				if (marker._datasetId === 'user_data') {
 					map.removeLayer(marker);
-					mapPoints.splice(index, 1);
+					// Don't splice while iterating - mark for removal
 				}
 			});
+			
+			// Filter out user markers
+			mapPoints = mapPoints.filter(marker => marker._datasetId !== 'user_data');
 			
 			// Update data table
 			populateDataTable();
@@ -1010,7 +1077,13 @@
 			
 			// Highlight on map
 			mapPoints.forEach(marker => {
+				// Add null check
+				if (!marker || !marker.setStyle) return;
+				
 				const latlng = marker.getLatLng();
+				// Add null check for latlng
+				if (!latlng) return;
+				
 				if (Math.abs(latlng.lat - point.latitude) < 0.0001 && 
 					Math.abs(latlng.lng - point.longitude) < 0.0001) {
 					
@@ -1042,60 +1115,42 @@
 			});
 			
 			// Highlight on charts
-			const charts = [elevationTempChart, elevationMoistureChart, elevationDateChart, 
-							tempDateChart, moistureDateChart, tempMoistureChart];
-
-			charts.forEach(chart => {
-				if (!chart || !chart.data || !chart.data.datasets) return;
+			if (mainChart && mainChart.data && mainChart.data.datasets) {
+				// Create a separate highlighted dataset for this point
+				const observationId = point.observationUrl ? 
+					point.observationUrl.split('/').pop() : 
+					'User Point';
+				const highlightDataset = {
+					label: `Obs: ${observationId}`,
+					data: [{
+						x: point.x || point[getXProperty(mainChart)],
+						y: point.y || point[getYProperty(mainChart)],
+						...point
+					}],
+					backgroundColor: highlightColor,
+					borderColor: highlightColor,
+					borderWidth: 3,
+					pointRadius: 8,
+					pointHoverRadius: 10,
+					order: -1,
+					datasetId: 'highlighted_point'
+				};
 				
-				chart.data.datasets.forEach((dataset, datasetIndex) => {
-					if (!dataset.data) return;
-					
-					dataset.data.forEach((dataPoint, pointIndex) => {
-						// Check if this is the same point
-						if (dataPoint === point || 
-							(dataPoint.latitude === point.latitude && 
-							 dataPoint.longitude === point.longitude &&
-							 dataPoint.date === point.date)) {
-							
-							// Create a separate highlighted dataset for this point
-							const observationId = point.observationUrl ? 
-								point.observationUrl.split('/').pop() : // Extract ID from URL
-								'User Point';
-							const highlightDataset = {
-								label: `Obs: ${observationId}`,
-								data: [{
-									x: dataPoint.x || dataPoint[getXProperty(chart)],
-									y: dataPoint.y || dataPoint[getYProperty(chart)],
-									...dataPoint // Keep all original properties
-								}],
-								backgroundColor: highlightColor,
-								borderColor: highlightColor,
-								borderWidth: 3,
-								pointRadius: 8,
-								pointHoverRadius: 10,
-								order: -1, // Ensure it renders on top
-								datasetId: 'highlighted_point'
-							};
-							
-							// Check if highlight dataset already exists
-							const existingIndex = chart.data.datasets.findIndex(ds => ds.datasetId === 'highlighted_point');
-							if (existingIndex > -1) {
-								chart.data.datasets[existingIndex] = highlightDataset;
-							} else {
-								chart.data.datasets.push(highlightDataset);
-							}
-							
-							highlightedChartElements.push({
-								chart: chart,
-								datasetIndex: chart.data.datasets.length - 1
-							});
-						}
-					});
+				// Check if highlight dataset already exists
+				const existingIndex = mainChart.data.datasets.findIndex(ds => ds.datasetId === 'highlighted_point');
+				if (existingIndex > -1) {
+					mainChart.data.datasets[existingIndex] = highlightDataset;
+				} else {
+					mainChart.data.datasets.push(highlightDataset);
+				}
+				
+				highlightedChartElements.push({
+					chart: mainChart,
+					datasetIndex: mainChart.data.datasets.length - 1
 				});
 				
-				chart.update('none');
-			});
+				mainChart.update('none');
+			}
 		}
 
 		// Function to remove all highlights
@@ -1108,18 +1163,6 @@
 					if (highlightIndex > -1) {
 						item.chart.data.datasets.splice(highlightIndex, 1);
 						item.chart.update('none');
-					} else if (marker._datasetId === 'user_data') {
-						// User point
-						marker.setStyle({
-							fillColor: userPointColor,
-							color: userPointColor,
-							fillOpacity: 0.8,
-							weight: 2,
-							radius: 5
-						});
-						
-						// Remove highlight flag
-						delete marker._isHighlighted;
 					}
 				}
 			});
@@ -1143,19 +1186,19 @@
 
 		// Helper function to get X property based on chart
 		function getXProperty(chart) {
-			if (chart === elevationTempChart) return 'soilTemp';
-			if (chart === elevationMoistureChart) return 'soilMoisture';
-			if (chart === elevationDateChart || chart === tempDateChart || chart === moistureDateChart) return 'monthFraction';
-			if (chart === tempMoistureChart) return 'soilTemp';
+			if (chart === mainChart) {
+				const xProp = document.getElementById('x-axis') ? document.getElementById('x-axis').value : 'soilTemp';
+				return xProp;
+			}
 			return 'soilTemp';
 		}
 
 		// Helper function to get Y property based on chart
 		function getYProperty(chart) {
-			if (chart === elevationTempChart || chart === elevationMoistureChart || chart === elevationDateChart) return 'elevationFt';
-			if (chart === tempDateChart) return 'soilTemp';
-			if (chart === moistureDateChart) return 'soilMoisture';
-			if (chart === tempMoistureChart) return 'soilMoisture';
+			if (chart === mainChart) {
+				const yProp = document.getElementById('y-axis') ? document.getElementById('y-axis').value : 'elevationFt';
+				return yProp;
+			}
 			return 'elevationFt';
 		}
         
@@ -2037,380 +2080,414 @@
         });
         
         // Initialize charts
-        function initCharts() {
-            const ctx1 = document.getElementById('elevationTempChart').getContext('2d');
-            const ctx2 = document.getElementById('elevationMoistureChart').getContext('2d');
-            const ctx3 = document.getElementById('elevationDateChart').getContext('2d');
-            const ctx4 = document.getElementById('tempDateChart').getContext('2d');
-            const ctx5 = document.getElementById('moistureDateChart').getContext('2d');
-            const ctx6 = document.getElementById('tempMoistureChart').getContext('2d');
-            
-            // Common chart configuration
-            const commonOptions = {
-                responsive: true,
-                maintainAspectRatio: false,
-				elements: {
-					point: {
-						radius: 3,
-						hoverRadius: 5,
-						hitRadius: 10
-					}
+		function initCharts() {
+			const mainCtx = document.getElementById('mainChart').getContext('2d');
+			const histogramCtx = document.getElementById('histogramChart').getContext('2d');
+			
+			// Main chart configuration
+			mainChart = new Chart(mainCtx, {
+				type: 'scatter',
+				data: {
+					datasets: []
 				},
-				onClick: (evt, elements) => {
-					if (elements.length > 0) {
-						const index = elements[0].index;
-						const datasetIndex = elements[0].datasetIndex;
-						
-						// Find which dataset was clicked
-						let dataPoint = null;
-						const clickedDataset = evt.chart.data.datasets[datasetIndex];
-						
-						if (clickedDataset && clickedDataset.data[index]) {
-							dataPoint = clickedDataset.data[index];
+				options: {
+					responsive: true,
+					maintainAspectRatio: false,
+					elements: {
+						point: {
+							radius: 3,
+							hoverRadius: 5,
+							hitRadius: 10
 						}
-						
-						if (dataPoint) {
-							highlightPoint(dataPoint);
-							showPointInfo(dataPoint);
+					},
+					onClick: (evt, elements) => {
+						if (elements.length > 0) {
+							const index = elements[0].index;
+							const datasetIndex = elements[0].datasetIndex;
+							
+							// Find which dataset was clicked
+							let dataPoint = null;
+							const clickedDataset = evt.chart.data.datasets[datasetIndex];
+							
+							if (clickedDataset && clickedDataset.data[index]) {
+								dataPoint = clickedDataset.data[index];
+							}
+							
+							if (dataPoint) {
+								highlightPoint(dataPoint);
+								showPointInfo(dataPoint);
+							}
+						}
+					},
+					plugins: {
+						legend: {
+							display: true,
+							position: 'top',
+							align: 'center',
+							labels: {
+								boxWidth: 12,
+								padding: 15,
+								font: {
+									size: 12,
+									family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+								},
+								usePointStyle: true,
+								pointStyle: 'circle',
+								color: '#333'
+							}
+						},
+						tooltip: {
+							callbacks: {
+								label: function(context) {
+									const dataPoint = context.dataset.data[context.dataIndex];
+									return [
+										`Dataset: ${dataPoint.datasetName || 'User Data'}`,
+										`Date: ${dataPoint.date || 'N/A'}`,
+										`Elevation: ${dataPoint.elevationFt} ft`,
+										`Soil Temp: ${dataPoint.soilTemp ? dataPoint.soilTemp.toFixed(1) : 'N/A'} °F`,
+										`Soil Moisture: ${dataPoint.soilMoisture ? dataPoint.soilMoisture.toFixed(3) : 'N/A'}`
+									];
+								}
+							}
+						}
+					},
+					scales: {
+						x: {
+							title: {
+								display: true,
+								text: 'X-Axis',
+								font: {
+									weight: 'bold'
+								}
+							},
+							grid: {
+								color: 'rgba(0, 0, 0, 0.05)'
+							}
+						},
+						y: {
+							title: {
+								display: true,
+								text: 'Y-Axis',
+								font: {
+									weight: 'bold'
+								}
+							},
+							grid: {
+								color: 'rgba(0, 0, 0, 0.05)'
+							}
 						}
 					}
+				}
+			});
+			
+			// Histogram chart configuration
+			histogramChart = new Chart(histogramCtx, {
+				type: 'bar',
+				data: {
+					labels: [],
+					datasets: [{
+						label: 'Observations',
+						data: [],
+						backgroundColor: 'rgba(139, 69, 19, 0.7)',
+						borderColor: 'rgba(139, 69, 19, 1)',
+						borderWidth: 1
+					}]
 				},
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                        align: 'center',
-                        labels: {
-                            boxWidth: 12,
-                            padding: 15,
-                            font: {
-                                size: 12,
-                                family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
-                            },
-                            usePointStyle: true,
-                            pointStyle: 'circle',
-                            color: '#333'
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const dataPoint = context.dataset.data[context.dataIndex];
-                                return [
-                                    `Dataset: ${dataPoint.datasetName || 'User Data'}`,
-                                    `Date: ${dataPoint.date || 'N/A'}`,
-                                    `Elevation: ${dataPoint.elevationFt} ft`,
-                                    `Soil Temp: ${dataPoint.soilTemp ? dataPoint.soilTemp.toFixed(1) : 'N/A'} °F`,
-                                    `Soil Moisture: ${dataPoint.soilMoisture ? dataPoint.soilMoisture.toFixed(3) : 'N/A'}`
-                                ];
-                            }
-                        }
-                    }
-                }
-            };
-            
-            // Chart 1: Elevation vs Soil Temperature
-            elevationTempChart = new Chart(ctx1, {
-                type: 'scatter',
-                data: {
-                    datasets: []
-                },
-                options: {
-                    ...commonOptions,
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Soil Temp °F',
-                                font: {
-                                    weight: 'bold'
-                                }
-                            },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Elevation ft',
-                                font: {
-                                    weight: 'bold'
-                                }
-                            },
-                            min: 0,
-                            max: 8000,
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
-                        }
-                    }
-                }
-            });
-            
-            // Chart 2: Elevation vs Soil Moisture
-            elevationMoistureChart = new Chart(ctx2, {
-                type: 'scatter',
-                data: {
-                    datasets: []
-                },
-                options: {
-                    ...commonOptions,
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Soil Moisture',
-                                font: {
-                                    weight: 'bold'
-                                }
-                            },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Elevation ft',
-                                font: {
-                                    weight: 'bold'
-                                }
-                            },
-                            min: 0,
-                            max: 8000,
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
-                        }
-                    }
-                }
-            });
-            
-            // Chart 3: Elevation vs Date
-            elevationDateChart = new Chart(ctx3, {
-                type: 'scatter',
-                data: {
-                    datasets: []
-                },
-                options: {
-                    ...commonOptions,
-                    scales: {
-                        x: {
-                            type: 'linear',
-                            title: {
-                                display: true,
-                                text: 'Month',
-                                font: {
-                                    weight: 'bold'
-                                }
-                            },
-                            min: 1,
-                            max: 13,
-                            ticks: {
-                                callback: function(value) {
-                                    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
-                                                  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                                    const monthIndex = Math.floor(value) - 1;
-                                    if (monthIndex >= 0 && monthIndex < 12) {
-                                        return months[monthIndex];
-                                    }
-                                    return '';
-                                },
-                                stepSize: 1,
-								autoSkip: false,
-								maxRotation: 45,
-								minRotation: 0,
-								padding: 5
-                            },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Elevation ft',
-                                font: {
-                                    weight: 'bold'
-                                }
-                            },
-                            min: 0,
-                            max: 8000,
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
-                        }
-                    }
-                }
-            });
-            
-            // Chart 4: Soil Temperature vs Date
-            tempDateChart = new Chart(ctx4, {
-                type: 'scatter',
-                data: {
-                    datasets: []
-                },
-                options: {
-                    ...commonOptions,
-                    scales: {
-                        x: {
-                            type: 'linear',
-                            title: {
-                                display: true,
-                                text: 'Month',
-                                font: {
-                                    weight: 'bold'
-                                }
-                            },
-                            min: 1,
-                            max: 13,
-                            ticks: {
-                                callback: function(value) {
-                                    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
-                                                  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                                    const monthIndex = Math.floor(value) - 1;
-                                    if (monthIndex >= 0 && monthIndex < 12) {
-                                        return months[monthIndex];
-                                    }
-                                    return '';
-                                },
-                                stepSize: 1,
-								autoSkip: false,
-								maxRotation: 45,
-								minRotation: 0,
-								padding: 5
-                            },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Soil Temp °F',
-                                font: {
-                                    weight: 'bold'
-                                }
-                            },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
-                        }
-                    }
-                }
-            });
-            
-            // Chart 5: Soil Moisture vs Date
-            moistureDateChart = new Chart(ctx5, {
-                type: 'scatter',
-                data: {
-                    datasets: []
-                },
-                options: {
-                    ...commonOptions,
-                    scales: {
-                        x: {
-                            type: 'linear',
-                            title: {
-                                display: true,
-                                text: 'Month',
-                                font: {
-                                    weight: 'bold'
-                                }
-                            },
-                            min: 1,
-                            max: 13,
-                            ticks: {
-                                callback: function(value) {
-                                    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
-                                                  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                                    const monthIndex = Math.floor(value) - 1;
-                                    if (monthIndex >= 0 && monthIndex < 12) {
-                                        return months[monthIndex];
-                                    }
-                                    return '';
-                                },
-                                stepSize: 1,
-								autoSkip: false,
-								maxRotation: 45,
-								minRotation: 0,
-								padding: 5
-                            },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Soil Moisture',
-                                font: {
-                                    weight: 'bold'
-                                }
-                            },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
-                        }
-                    }
-                }
-            });
-            
-            // Chart 6: Soil Temperature vs Soil Moisture
-            tempMoistureChart = new Chart(ctx6, {
-                type: 'scatter',
-                data: {
-                    datasets: []
-                },
-                options: {
-                    ...commonOptions,
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Soil Temp °F',
-                                font: {
-                                    weight: 'bold'
-                                }
-                            },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Soil Moisture',
-                                font: {
-                                    weight: 'bold'
-                                }
-                            },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
-                        }
-                    }
-                }
-            });
-            
-            // Populate data table
-            populateDataTable();
-        }
+				options: {
+					responsive: true,
+					maintainAspectRatio: false,
+					plugins: {
+						legend: {
+							display: false
+						},
+						tooltip: {
+							callbacks: {
+								label: function(context) {
+									return `Observations: ${context.parsed.y}`;
+								}
+							}
+						}
+					},
+					scales: {
+						x: {
+							title: {
+								display: true,
+								text: 'Value',
+								font: {
+									weight: 'bold'
+								}
+							},
+							grid: {
+								display: false
+							}
+						},
+						y: {
+							title: {
+								display: true,
+								text: 'Count',
+								font: {
+									weight: 'bold'
+								}
+							},
+							beginAtZero: true,
+							grid: {
+								color: 'rgba(0, 0, 0, 0.05)'
+							}
+						}
+					}
+				}
+			});
+			
+			// Set up chart type change listener
+			document.getElementById('x-axis').addEventListener('change', updateMainChart);
+			document.getElementById('y-axis').addEventListener('change', updateMainChart);
+			
+			// Set up histogram dimension change listener
+			document.getElementById('histogram-dimension').addEventListener('change', updateHistogram);
+			document.getElementById('bin-count').addEventListener('change', updateHistogram);
+			
+			// Set initial state
+			setDefaultAxes();
+		}
+
+		// Set default axis selections
+		function setDefaultAxes() {
+			document.getElementById('x-axis').value = 'soilTemp';
+			document.getElementById('y-axis').value = 'elevationFt';
+			updateMainChart();
+		}
+
+		// Update main chart based on selections
+		function updateMainChart() {
+			const xProp = document.getElementById('x-axis').value;
+			const yProp = document.getElementById('y-axis').value;
+			
+			// Update axis labels based on selection
+			const axisLabels = {
+				'soilTemp': 'Soil Temperature (°F)',
+				'soilMoisture': 'Soil Moisture',
+				'monthFraction': 'Month',
+				'elevationFt': 'Elevation (ft)'
+			};
+			
+			mainChart.options.scales.x.title.text = axisLabels[xProp] || 'X-Axis';
+			mainChart.options.scales.y.title.text = axisLabels[yProp] || 'Y-Axis';
+			
+			// Special handling for month axis
+			if (xProp === 'monthFraction') {
+				mainChart.options.scales.x.ticks = {
+					callback: function(value) {
+						const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+									  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+						const monthIndex = Math.floor(value) - 1;
+						if (monthIndex >= 0 && monthIndex < 12) {
+							return months[monthIndex];
+						}
+						return '';
+					},
+					stepSize: 1,
+					autoSkip: false,
+					maxRotation: 45,
+					minRotation: 0,
+					padding: 5
+				};
+				mainChart.options.scales.x.min = 1;
+				mainChart.options.scales.x.max = 13;
+			} else {
+				mainChart.options.scales.x.ticks = {};
+				mainChart.options.scales.x.min = undefined;
+				mainChart.options.scales.x.max = undefined;
+			}
+			
+			if (yProp === 'monthFraction') {
+				mainChart.options.scales.y.ticks = {
+					callback: function(value) {
+						const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+									  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+						const monthIndex = Math.floor(value) - 1;
+						if (monthIndex >= 0 && monthIndex < 12) {
+							return months[monthIndex];
+						}
+						return '';
+					},
+					stepSize: 1
+				};
+				mainChart.options.scales.y.min = 1;
+				mainChart.options.scales.y.max = 13;
+			} else {
+				mainChart.options.scales.y.ticks = {};
+				mainChart.options.scales.y.min = undefined;
+				mainChart.options.scales.y.max = undefined;
+			}
+			
+			// Update chart data
+			updateChartData(xProp, yProp);
+		}
+
+		// Update chart data
+		function updateChartData(xProp, yProp) {
+			// Group data by dataset
+			const datasetsMap = {};
+			
+			chartData.forEach(point => {
+				if (!datasetsMap[point.datasetId]) {
+					datasetsMap[point.datasetId] = {
+						label: point.datasetName,
+						data: [],
+						backgroundColor: point.datasetColor,
+						borderColor: point.datasetColor,
+						borderWidth: 1,
+						pointRadius: 3,
+						pointHoverRadius: 4,
+						datasetId: point.datasetId
+					};
+				}
+				
+				datasetsMap[point.datasetId].data.push(point);
+			});
+			
+			// Convert to array
+			const datasets = Object.values(datasetsMap);
+			
+			// Add user data if exists
+			if (userData.length > 0) {
+				datasets.push({
+					label: 'Your Added Point',
+					data: userData,
+					backgroundColor: userPointColor,
+					borderColor: userPointColor,
+					borderWidth: 3,
+					pointRadius: 8,
+					pointHoverRadius: 10,
+					order: 0,
+					datasetId: 'user_data'
+				});
+			}
+			
+			// Prepare datasets with filtered data
+			mainChart.data.datasets = datasets.map(dataset => {
+				const filteredData = dataset.data
+					.filter(point => point[xProp] !== null && point[yProp] !== null)
+					.map(point => ({
+						x: point[xProp],
+						y: point[yProp],
+						...point // Include all point properties
+					}));
+				
+				return {
+					...dataset,
+					data: filteredData,
+					pointRadius: dataset.datasetId === 'user_data' ? 8 : 3,
+					pointHoverRadius: dataset.datasetId === 'user_data' ? 10 : 5,
+					order: dataset.datasetId === 'user_data' ? 0 : 1
+				};
+			});
+			
+			mainChart.update();
+		}
+
+		// Update histogram
+		function updateHistogram() {
+			const dimension = document.getElementById('histogram-dimension').value;
+			const binCount = parseInt(document.getElementById('bin-count').value) || 15;
+			
+			// Get all values for the selected dimension
+			const values = allData
+				.filter(point => point[dimension] !== null && point[dimension] !== undefined)
+				.map(point => point[dimension]);
+			
+			if (values.length === 0) {
+				histogramChart.data.labels = ['No data'];
+				histogramChart.data.datasets[0].data = [0];
+				histogramChart.update();
+				return;
+			}
+			
+			// Create bins
+			let bins, labels;
+			
+			if (dimension === 'month') {
+				// For months, use fixed bins (1-12)
+				bins = Array(12).fill(0);
+				values.forEach(value => {
+					const monthIndex = Math.floor(value) - 1;
+					if (monthIndex >= 0 && monthIndex < 12) {
+						bins[monthIndex]++;
+					}
+				});
+				labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+						 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+			} else if (dimension === 'yearMonth') {
+				// For year-month, group by unique values
+				const valueCounts = {};
+				values.forEach(value => {
+					valueCounts[value] = (valueCounts[value] || 0) + 1;
+				});
+				
+				labels = Object.keys(valueCounts).sort();
+				bins = labels.map(label => valueCounts[label]);
+			} else {
+				// For numeric dimensions, create bins
+				const min = Math.min(...values);
+				const max = Math.max(...values);
+				const binSize = (max - min) / binCount;
+				
+				bins = Array(binCount).fill(0);
+				labels = [];
+				
+				// Create bins and count values
+				values.forEach(value => {
+					let binIndex = Math.floor((value - min) / binSize);
+					if (binIndex === binCount) binIndex = binCount - 1; // Handle edge case
+					bins[binIndex]++;
+				});
+				
+				// Create labels for bins
+				for (let i = 0; i < binCount; i++) {
+					const binStart = min + (i * binSize);
+					const binEnd = min + ((i + 1) * binSize);
+					labels.push(`${binStart.toFixed(1)} - ${binEnd.toFixed(1)}`);
+				}
+			}
+			
+			// Update histogram
+			histogramChart.data.labels = labels;
+			histogramChart.data.datasets[0].data = bins;
+			
+			// Update axis label
+			const dimensionLabels = {
+				'elevationFt': 'Elevation (ft)',
+				'soilTemp': 'Soil Temperature (°F)',
+				'soilMoisture': 'Soil Moisture',
+				'month': 'Month',
+				'yearMonth': 'Year-Month'
+			};
+			
+			histogramChart.options.scales.x.title.text = dimensionLabels[dimension] || 'Value';
+			histogramChart.update();
+		}
         
 		function updateVisualsOnly() {
 			// Save current highlight state
 			const currentHighlight = highlightedPoint;
 			
-			// Update chart colors without reprocessing data
+			// Update main chart colors
 			updateChartColors();
 			
-			// Update map point colors without rebuilding
-			updateMapPointColors();
+			// Update map point colors if markers exist
+			if (mapPoints.length > 0) {
+				updateMapPointColors();
+			}
+			
+			// Update histogram color
+			if (histogramChart && histogramChart.data && histogramChart.data.datasets[0]) {
+				histogramChart.data.datasets[0].backgroundColor = 'rgba(139, 69, 19, 0.7)';
+				histogramChart.data.datasets[0].borderColor = 'rgba(139, 69, 19, 1)';
+				histogramChart.update('none');
+			}
 			
 			// Restore highlight if there was one
 			if (currentHighlight) {
-				// Use a small delay to ensure visuals are updated first
 				setTimeout(() => {
 					highlightPoint(currentHighlight);
 				}, 50);
@@ -2418,38 +2495,32 @@
 		}
 
 		function updateChartColors() {
-			if (!elevationTempChart || !elevationTempChart.data.datasets) return;
-			
-			const charts = [elevationTempChart, elevationMoistureChart, elevationDateChart, 
-						   tempDateChart, moistureDateChart, tempMoistureChart];
-			
-			charts.forEach(chart => {
-				if (chart && chart.data && chart.data.datasets) {
-					chart.data.datasets.forEach(dataset => {
-						// Skip if no data or no datasetId
-						if (!dataset.data || dataset.data.length === 0) return;
-						
-						// Skip highlighted datasets - don't change their colors
-						if (dataset.datasetId === 'highlighted_point') return;
-						
-						// Get the datasetId from the first data point
-						const firstPoint = dataset.data[0];
-						if (!firstPoint) return;
-						
-						if (firstPoint.datasetId === 'user_data') {
-							// User data - use current userPointColor
-							dataset.backgroundColor = userPointColor;
-							dataset.borderColor = userPointColor;
-						} else if (firstPoint.datasetId && activeDatasets[firstPoint.datasetId]) {
-							// NDJSON dataset - use current color from activeDatasets
-							dataset.backgroundColor = activeDatasets[firstPoint.datasetId].color;
-							dataset.borderColor = activeDatasets[firstPoint.datasetId].color;
-						}
-					});
+			// Update main chart colors
+			if (mainChart && mainChart.data && mainChart.data.datasets) {
+				mainChart.data.datasets.forEach(dataset => {
+					// Skip if no data or no datasetId
+					if (!dataset.data || dataset.data.length === 0) return;
 					
-					chart.update('none');
-				}
-			});
+					// Skip highlighted datasets
+					if (dataset.datasetId === 'highlighted_point') return;
+					
+					// Get the datasetId from the first data point
+					const firstPoint = dataset.data[0];
+					if (!firstPoint) return;
+					
+					if (firstPoint.datasetId === 'user_data') {
+						// User data
+						dataset.backgroundColor = userPointColor;
+						dataset.borderColor = userPointColor;
+					} else if (firstPoint.datasetId && activeDatasets[firstPoint.datasetId]) {
+						// NDJSON dataset
+						dataset.backgroundColor = activeDatasets[firstPoint.datasetId].color;
+						dataset.borderColor = activeDatasets[firstPoint.datasetId].color;
+					}
+				});
+				
+				mainChart.update('none');
+			}
 		}
 
 		function updateMapPointColors() {
@@ -2515,76 +2586,12 @@
 
         // Update charts with current data
 		function updateCharts() {
-			// Group data by dataset
-			const datasetsMap = {};
+			// Get current axis selections
+			const xProp = document.getElementById('x-axis').value;
+			const yProp = document.getElementById('y-axis').value;
 			
-			chartData.forEach(point => {
-				if (!datasetsMap[point.datasetId]) {
-					datasetsMap[point.datasetId] = {
-						label: point.datasetName,
-						data: [],
-						backgroundColor: point.datasetColor,
-						borderColor: point.datasetColor,
-						borderWidth: 1,
-						pointRadius: 3,
-						pointHoverRadius: 4,
-						datasetId: point.datasetId // Add datasetId for reference
-					};
-				}
-				
-				datasetsMap[point.datasetId].data.push(point);
-			});
-			
-			// Convert to array
-			const datasets = Object.values(datasetsMap);
-			
-			// Add user data if exists
-			if (userData.length > 0) {
-				datasets.push({
-					label: 'Your Added Point',
-					data: userData,
-					backgroundColor: userPointColor,
-					borderColor: userPointColor,
-					borderWidth: 3,
-					pointRadius: 8,
-					pointHoverRadius: 10,
-					order: 0,
-					datasetId: 'user_data'
-				});
-			}
-			
-			// Update each chart
-			const chartConfigs = [
-				{ chart: elevationTempChart, xProp: 'soilTemp', yProp: 'elevationFt' },
-				{ chart: elevationMoistureChart, xProp: 'soilMoisture', yProp: 'elevationFt' },
-				{ chart: elevationDateChart, xProp: 'monthFraction', yProp: 'elevationFt' },
-				{ chart: tempDateChart, xProp: 'monthFraction', yProp: 'soilTemp' },
-				{ chart: moistureDateChart, xProp: 'monthFraction', yProp: 'soilMoisture' },
-				{ chart: tempMoistureChart, xProp: 'soilTemp', yProp: 'soilMoisture' }
-			];
-			
-			chartConfigs.forEach(config => {
-				config.chart.data.datasets = datasets.map(dataset => {
-					// Filter out null values for this specific chart
-					const filteredData = dataset.data
-						.filter(point => point[config.xProp] !== null && point[config.yProp] !== null)
-						.map(point => ({
-							x: point[config.xProp],
-							y: point[config.yProp],
-							...point // Include all point properties
-						}));
-					
-					return {
-						...dataset,
-						data: filteredData,
-						// Ensure user data has larger points and renders on top
-						pointRadius: dataset.datasetId === 'user_data' ? 8 : 3,
-						pointHoverRadius: dataset.datasetId === 'user_data' ? 10 : 5,
-						order: dataset.datasetId === 'user_data' ? 0 : 1
-					};
-				});
-				config.chart.update('none');
-			});
+			updateChartData(xProp, yProp);
+			updateHistogram();
 		}
         
         // Populate data table
@@ -3051,6 +3058,12 @@
 				// Initialize the rest of the application
 				initMap();
 				initCharts();
+
+				// Set default chart type
+				setTimeout(() => {
+					setDefaultAxes();
+					updateHistogram();
+				}, 100);
 				
 				// Load Washington_Boletus_edulis.ndjson automatically since it's enabled by default
 				setTimeout(() => {
