@@ -55,6 +55,7 @@
             margin-bottom: 25px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             border-left: 4px solid #8B4513;
+			font-size: 14px;
         }
         
         .main-container {
@@ -160,7 +161,7 @@
 			margin-bottom: 0;
 			min-width: 80px;
 			text-align: right;
-			font-size: 14px;
+			font-size: 16px;
 			font-weight: 600;
 		}
 
@@ -178,15 +179,27 @@
 			justify-content: center;
 			gap: 10px;
 			margin-top: 10px;
+			flex-wrap: wrap;
 		}
 
-		.histogram-controls select {
+		.histogram-controls select,
+		.histogram-controls input[type="number"] {
 			padding: 8px 12px;
 			font-size: 14px;
 			border: 1px solid #ddd;
 			border-radius: 4px;
 			min-width: 50px;
 			max-width: 30%;
+		}
+
+		.histogram-controls label {
+			font-size: 14px;
+			margin-left: 5px;
+			white-space: nowrap;
+		}
+
+		#histogramChart {
+			cursor: pointer;
 		}
         
         .input-section {
@@ -287,6 +300,7 @@
             color: #8B4513;
             margin-bottom: 15px;
             font-size: 1.4rem;
+            border-bottom: 2px solid #8B4513;
         }
         
         .info-content {
@@ -296,14 +310,15 @@
         .info-item {
             margin-bottom: 10px;
             padding-bottom: 10px;
-            border-bottom: 1px dashed #eee;
+            border-bottom: 1px solid #eee;
         }
         
         .info-label {
             font-weight: 600;
             color: #555;
             display: inline-block;
-            width: 200px;
+            width: 275px;
+            white-space: nowrap;
         }
         
         .link {
@@ -356,8 +371,6 @@
 			justify-content: space-between;
 			align-items: center;
 			margin-bottom: 20px;
-			padding-bottom: 15px;
-			border-bottom: 2px solid #8B4513;
 			position: sticky;
 			top: 0;
 			background-color: #fff;
@@ -366,8 +379,8 @@
         
         .directory-title {
             color: #8B4513;
-            font-size: 1.4rem;
-            font-weight: 600;
+            font-size: 1.3rem;
+            font-weight: 625;
         }
         
 		.directory-content {
@@ -615,11 +628,11 @@
         }
 
         .noUi-connect {
-            background-color: #8B4513 !important;
+            background-color: transparent !important;
         }
 
         .noUi-target {
-            background-color: #f0f0f0 !important;
+            background-color: none !important;
             border: 1px solid #ddd !important;
             box-shadow: none !important;
         }
@@ -761,13 +774,13 @@
         }
 
 		.highlighted-point {
-			background-color: #FFFF00 !important;
+			background-color: #FFA500 !important;
 			border-color: #FFD700 !important;
 			z-index: 10000 !important;
 		}
 
 		.chart-highlight {
-			background-color: #FFFF00 !important;
+			background-color: #FFA500 !important;
 			border-color: #FFD700 !important;
 			border-width: 3px !important;
 			z-index: 10 !important;
@@ -803,7 +816,7 @@
     </header>
     
     <div class="description">
-        <p>This interactive dashboard explores environmental factors associated with King Bolete observations in Washington State using only open (non-obscured) observation data. The scatter plots below show relationships between elevation, soil temperature, soil moisture, and time of year. Click on any point to view detailed information about that observation.</p>
+        <p>This interactive dashboard explores environmental factors associated with King Bolete observations using only open (non-obscured) observation data. The scatter plots below show relationships between elevation, soil temperature, soil moisture, and time of year. Click on any point to view detailed information about that observation.</p>
     </div>
     
 	<div class="main-container">    
@@ -823,7 +836,7 @@
 					</div>
 				</div>
 				
-				<!-- Data Settings container - SEPARATE from NDJSON directory -->
+				<!-- Data Settings container -->
 				<div class="settings-section">
 					<h3 class="settings-title">Data Settings</h3>
 					
@@ -866,17 +879,17 @@
 			
 			<div class="input-section">
 				<div class="input-header">
-					<h2 class="input-title">Add New Location Data</h2>
+					<h2 class="input-title">Location Data</h2>
 					<div style="display: flex; gap: 10px;">
 						<button id="clear-user-points" title="Clear user points">🗑️</button>
 						<input type="color" id="user-point-color" value="#FF6B6B" title="User point color">
-						<input type="color" id="highlight-color" value="#FFFF00" title="Highlight color">
+						<input type="color" id="highlight-color" value="#FFA500" title="Highlight color">
 						<label style="display: flex; align-items: center; gap: 5px; font-size: 12px;">
 							<input type="checkbox" id="disable-scroll" checked> Scroll
 						</label>
 					</div>
 				</div>
-                <p>Enter coordinates manually or click on the map to select a location. The system will retrieve the average soil temperature and elevation data from the Open-Meteo Historical Weather API.</p>
+                <p style="font-size: 18px;">Enter coordinates manually or click on the map to select a location. The system will retrieve the soil and elevation data from the Open-Meteo Historical Weather API.</p>
                 
                 <div class="input-group">
                     <div class="input-field" style="flex: 1 1 200px;">
@@ -942,14 +955,16 @@
 						<h3 class="graph-title">Distribution Histogram</h3>
 						<div class="histogram-controls">
 							<select id="histogram-dimension">
-								<option value="elevationFt">Elevation</option>
-								<option value="soilTemp">Soil Temperature</option>
+								<option value="elevationFt">Elevation (ft)</option>
+								<option value="soilTemp">Soil Temperature (°F)</option>
 								<option value="soilMoisture">Soil Moisture</option>
 								<option value="month">Month</option>
 								<option value="yearMonth">Year-Month</option>
 							</select>
-							<input type="number" id="bin-count" min="5" max="50" value="15" style="width: 100px; margin-left: 10px;">
-							<label for="bin-count" style="font-size: 16px; margin-left: 5px;">Bins</label>
+							<label for="bin-count" style="font-size: 16px; margin-left: 5px;">Bins:</label>
+							<input type="number" id="bin-count" min="5" max="100" value="30" style="width: 100px;">
+							<label for="bin-offset" style="font-size: 16px; margin-left: 5px;">Offset:</label>
+							<input type="number" id="bin-offset" min="0" max="100" value="0" style="width: 100px;">
 						</div>
 					</div>
 					<div class="chart-wrapper">
@@ -960,15 +975,15 @@
             
             <div class="info-panel" id="info-panel">
                 <h3 class="info-title">Observation Details</h3>
-                <div class="info-content" id="info-content">
-                    <!-- Details will be populated here when a point is clicked -->
-                </div>
 				<div class="soil-temp-chart-container" style="margin-top: 20px; display: none;" id="soil-temp-chart-container">
 					<h4 style="color: #8B4513; margin-bottom: 15px;">Soil Temperature & Moisture Trend</h4>
 					<div class="chart-wrapper" style="height: 200px;">
 						<canvas id="soil-temp-chart"></canvas>
 					</div>
 				</div>
+                <div class="info-content" id="info-content">
+                    <!-- Details will be populated here when a point is clicked -->
+                </div>
             </div>
 			<div class="graph-container" style="grid-column: 1 / -1; width: 100%; margin-top: 25px;">
 				<h3 class="graph-title">Data Table</h3>
@@ -1024,7 +1039,7 @@
         let moistureDepth = '7_to_28cm';
 
 		let userPointColor = '#FF6B6B';
-		let highlightColor = '#FFFF00';
+		let highlightColor = '#FFA500';
 		let enableScroll = true;
 
 		function clearUserPoints() {
@@ -1209,7 +1224,7 @@
                 '#6A0DAD', // Purple at 0 ft
                 '#0000FF', // Blue at 1333 ft
                 '#00FF00', // Green at 2666 ft
-                '#FFFF00', // Yellow at 4000 ft
+                '#FFA500', // Yellow at 4000 ft
                 '#FFA500', // Orange at 5333 ft
                 '#FF4500', // Red-Orange at 6666 ft
                 '#FF0000'  // Red at 8000 ft
@@ -1242,11 +1257,11 @@
         
         // NDJSON directory structure
         const ndjsonStructure = {
-            "boletus_edulis": [
+            "Boletus edulis": [
                 "Washington_Boletus_edulis.ndjson",
                 "Oregon_Boletus_edulis.ndjson"
             ],
-            "boletus_rex-veris": [
+            "Boletus rex-veris": [
                 "Washington_Boletus_rex-veris.ndjson"
             ]
         };
@@ -1504,11 +1519,13 @@
 				processNdjsonData();
 				populateDataTable(); // Only needed when data changes
 				updateCharts(); // Full chart update with new data
+				updateHistogram(); // Update histogram with new data
 				// Create map points with fresh data
 				updateMapPoints(); // This will create the initial markers
 			} else {
 				// Just update colors/visuals
 				updateChartColors();
+				updateVisualsOnly(); // This will update histogram colors too
 				// Only update map point colors if markers already exist
 				if (mapPoints.length > 0) {
 					updateMapPointColors();
@@ -1595,21 +1612,6 @@
                         </div>
                     </div>
                 `;
-
-                // Legend container
-                const legendDiv = L.DomUtil.create('div', 'legend-container', map.getContainer());
-                legendDiv.innerHTML = `
-                    <div class="legend-title">Color Legend</div>
-                    <div id="gradient-legend" class="legend-gradient"></div>
-                    <div class="legend-labels">
-                        <span id="legend-min">Min</span>
-                        <span id="legend-max">Max</span>
-                    </div>
-                    <div id="month-legend" class="month-legend-grid" style="display: none;">
-                        <!-- Month legend items will be populated here in 3x4 grid -->
-                    </div>
-                `;
-                L.DomEvent.disableClickPropagation(legendDiv);
                 
                 // Fullscreen button
                 const fullscreenBtn = L.DomUtil.create('button', 'fullscreen-btn', map.getContainer());
@@ -1619,17 +1621,16 @@
                 
                 // View option click handlers
                 div.querySelectorAll('.view-options button').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        div.querySelectorAll('.view-options button').forEach(b => b.classList.remove('active'));
-                        this.classList.add('active');
-                        currentView = this.dataset.view;
-                        
-                        updateMapPoints();
-                        
-                        if (typeof updateMonthLegend === 'function') {
-                            updateMonthLegend();
-                        }
-                    });
+					btn.addEventListener('click', function() {
+						div.querySelectorAll('.view-options button').forEach(b => b.classList.remove('active'));
+						this.classList.add('active');
+						currentView = this.dataset.view;
+						
+						// Update slider backgrounds when view changes
+						updateAllSliderBackgrounds();
+						
+						updateMapPoints();
+					});
                 });
                 
                 return div;
@@ -1642,7 +1643,13 @@
 				window.elevationSlider = createRangeSlider('elevation-slider-range', 0, 8000, [0, 8000], 100);
 				window.tempSlider = createRangeSlider('temp-slider-range', 30, 70, [30, 70], 1);
 				window.moistureSlider = createRangeSlider('moisture-slider-range', 0, 0.5, [0, 0.5], 0.01);
-				window.monthSlider = createRangeSlider('month-slider-range', 1, 12, [1, 12], 1);
+				window.monthSlider = createRangeSlider('month-slider-range', 1, 365, [1, 365], 1);
+
+				// Set initial gradient backgrounds
+				updateSliderBackground(window.elevationSlider, 'elevation');
+				updateSliderBackground(window.tempSlider, 'temp');
+				updateSliderBackground(window.moistureSlider, 'moisture');
+				updateSliderBackground(window.monthSlider, 'month');
 				
 				window.elevationSlider.on('update', function(values) {
 					elevationRange = values.map(v => parseFloat(v));
@@ -1676,7 +1683,58 @@
 				
 			}, 100);
         }
+
+		function updateAllSliderBackgrounds() {
+			if (window.elevationSlider) updateSliderBackground(window.elevationSlider, 
+				currentView === 'elevation' ? 'elevation' : 'default');
+			if (window.tempSlider) updateSliderBackground(window.tempSlider, 
+				currentView === 'temp' ? 'temp' : 'default');
+			if (window.moistureSlider) updateSliderBackground(window.moistureSlider, 
+				currentView === 'moisture' ? 'moisture' : 'default');
+			if (window.monthSlider) updateSliderBackground(window.monthSlider, 
+				currentView === 'month' ? 'month' : 'default');
+		}
         
+		function updateSliderBackground(slider, viewType) {
+			const sliderElement = slider.target;
+			const baseElement = sliderElement.querySelector('.noUi-base');
+			
+			if (!baseElement) return;
+			
+			switch(viewType) {
+				case 'elevation':
+					baseElement.style.background = 'linear-gradient(to right, #6A0DAD, #0000FF, #00FF00, #FFA500, #FFA500, #FF0000)';
+					break;
+				case 'temp':
+					baseElement.style.background = 'linear-gradient(to right, #0000FF, #FF0000)';
+					break;
+				case 'moisture':
+					baseElement.style.background = 'linear-gradient(to right, #FFD700, #00008B)';
+					break;
+				case 'month':
+					// Create gradient that cycles through 12 months across 365 days
+					const monthColors = [
+						'#FF6B6B', '#FF8E53', '#FFB347', '#FFD166', // Jan-Apr
+						'#A8E6CF', '#7BC8A4', '#4ECDC4', '#45B7D1', // May-Aug
+						'#6C5CE7', '#A29BFE', '#DDA0DD', '#FFB6C1'  // Sep-Dec
+					];
+					
+					// Create 12 color stops for the 12 months
+					let gradientStops = '';
+					for (let i = 0; i < 12; i++) {
+						const position = (i / 12) * 100;
+						gradientStops += `${monthColors[i]} ${position}%, `;
+					}
+					// Add the last color again at 100%
+					gradientStops += `${monthColors[0]} 100%`;
+					
+					baseElement.style.background = `linear-gradient(to right, ${gradientStops})`;
+					break;
+				default:
+					baseElement.style.background = '#f0f0f0';
+			}
+		}
+
         // Create range slider with two handles
 		function createRangeSlider(id, min, max, values, step) {
 			const slider = noUiSlider.create(document.getElementById(id), {
@@ -1703,90 +1761,41 @@
 			return slider;
 		}
         
-        function updateMonthLabels() {
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
-                           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            
-            const minMonthElem = document.getElementById('month-min');
-            const maxMonthElem = document.getElementById('month-max');
-            
-            if (minMonthElem && maxMonthElem) {
-                minMonthElem.textContent = months[monthRange[0] - 1] || 'Jan';
-                maxMonthElem.textContent = months[monthRange[1] - 1] || 'Dec';
-            }
-        }
-        
-		function updateMapPoints() {
-			const legendContainer = document.querySelector('.legend-container');
-			const gradientLegend = document.getElementById('gradient-legend');
-			const monthLegend = document.getElementById('month-legend');
-			const legendMin = document.getElementById('legend-min');
-			const legendMax = document.getElementById('legend-max');
+		function updateMonthLabels() {
+			const minDayElem = document.getElementById('month-min');
+			const maxDayElem = document.getElementById('month-max');
 			
-			if (legendContainer) {
-				legendContainer.classList.toggle('active', 
-					currentView === 'elevation' || currentView === 'temp' || currentView === 'moisture' || currentView === 'month');
-			}
-			
-			// Update legend content based on current view
-			if (gradientLegend && legendMin && legendMax) {
-				const legendLabels = document.querySelector('.legend-labels');
+			if (minDayElem && maxDayElem) {
+				// Convert day number to month/day format
+				const getMonthDay = (dayNum) => {
+					// Days per month (non-leap year)
+					const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+					const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+									   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+					
+					let dayCount = dayNum;
+					let month = 0;
+					
+					// Find which month this day falls in
+					while (dayCount > daysInMonth[month]) {
+						dayCount -= daysInMonth[month];
+						month++;
+						if (month >= 12) {
+							month = 11; // Shouldn't happen with 1-365 range
+							dayCount = daysInMonth[11];
+							break;
+						}
+					}
+					
+					return `${monthNames[month]} ${Math.round(dayCount)}`;
+				};
 				
-				switch(currentView) {
-					case 'elevation':
-						gradientLegend.style.display = 'block';
-						monthLegend.style.display = 'none';
-						if (legendLabels) legendLabels.style.display = 'flex';
-						gradientLegend.style.background = 'linear-gradient(to right, #6A0DAD, #0000FF, #00FF00, #FFFF00, #FFA500, #FF0000)';
-						legendMin.textContent = '0 ft';
-						legendMax.textContent = '8000 ft';
-						if (legendContainer) {
-							legendContainer.style.maxWidth = '200px';
-						}
-						break;
-						
-					case 'temp':
-						gradientLegend.style.display = 'block';
-						monthLegend.style.display = 'none';
-						if (legendLabels) legendLabels.style.display = 'flex';
-						gradientLegend.style.background = 'linear-gradient(to right, #0000FF, #FF0000)';
-						legendMin.textContent = '30°F';
-						legendMax.textContent = '70°F';
-						if (legendContainer) {
-							legendContainer.style.maxWidth = '200px';
-						}
-						break;
-						
-					case 'moisture':
-						gradientLegend.style.display = 'block';
-						monthLegend.style.display = 'none';
-						if (legendLabels) legendLabels.style.display = 'flex';
-						gradientLegend.style.background = 'linear-gradient(to right, #FFD700, #00008B)';
-						legendMin.textContent = '0.0';
-						legendMax.textContent = '0.5';
-						if (legendContainer) {
-							legendContainer.style.maxWidth = '200px';
-						}
-						break;
-						
-					case 'month':
-						gradientLegend.style.display = 'none';
-						monthLegend.style.display = 'grid';
-						if (legendLabels) legendLabels.style.display = 'none';
-						if (legendContainer) {
-							legendContainer.style.maxWidth = '180px';
-						}
-						break;
-						
-					default:
-						if (gradientLegend) gradientLegend.style.display = 'block';
-						if (monthLegend) monthLegend.style.display = 'none';
-						if (legendLabels) legendLabels.style.display = 'flex';
-						if (legendMin) legendMin.textContent = 'Min';
-						if (legendMax) legendMax.textContent = 'Max';
-				}
+				minDayElem.textContent = getMonthDay(monthRange[0]);
+				maxDayElem.textContent = getMonthDay(monthRange[1]);
 			}
-			
+		}
+        
+		function updateMapPoints() {			
 			// Clear existing points
 			mapPoints.forEach(point => map.removeLayer(point));
 			mapPoints = [];
@@ -1839,8 +1848,10 @@
 				const inMoistureRange = point.soilMoisture !== null && 
 									 point.soilMoisture >= moistureRange[0] && 
 									 point.soilMoisture <= moistureRange[1];
-				const inMonthRange = point.month >= monthRange[0] && 
-								  point.month <= monthRange[1];
+				let inMonthRange = true; // Default to true for non-month views
+				if (currentView === 'month') {
+					inMonthRange = isPointInDayRange(point, monthRange[0], monthRange[1]);
+				}
 				
 				if (!inElevationRange || !inTempRange || !inMoistureRange || !inMonthRange) return;
 				
@@ -1874,7 +1885,45 @@
 						fillColor = color;
 						break;
 					case 'month':
-						color = monthColors[point.month - 1];
+						// Calculate day of year (1-365) from month and day
+						const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+						let dayOfYear = 0;
+						
+						// Sum days from previous months
+						for (let m = 0; m < point.month - 1; m++) {
+							dayOfYear += daysInMonth[m];
+						}
+						
+						// Add days in current month
+						dayOfYear += point.monthDay;
+						
+						// Clamp to 1-365 range
+						dayOfYear = Math.max(1, Math.min(365, dayOfYear));
+						
+						// Get position in year (0-1)
+						const yearFraction = (dayOfYear - 1) / 364;
+						
+						// Get color from month gradient based on position
+						const monthGradientColors = [
+							'#FF6B6B', '#FF8E53', '#FFB347', '#FFD166', // Jan-Apr
+							'#A8E6CF', '#7BC8A4', '#4ECDC4', '#45B7D1', // May-Aug
+							'#6C5CE7', '#A29BFE', '#DDA0DD', '#FFB6C1'  // Sep-Dec
+						];
+						
+						// Interpolate between month colors
+						const gradientPos = yearFraction * 11; // 0-11 for 12 colors
+						const colorIndex = Math.floor(gradientPos);
+						const colorFraction = gradientPos - colorIndex;
+						
+						if (colorIndex < 11) {
+							// Interpolate between two colors
+							const startColor = monthGradientColors[colorIndex];
+							const endColor = monthGradientColors[colorIndex + 1];
+							color = interpolateColor(startColor, endColor, colorFraction);
+						} else {
+							color = monthGradientColors[11];
+						}
+						
 						fillColor = color;
 						break;
 					default:
@@ -1907,10 +1956,11 @@
 					// Regular point - use calculated color and opacity
 					const marker = L.circleMarker([point.latitude, point.longitude], {
 						radius: point.datasetId === 'user_data' ? 5 : 3,
-						color: color,
+						color: fillColor,
 						fillColor: fillColor,
 						fillOpacity: opacity, // Use the calculated opacity
-						weight: point.datasetId === 'user_data' ? 2 : 1
+						opacity: opacity,
+						weight: point.datasetId === 'user_data' ? 2 : 0
 					}).addTo(map);
 					
 					// Store dataset info for reference
@@ -1936,8 +1986,10 @@
 					const inMoistureRange = point.soilMoisture !== null && 
 										 point.soilMoisture >= moistureRange[0] && 
 										 point.soilMoisture <= moistureRange[1];
-					const inMonthRange = point.month >= monthRange[0] && 
-									  point.month <= monthRange[1];
+					let inMonthRange = true; // Default to true for non-month views
+					if (currentView === 'month') {
+						inMonthRange = isPointInDayRange(point, monthRange[0], monthRange[1]);
+					}
 					
 					if (!inElevationRange || !inTempRange || !inMoistureRange || !inMonthRange) return;
 					
@@ -1992,32 +2044,54 @@
 					}
 				});
 			}
-			
-			// Update month legend if needed
-			if (currentView === 'month') {
-				updateMonthLegend();
-			}
 		}
-        
-        function updateMonthLegend() {
-            const monthLegend = document.getElementById('month-legend');
-            if (!monthLegend) return;
-            
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
-                           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            
-            let legendHTML = '';
-            monthColors.forEach((color, index) => {
-                legendHTML += `
-                    <div class="month-legend-item">
-                        <div class="month-color-box" style="background-color: ${color};"></div>
-                        <div class="month-label">${months[index]}</div>
-                    </div>
-                `;
-            });
-            
-            monthLegend.innerHTML = legendHTML;
-        }
+
+		function isPointInDayRange(point, startDay, endDay) {
+			// Convert point's month/day to day of year
+			const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+			let pointDayOfYear = 0;
+			
+			// Sum days from previous months
+			for (let m = 0; m < point.month - 1; m++) {
+				pointDayOfYear += daysInMonth[m];
+			}
+			
+			// Add days in current month
+			pointDayOfYear += point.monthDay;
+			
+			// Clamp to valid range
+			pointDayOfYear = Math.max(1, Math.min(365, pointDayOfYear));
+			
+			// Check if point is within the day range
+			return pointDayOfYear >= startDay && pointDayOfYear <= endDay;
+		}
+
+		function interpolateColor(color1, color2, factor) {
+			// Convert hex to RGB
+			const hexToRgb = (hex) => {
+				const r = parseInt(hex.slice(1, 3), 16);
+				const g = parseInt(hex.slice(3, 5), 16);
+				const b = parseInt(hex.slice(5, 7), 16);
+				return {r, g, b};
+			};
+			
+			// RGB to hex
+			const rgbToHex = (r, g, b) => {
+				return '#' + [r, g, b].map(x => {
+					const hex = Math.round(x).toString(16);
+					return hex.length === 1 ? '0' + hex : hex;
+				}).join('');
+			};
+			
+			const rgb1 = hexToRgb(color1);
+			const rgb2 = hexToRgb(color2);
+			
+			const r = rgb1.r + factor * (rgb2.r - rgb1.r);
+			const g = rgb1.g + factor * (rgb2.g - rgb1.g);
+			const b = rgb1.b + factor * (rgb2.b - rgb1.b);
+			
+			return rgbToHex(r, g, b);
+		}
         
         function toggleFullscreen() {
             const mapContainer = document.querySelector('.map-container');
@@ -2102,20 +2176,30 @@
 					},
 					onClick: (evt, elements) => {
 						if (elements.length > 0) {
-							const index = elements[0].index;
-							const datasetIndex = elements[0].datasetIndex;
+							const element = elements[0];
+							const datasetIndex = element.datasetIndex;
+							const index = element.index;
 							
-							// Find which dataset was clicked
-							let dataPoint = null;
-							const clickedDataset = evt.chart.data.datasets[datasetIndex];
+							// Get the chart instance
+							const chart = evt.chart;
+							const dataset = chart.data.datasets[datasetIndex];
 							
-							if (clickedDataset && clickedDataset.data[index]) {
-								dataPoint = clickedDataset.data[index];
-							}
-							
-							if (dataPoint) {
-								highlightPoint(dataPoint);
-								showPointInfo(dataPoint);
+							if (dataset && dataset.data[index]) {
+								// Get the original data point (not just x/y properties)
+								const dataPoint = dataset.data[index];
+								
+								// Find the corresponding point in allData using the original properties
+								// Look for a point with matching coordinates and date
+								const originalPoint = allData.find(p => 
+									p.latitude === dataPoint.latitude && 
+									p.longitude === dataPoint.longitude &&
+									p.date === dataPoint.date
+								);
+								
+								if (originalPoint) {
+									highlightPoint(originalPoint);
+									showPointInfo(originalPoint);
+								}
 							}
 						}
 					},
@@ -2185,31 +2269,65 @@
 				type: 'bar',
 				data: {
 					labels: [],
-					datasets: [{
-						label: 'Observations',
-						data: [],
-						backgroundColor: 'rgba(139, 69, 19, 0.7)',
-						borderColor: 'rgba(139, 69, 19, 1)',
-						borderWidth: 1
-					}]
+					datasets: []
 				},
 				options: {
 					responsive: true,
 					maintainAspectRatio: false,
+					onClick: (evt, elements) => {
+						if (elements.length > 0) {
+							const element = elements[0];
+							const chart = evt.chart;
+							const dimension = document.getElementById('histogram-dimension').value;
+							
+							// Get the tooltip for the clicked element
+							const tooltip = chart.tooltip;
+							
+							if (tooltip && tooltip.dataPoints && tooltip.dataPoints.length > 0) {
+								// Get the title from the tooltip
+								const tooltipTitle = tooltip.title && tooltip.title.length > 0 
+									? tooltip.title[0] 
+									: null;
+								
+								if (tooltipTitle) {
+									// For month dimension, the tooltip title already has "Month - Week X" format
+									switchToMapViewFromHistogram(dimension, tooltipTitle);
+								} else {
+									// Fallback to using x-axis label
+									const label = chart.data.labels[element.index];
+									switchToMapViewFromHistogram(dimension, label);
+								}
+							} else {
+								// Fallback if tooltip is not available
+								const label = chart.data.labels[element.index];
+								switchToMapViewFromHistogram(dimension, label);
+							}
+						}
+					},
 					plugins: {
 						legend: {
-							display: false
+							display: true,
+							position: 'top'
 						},
 						tooltip: {
+							mode: 'index',
+							intersect: false,
 							callbacks: {
 								label: function(context) {
-									return `Observations: ${context.parsed.y}`;
+									const label = context.dataset.label || '';
+									const value = context.parsed.y;
+									const total = context.chart.data.datasets
+										.map(ds => ds.data[context.dataIndex])
+										.reduce((a, b) => a + b, 0);
+									const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+									return `${label}: ${value} (${percentage}%)`;
 								}
 							}
 						}
 					},
 					scales: {
 						x: {
+							stacked: true,
 							title: {
 								display: true,
 								text: 'Value',
@@ -2222,6 +2340,7 @@
 							}
 						},
 						y: {
+							stacked: true,
 							title: {
 								display: true,
 								text: 'Count',
@@ -2245,9 +2364,196 @@
 			// Set up histogram dimension change listener
 			document.getElementById('histogram-dimension').addEventListener('change', updateHistogram);
 			document.getElementById('bin-count').addEventListener('change', updateHistogram);
+			document.getElementById('bin-offset').addEventListener('change', updateHistogram);
 			
 			// Set initial state
 			setDefaultAxes();
+		}
+
+		function switchToMapViewFromHistogram(dimension, label) {
+			// Map histogram dimensions to map views
+			const dimensionToView = {
+				'elevationFt': 'elevation',
+				'soilTemp': 'temp',
+				'soilMoisture': 'moisture',
+				'month': 'month',
+				'yearMonth': 'month' // yearMonth also uses month view
+			};
+			
+			const view = dimensionToView[dimension];
+			if (!view) return;
+			
+			// Activate the corresponding view button
+			const viewButtons = document.querySelectorAll('.view-options button');
+			viewButtons.forEach(btn => {
+				btn.classList.remove('active');
+				if (btn.dataset.view === view) {
+					btn.classList.add('active');
+				}
+			});
+			
+			// Set current view
+			currentView = view;
+
+			//Update all slider backgrounds for the new view
+			updateAllSliderBackgrounds();
+			
+			// Parse the label to get range values
+			let rangeValues = parseLabelToRange(dimension, label);
+			
+			if (rangeValues) {
+				// Update the corresponding slider
+				updateSliderFromRange(dimension, rangeValues);
+			}
+			
+			// Update map points with new view
+			updateMapPoints();
+			
+			// Scroll to map if enabled
+			if (enableScroll) {
+				document.getElementById('map').scrollIntoView({ behavior: 'smooth' });
+			}
+		}
+
+		function parseLabelToRange(dimension, label) {
+			// Parse histogram bin label to extract range values
+			// Example labels: "1000 - 2000 ft", "Jan", "45 - 50 °F", "0.10 - 0.15"
+			
+			if (dimension === 'month') {
+				// The label parameter contains the tooltip title, which is "Month - Week X"
+				// Parse it to get month and week
+				const match = label.match(/^(\w{3})\s*-\s*Week\s*(\d+)$/i);
+				
+				if (match) {
+					const monthName = match[1];
+					const weekNumber = parseInt(match[2]);
+					
+					const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+									   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+					const monthIndex = monthNames.indexOf(monthName);
+					
+					if (monthIndex !== -1 && weekNumber >= 1 && weekNumber <= 5) {
+						// Convert month and week to day range
+						const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+						let startDay = 1;
+						
+						// Sum days from previous months
+						for (let m = 0; m < monthIndex; m++) {
+							startDay += daysInMonth[m];
+						}
+						
+						// Add days from previous weeks in this month
+						startDay += (weekNumber - 1) * 7;
+						
+						// End day is start day + 6 (or end of month)
+						const daysInThisMonth = daysInMonth[monthIndex];
+						const remainingDays = daysInThisMonth - ((weekNumber - 1) * 7);
+						const weekDays = Math.min(7, remainingDays);
+						const endDay = startDay + weekDays - 1;
+						
+						return [startDay, endDay];
+					}
+				}
+				
+				// Fallback: If we can't parse week info, use the whole month
+				const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+								   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+				const monthIndex = monthNames.indexOf(label);
+				
+				if (monthIndex !== -1) {
+					// When clicking on a month label, show the full month
+					const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+					let startDay = 1;
+					
+					// Sum days from previous months
+					for (let m = 0; m < monthIndex; m++) {
+						startDay += daysInMonth[m];
+					}
+					
+					const endDay = startDay + daysInMonth[monthIndex] - 1;
+					return [startDay, endDay];
+				}
+			} else if (dimension === 'yearMonth') {
+				// Handle year-month labels like "2023-01"
+				const [year, month] = label.split('-').map(Number);
+				if (month) {
+					return [month, month]; // Single month range
+				}
+			} else {
+				// Handle numeric ranges
+				const rangeMatch = label.match(/([\d\.]+)\s*-\s*([\d\.]+)/);
+				if (rangeMatch) {
+					let min = parseFloat(rangeMatch[1]);
+					let max = parseFloat(rangeMatch[2]);
+					
+					// Adjust for ft vs elevation values
+					if (dimension === 'elevationFt' && label.includes('ft')) {
+						// Already in correct units
+					}
+					
+					return [min, max];
+				}
+			}
+			
+			return null;
+		}
+
+		function updateSliderFromRange(dimension, rangeValues) {
+			const [minValue, maxValue] = rangeValues;
+			
+			// Show the corresponding slider container
+			const sliderContainers = {
+				'elevationFt': 'elevation-slider',
+				'soilTemp': 'temp-slider',
+				'soilMoisture': 'moisture-slider',
+				'month': 'month-slider',
+				'yearMonth': 'month-slider'
+			};
+			
+			const sliderId = sliderContainers[dimension];
+			if (!sliderId) return;
+			
+			// Activate the slider container
+			const allSliders = ['elevation-slider', 'temp-slider', 'moisture-slider', 'month-slider'];
+			allSliders.forEach(id => {
+				const el = document.getElementById(id);
+				if (el) el.classList.remove('active');
+			});
+			
+			const targetSlider = document.getElementById(sliderId);
+			if (targetSlider) {
+				targetSlider.classList.add('active');
+			}
+			
+			// Update the slider values
+			switch(dimension) {
+				case 'elevationFt':
+					if (window.elevationSlider) {
+						window.elevationSlider.set([minValue, maxValue]);
+						elevationRange = [minValue, maxValue];
+					}
+					break;
+				case 'soilTemp':
+					if (window.tempSlider) {
+						window.tempSlider.set([minValue, maxValue]);
+						tempRange = [minValue, maxValue];
+					}
+					break;
+				case 'soilMoisture':
+					if (window.moistureSlider) {
+						window.moistureSlider.set([minValue, maxValue]);
+						moistureRange = [minValue, maxValue];
+					}
+					break;
+				case 'month':
+				case 'yearMonth':
+					if (window.monthSlider) {
+						window.monthSlider.set([minValue, maxValue]);
+						monthRange = [minValue, maxValue];
+						updateMonthLabels();
+					}
+					break;
+			}
 		}
 
 		// Set default axis selections
@@ -2293,12 +2599,17 @@
 				};
 				mainChart.options.scales.x.min = 1;
 				mainChart.options.scales.x.max = 13;
+			} else if (xProp === 'elevationFt') {
+				// Set elevation max to 8000
+				mainChart.options.scales.x.max = 8000;
+				mainChart.options.scales.x.ticks = {};
+				mainChart.options.scales.x.min = 0;
 			} else {
 				mainChart.options.scales.x.ticks = {};
 				mainChart.options.scales.x.min = undefined;
 				mainChart.options.scales.x.max = undefined;
 			}
-			
+
 			if (yProp === 'monthFraction') {
 				mainChart.options.scales.y.ticks = {
 					callback: function(value) {
@@ -2314,6 +2625,11 @@
 				};
 				mainChart.options.scales.y.min = 1;
 				mainChart.options.scales.y.max = 13;
+			} else if (yProp === 'elevationFt') {
+				// Set elevation max to 8000
+				mainChart.options.scales.y.max = 8000;
+				mainChart.options.scales.y.ticks = {};
+				mainChart.options.scales.y.min = 0;
 			} else {
 				mainChart.options.scales.y.ticks = {};
 				mainChart.options.scales.y.min = undefined;
@@ -2322,6 +2638,7 @@
 			
 			// Update chart data
 			updateChartData(xProp, yProp);
+			updateChartColors();
 		}
 
 		// Update chart data
@@ -2364,8 +2681,34 @@
 				});
 			}
 			
+			// Add highlighted point dataset if exists
+			if (highlightedPoint) {
+				const highlightDataset = {
+					label: `Obs: ${highlightedPoint.observationUrl ? highlightedPoint.observationUrl.split('/').pop() : 'User Point'}`,
+					data: [{
+						x: highlightedPoint[xProp],
+						y: highlightedPoint[yProp],
+						...highlightedPoint
+					}],
+					backgroundColor: highlightColor,
+					borderColor: highlightColor,
+					borderWidth: 3,
+					pointRadius: 8,
+					pointHoverRadius: 10,
+					order: -1,
+					datasetId: 'highlighted_point'
+				};
+				
+				datasets.push(highlightDataset);
+			}
+			
 			// Prepare datasets with filtered data
 			mainChart.data.datasets = datasets.map(dataset => {
+				// Skip highlighted dataset - it already has the right data
+				if (dataset.datasetId === 'highlighted_point') {
+					return dataset;
+				}
+				
 				const filteredData = dataset.data
 					.filter(point => point[xProp] !== null && point[yProp] !== null)
 					.map(point => ({
@@ -2386,73 +2729,348 @@
 			mainChart.update();
 		}
 
+		// Helper function to get week number in a month (1-5)
+		function getWeekInMonth(date) {
+			const month = date.getMonth();
+			const year = date.getFullYear();
+			const day = date.getDate();
+			
+			// First day of the month
+			const firstDay = new Date(year, month, 1);
+			const firstDayOfWeek = firstDay.getDay(); // 0 = Sunday
+			
+			// Calculate which week of the month (1-5)
+			return Math.ceil((day + firstDayOfWeek) / 7);
+		}
+
 		// Update histogram
 		function updateHistogram() {
 			const dimension = document.getElementById('histogram-dimension').value;
 			const binCount = parseInt(document.getElementById('bin-count').value) || 15;
-			
-			// Get all values for the selected dimension
-			const values = allData
-				.filter(point => point[dimension] !== null && point[dimension] !== undefined)
-				.map(point => point[dimension]);
-			
-			if (values.length === 0) {
-				histogramChart.data.labels = ['No data'];
-				histogramChart.data.datasets[0].data = [0];
-				histogramChart.update();
-				return;
+			const binOffset = parseInt(document.getElementById('bin-offset').value) || 0;
+
+			// Reset x-axis ticks if not month dimension
+			if (dimension !== 'month') {
+				histogramChart.options.scales.x.ticks = {};
+				histogramChart.options.plugins.tooltip.callbacks = {
+					label: function(context) {
+						const label = context.dataset.label || '';
+						const value = context.parsed.y;
+						const total = context.chart.data.datasets
+							.map(ds => ds.data[context.dataIndex])
+							.reduce((a, b) => a + b, 0);
+						const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+						return `${label}: ${value} (${percentage}%)`;
+					}
+				};
 			}
 			
-			// Create bins
-			let bins, labels;
+			// Get all active datasets
+			const activeDatasetIds = Object.keys(activeDatasets).filter(id => activeDatasets[id].active);
 			
+			// Special handling for month and yearMonth dimensions
 			if (dimension === 'month') {
-				// For months, use fixed bins (1-12)
-				bins = Array(12).fill(0);
-				values.forEach(value => {
-					const monthIndex = Math.floor(value) - 1;
-					if (monthIndex >= 0 && monthIndex < 12) {
-						bins[monthIndex]++;
-					}
-				});
-				labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
-						 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-			} else if (dimension === 'yearMonth') {
-				// For year-month, group by unique values
-				const valueCounts = {};
-				values.forEach(value => {
-					valueCounts[value] = (valueCounts[value] || 0) + 1;
+				// For months split into weeks, create 60 bins (12 months × 5 weeks)
+				const weekBins = Array(60).fill(0);
+				const datasetsData = {};
+				
+				// Initialize data structure for each dataset
+				activeDatasetIds.forEach(id => {
+					datasetsData[id] = Array(60).fill(0);
 				});
 				
-				labels = Object.keys(valueCounts).sort();
-				bins = labels.map(label => valueCounts[label]);
+				// Count values per dataset per week
+				allData.forEach(point => {
+					if (point.date) {
+						try {
+							const date = new Date(point.date);
+							const month = date.getMonth(); // 0-11
+							const week = getWeekInMonth(date); // 1-5
+							
+							// Calculate bin index: (month * 5) + (week - 1)
+							const binIndex = (month * 5) + (week - 1);
+							
+							if (binIndex >= 0 && binIndex < 60) {
+								weekBins[binIndex]++;
+								if (point.datasetId && datasetsData[point.datasetId]) {
+									datasetsData[point.datasetId][binIndex]++;
+								}
+							}
+						} catch (e) {
+							console.error('Error parsing date:', point.date, e);
+						}
+					}
+				});
+				
+				// Create month labels (one per month, not per week)
+				const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+								   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+				const monthLabels = monthNames;
+				
+				// Apply offset
+				let finalWeekLabels = [];
+				let finalDatasetsData = {};
+
+				// Create detailed week labels for tooltips
+				for (let month = 0; month < 12; month++) {
+					for (let week = 1; week <= 5; week++) {
+						finalWeekLabels.push(`Week ${week}`);
+					}
+				}
+
+				// Apply offset to the data (skip first N weeks)
+				const startIndex = binOffset * 5; // Convert months to weeks (5 weeks per month)
+				const totalWeeks = 60;
+
+				activeDatasetIds.forEach(id => {
+					// Get the weekly data
+					const weeklyData = datasetsData[id] || Array(60).fill(0);
+					
+					// Apply offset by slicing the data
+					const slicedData = weeklyData.slice(startIndex);
+					
+					// Store the sliced data
+					finalDatasetsData[id] = slicedData;
+				});
+
+				// Apply same offset to labels
+				const slicedWeekLabels = finalWeekLabels.slice(startIndex);
+
+				// Update histogram with sliced data
+				histogramChart.data.labels = slicedWeekLabels;
+				histogramChart.data.datasets = [];
+
+				// Create datasets for chart
+				activeDatasetIds.forEach(id => {
+					const datasetInfo = activeDatasets[id];
+					histogramChart.data.datasets.push({
+						label: datasetInfo.fileName,
+						data: finalDatasetsData[id] || Array(slicedWeekLabels.length).fill(0),
+						backgroundColor: datasetInfo.color,
+						borderColor: datasetInfo.color,
+						borderWidth: 1
+					});
+				});
+
+				// Customize x-axis to show month names instead of week numbers
+				histogramChart.options.scales.x.ticks = {
+					callback: function(value, index, ticks) {
+						// Calculate the original week index (accounting for offset)
+						const originalIndex = index + startIndex;
+						// Group every 5 weeks into a month
+						const monthIndex = Math.floor(originalIndex / 5);
+						const weekInMonth = originalIndex % 5;
+						
+						// Show month name in the middle week (week 3) of each month
+						if (weekInMonth === 2) { // Week 3 (0-indexed: 0=W1, 1=W2, 2=W3, 3=W4, 4=W5)
+							return monthNames[monthIndex] || '';
+						}
+						
+						// Add a small tick mark at the start of each month (optional)
+						if (weekInMonth === 0) {
+							// You can return a small character or just empty string
+							return '|';
+						}
+						
+						return ''; // Don't show week numbers on x-axis
+					},
+					autoSkip: false,
+					maxRotation: 0,
+					padding: 10,
+					// Add minor ticks between weeks
+					minor: {
+						enabled: true
+					}
+				};
+
+				// Add grid lines between months for better visualization
+				histogramChart.options.scales.x.grid = {
+					...histogramChart.options.scales.x.grid,
+					color: function(context) {
+						// Calculate the original week index (accounting for offset)
+						const originalIndex = context.index + startIndex;
+						const weekInMonth = originalIndex % 5;
+						
+						// Draw a thicker line at the start of each month (between months)
+						if (weekInMonth === 0 && context.index > 0) {
+							return 'rgba(0, 0, 0, 0.3)'; // Darker line between months
+						}
+						
+						// Draw medium line between weeks
+						return 'rgba(0, 0, 0, 0.1)'; // Lighter line between weeks
+					},
+					lineWidth: function(context) {
+						// Calculate the original week index (accounting for offset)
+						const originalIndex = context.index + startIndex;
+						const weekInMonth = originalIndex % 5;
+						
+						// Thicker line at month boundaries
+						if (weekInMonth === 0 && context.index > 0) {
+							return 2;
+						}
+						
+						// Normal line between weeks
+						return 1;
+					}
+				};
+				
+				// Customize tooltip to show week number
+				histogramChart.options.plugins.tooltip.callbacks = {
+					...histogramChart.options.plugins.tooltip.callbacks,
+					title: function(context) {
+						// Get the index of the hovered bar (accounting for offset)
+						const index = context[0].dataIndex + startIndex;
+						const monthIndex = Math.floor(index / 5);
+						const weekNumber = (index % 5) + 1;
+						return `${monthNames[monthIndex]} - Week ${weekNumber}`;
+					},
+					label: function(context) {
+						const label = context.dataset.label || '';
+						const value = context.parsed.y;
+						const total = context.chart.data.datasets
+							.map(ds => ds.data[context.dataIndex])
+							.reduce((a, b) => a + b, 0);
+						const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+						return `${label}: ${value} (${percentage}%)`;
+					}
+				};
+				
+			} else if (dimension === 'yearMonth') {
+				// For year-month, group by unique values
+				const uniqueValues = [...new Set(allData
+					.filter(point => point[dimension] !== null && point[dimension] !== undefined)
+					.map(point => point[dimension]))].sort();
+				
+				const datasetsData = {};
+				
+				// Initialize data structure for each dataset
+				activeDatasetIds.forEach(id => {
+					datasetsData[id] = Array(uniqueValues.length).fill(0);
+				});
+				
+				// Count values per dataset
+				allData.forEach(point => {
+					if (point[dimension] !== null && point[dimension] !== undefined) {
+						const valueIndex = uniqueValues.indexOf(point[dimension]);
+						if (valueIndex !== -1) {
+							if (point.datasetId && datasetsData[point.datasetId]) {
+								datasetsData[point.datasetId][valueIndex]++;
+							}
+						}
+					}
+				});
+				
+				// Apply offset
+				let finalLabels = uniqueValues;
+				let finalDatasetsData = datasetsData;
+				if (binOffset > 0) {
+					finalLabels = uniqueValues.slice(binOffset);
+					Object.keys(datasetsData).forEach(id => {
+						finalDatasetsData[id] = datasetsData[id].slice(binOffset);
+					});
+				}
+				
+				// Create datasets for chart
+				const datasets = [];
+				activeDatasetIds.forEach(id => {
+					const datasetInfo = activeDatasets[id];
+					datasets.push({
+						label: datasetInfo.fileName,
+						data: finalDatasetsData[id] || Array(finalLabels.length).fill(0),
+						backgroundColor: datasetInfo.color,
+						borderColor: datasetInfo.color,
+						borderWidth: 1
+					});
+				});
+				
+				// Update histogram
+				histogramChart.data.labels = finalLabels;
+				histogramChart.data.datasets = datasets;
+				
 			} else {
 				// For numeric dimensions, create bins
+				const values = allData
+					.filter(point => point[dimension] !== null && point[dimension] !== undefined)
+					.map(point => point[dimension]);
+				
+				if (values.length === 0) {
+					histogramChart.data.labels = ['No data'];
+					histogramChart.data.datasets = [];
+					histogramChart.update();
+					return;
+				}
+				
 				const min = Math.min(...values);
 				const max = Math.max(...values);
 				const binSize = (max - min) / binCount;
 				
-				bins = Array(binCount).fill(0);
-				labels = [];
+				const datasetsData = {};
 				
-				// Create bins and count values
-				values.forEach(value => {
-					let binIndex = Math.floor((value - min) / binSize);
-					if (binIndex === binCount) binIndex = binCount - 1; // Handle edge case
-					bins[binIndex]++;
+				// Initialize data structure for each dataset
+				activeDatasetIds.forEach(id => {
+					datasetsData[id] = Array(binCount).fill(0);
 				});
 				
-				// Create labels for bins
+				// Count values per dataset per bin
+				allData.forEach(point => {
+					if (point[dimension] !== null && point[dimension] !== undefined) {
+						let binIndex = Math.floor((point[dimension] - min) / binSize);
+						if (binIndex === binCount) binIndex = binCount - 1; // Handle edge case
+						
+						if (point.datasetId && datasetsData[point.datasetId]) {
+							datasetsData[point.datasetId][binIndex]++;
+						}
+					}
+				});
+				
+				// Create labels for bins with better formatting
+				const labels = [];
 				for (let i = 0; i < binCount; i++) {
 					const binStart = min + (i * binSize);
 					const binEnd = min + ((i + 1) * binSize);
-					labels.push(`${binStart.toFixed(1)} - ${binEnd.toFixed(1)}`);
+					
+					// Format based on dimension type
+					if (dimension === 'elevationFt') {
+						// Round to nearest 100 for clean numbers
+						const roundedStart = Math.round(binStart / 100) * 100;
+						const roundedEnd = Math.round(binEnd / 100) * 100;
+						labels.push(`${roundedStart} - ${roundedEnd} ft`);
+					} else if (dimension === 'soilTemp') {
+						labels.push(`${Math.round(binStart)} - ${Math.round(binEnd)} °F`);
+					} else if (dimension === 'soilMoisture') {
+						labels.push(`${binStart.toFixed(2)} - ${binEnd.toFixed(2)}`);
+					} else {
+						labels.push(`${binStart.toFixed(1)} - ${binEnd.toFixed(1)}`);
+					}
 				}
+				
+				// Apply offset
+				let finalLabels = labels;
+				let finalDatasetsData = datasetsData;
+				if (binOffset > 0) {
+					finalLabels = labels.slice(binOffset);
+					Object.keys(datasetsData).forEach(id => {
+						finalDatasetsData[id] = datasetsData[id].slice(binOffset);
+					});
+				}
+				
+				// Create datasets for chart
+				const datasets = [];
+				activeDatasetIds.forEach(id => {
+					const datasetInfo = activeDatasets[id];
+					datasets.push({
+						label: datasetInfo.fileName,
+						data: finalDatasetsData[id] || Array(finalLabels.length).fill(0),
+						backgroundColor: datasetInfo.color,
+						borderColor: datasetInfo.color,
+						borderWidth: 1
+					});
+				});
+				
+				// Update histogram
+				histogramChart.data.labels = finalLabels;
+				histogramChart.data.datasets = datasets;
 			}
-			
-			// Update histogram
-			histogramChart.data.labels = labels;
-			histogramChart.data.datasets[0].data = bins;
 			
 			// Update axis label
 			const dimensionLabels = {
@@ -2474,16 +3092,36 @@
 			// Update main chart colors
 			updateChartColors();
 			
+			// Update histogram colors
+			if (histogramChart && histogramChart.data && histogramChart.data.datasets) {
+				let needsUpdate = false;
+				
+				histogramChart.data.datasets.forEach(dataset => {
+					// Find the corresponding dataset in activeDatasets
+					const datasetId = Object.keys(activeDatasets).find(id => 
+						activeDatasets[id].fileName === dataset.label
+					);
+					
+					if (datasetId && activeDatasets[datasetId]) {
+						const newColor = activeDatasets[datasetId].color;
+						// Only update if color changed
+						if (dataset.backgroundColor !== newColor) {
+							dataset.backgroundColor = newColor;
+							dataset.borderColor = newColor;
+							needsUpdate = true;
+						}
+					}
+				});
+				
+				// Only update if colors changed
+				if (needsUpdate) {
+					histogramChart.update();
+				}
+			}
+			
 			// Update map point colors if markers exist
 			if (mapPoints.length > 0) {
 				updateMapPointColors();
-			}
-			
-			// Update histogram color
-			if (histogramChart && histogramChart.data && histogramChart.data.datasets[0]) {
-				histogramChart.data.datasets[0].backgroundColor = 'rgba(139, 69, 19, 0.7)';
-				histogramChart.data.datasets[0].borderColor = 'rgba(139, 69, 19, 1)';
-				histogramChart.update('none');
 			}
 			
 			// Restore highlight if there was one
@@ -2527,61 +3165,83 @@
 			// If no markers exist yet, return early
 			if (mapPoints.length === 0) return;
 			
-			// Update existing markers with new colors
-			mapPoints.forEach(marker => {
-				const datasetId = marker._datasetId;
-				
-				// Skip highlighted markers completely
-				if (marker._isHighlighted) return;
-				
-				// Handle user data points
-				if (datasetId === 'user_data') {
-					marker.setStyle({
-						color: userPointColor,
-						fillColor: userPointColor,
-						fillOpacity: 0.8
-					});
-					return;
-				}
-				
-				if (datasetId && activeDatasets[datasetId]) {
-					const datasetInfo = activeDatasets[datasetId];
-					const color = datasetInfo.color;
+			// Save current highlight state
+			const currentHighlight = highlightedPoint;
+			
+			// First, remove all highlights temporarily
+			removeHighlights();
+			
+			// If we're in a view mode, completely redraw map points with correct colors
+			if (currentView && currentView !== 'default') {
+				updateMapPoints(); // This will recreate all points with correct view-based colors
+			} else {
+				// In default mode, update existing markers with new colors
+				mapPoints.forEach(marker => {
+					const datasetId = marker._datasetId;
 					
-					// Extract alpha from color string
-					let fillOpacity = 0.8; // default
-					if (color.length === 9) { // #RRGGBBAA format
-						const alphaHex = color.substring(7, 9);
-						fillOpacity = parseInt(alphaHex, 16) / 255;
-					}
-					
-					marker.setStyle({
-						color: color,
-						fillColor: color,
-						fillOpacity: fillOpacity
-					});
-				} else {
-					// Try to find the marker's corresponding data point
-					const latlng = marker.getLatLng();
-					
-					// Look for user data points that match this marker's location
-					const userPoint = userData.find(point => 
-						Math.abs(point.latitude - latlng.lat) < 0.0001 && 
-						Math.abs(point.longitude - latlng.lng) < 0.0001
-					);
-					
-					if (userPoint) {
-						// This is a user point
+					// Handle user data points
+					if (datasetId === 'user_data') {
 						marker.setStyle({
 							color: userPointColor,
 							fillColor: userPointColor,
-							fillOpacity: 0.8
+							fillOpacity: 0.8,
+							weight: 2,
+							radius: 5
 						});
-						// Update the datasetId for future reference
-						marker._datasetId = 'user_data';
+						return;
 					}
-				}
-			});
+					
+					if (datasetId && activeDatasets[datasetId]) {
+						const datasetInfo = activeDatasets[datasetId];
+						const color = datasetInfo.color;
+						
+						// Extract alpha from color string
+						let fillOpacity = 0.8; // default
+						if (color.length === 9) { // #RRGGBBAA format
+							const alphaHex = color.substring(7, 9);
+							fillOpacity = parseInt(alphaHex, 16) / 255;
+						}
+						
+						marker.setStyle({
+							color: color,
+							fillColor: color,
+							fillOpacity: fillOpacity,
+							weight: 0,
+							radius: 3
+						});
+					} else {
+						// Try to find the marker's corresponding data point
+						const latlng = marker.getLatLng();
+						
+						// Look for user data points that match this marker's location
+						const userPoint = userData.find(point => 
+							Math.abs(point.latitude - latlng.lat) < 0.0001 && 
+							Math.abs(point.longitude - latlng.lng) < 0.0001
+						);
+						
+						if (userPoint) {
+							// This is a user point
+							marker.setStyle({
+								color: userPointColor,
+								fillColor: userPointColor,
+								fillOpacity: 0.8,
+								weight: 2,
+								radius: 5
+							});
+							// Update the datasetId for future reference
+							marker._datasetId = 'user_data';
+						}
+					}
+				});
+			}
+			
+			// Re-apply highlight if there was one
+			if (currentHighlight) {
+				// Use a small delay to ensure markers are recreated
+				setTimeout(() => {
+					highlightPoint(currentHighlight);
+				}, 100);
+			}
 		}
 
         // Update charts with current data
@@ -2661,7 +3321,7 @@
 				</div>
 				<div class="info-item">
 					<span class="info-label">Open-Meteo Docs:</span> 
-					<a href="${docsUrl}" target="_blank" class="link">${docsUrl}</a>
+					<a href="${docsUrl}" target="_blank" class="link">https://open-meteo.com/docs...</a>
 				</div>
 			`;
 			
@@ -3032,6 +3692,7 @@
                 allData = [...originalData, ...userData];
                 
 				updateCharts(); // Just update charts with current data
+				updateChartColors();
 				populateDataTable(); // Update table
 
 				// Update map points to include the new user point
@@ -3156,7 +3817,6 @@
 				});
 				
 				// Initialize with default settings
-				updateMonthLegend();
 				setTimeout(() => {
 					if (typeof updateMapPoints === 'function') {
 						updateMapPoints();
