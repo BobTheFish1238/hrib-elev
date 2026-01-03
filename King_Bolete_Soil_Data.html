@@ -275,7 +275,7 @@
         }
         
         .map-container {
-            height: 300px;
+            height: 600px;
             width: 100%;
             border-radius: 8px;
             overflow: hidden;
@@ -544,7 +544,7 @@
 			}
 		}
         
-        /* New styles for map controls */
+        /* Styles for map controls */
         .map-controls {
             position: absolute;
             top: 10px;
@@ -807,6 +807,144 @@
 		#clear-user-points:hover {
 			background-color: #f0f0f0;
 		}
+
+		.aspect-circular-container {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			padding: 10px;
+			background: #f9f9f9;
+			border-radius: 5px;
+			margin-top: 5px;
+		}
+
+		.aspect-inputs {
+			display: flex;
+			align-items: center;
+			gap: 15px;
+			margin-bottom: 15px;
+			width: 100%;
+			justify-content: center;
+		}
+
+		.aspect-input {
+			display: flex;
+			align-items: center;
+			gap: 5px;
+		}
+
+		.aspect-input input {
+			width: 60px;
+			padding: 5px;
+			border: 1px solid #ddd;
+			border-radius: 3px;
+			text-align: center;
+		}
+
+		.aspect-circle {
+			position: relative;
+			width: 200px;
+			height: 200px;
+			border-radius: 50%;
+			background: conic-gradient(
+				from 0deg,
+				#ff0000 0deg,
+				#ffff00 90deg,
+				#00ff00 180deg,
+				#0000ff 270deg,
+				#ff0000 360deg
+			);
+			border: 2px solid white;
+			box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+		}
+
+		/* Selected range overlay */
+		.aspect-selected-overlay {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			border-radius: 50%;
+			pointer-events: none;
+		}
+
+		.aspect-handle {
+			position: absolute;
+			width: 16px;
+			height: 16px;
+			border-radius: 50%;
+			background: #cc5d31;
+			border: 2px solid white;
+			cursor: pointer;
+			box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+			transform: translate(-50%, -50%);
+			z-index: 10;
+		}
+
+		.aspect-handle.start {
+			background: #8B4513;
+		}
+
+		.aspect-handle.end {
+			background: #cc5d31;
+		}
+
+		.aspect-center {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 60%;
+			height: 60%;
+			background: white;
+			border-radius: 50%;
+			transform: translate(-50%, -50%);
+			pointer-events: none;
+		}
+
+		.aspect-north {
+			position: absolute;
+			top: 10px;
+			left: 50%;
+			transform: translateX(-50%);
+			font-size: 12px;
+			font-weight: bold;
+			color: #333;
+		}
+
+		.aspect-compass {
+			position: absolute;
+			font-size: 12px;
+			font-weight: bold;
+			color: #333;
+			pointer-events: none;
+			text-shadow: 1px 1px 1px white;
+		}
+
+		/* Main compass directions */
+		.aspect-compass.north { top: -20px; left: 50%; transform: translateX(-50%); }
+		.aspect-compass.east { top: 50%; right: -20px; transform: translateY(-50%); }
+		.aspect-compass.south { bottom: -20px; left: 50%; transform: translateX(-50%); }
+		.aspect-compass.west { top: 50%; left: -20px; transform: translateY(-50%); }
+
+		/* Intermediate directions */
+		.aspect-compass.northeast { top: 10px; right: 10px; }
+		.aspect-compass.southeast { bottom: 10px; right: 10px; }
+		.aspect-compass.southwest { bottom: 10px; left: 10px; }
+		.aspect-compass.northwest { top: 10px; left: 10px; }
+
+		/* Degree markers */
+		.aspect-degree {
+			position: absolute;
+			font-size: 10px;
+			color: #666;
+			pointer-events: none;
+		}
+
+		.aspect-degree.zero { top: 5px; left: 50%; transform: translateX(-50%); }
+		.aspect-degree.ninety { top: 50%; right: 5px; transform: translateY(-50%); }
+		.aspect-degree.one-eighty { bottom: 5px; left: 50%; transform: translateX(-50%); }
+		.aspect-degree.two-seventy { top: 50%; left: 5px; transform: translateY(-50%); }
     </style>
 </head>
 <body>
@@ -930,16 +1068,20 @@
 										<option value="elevationFt">Elevation (ft)</option>
 										<option value="soilTemp">Soil Temperature (°F)</option>
 										<option value="soilMoisture">Soil Moisture</option>
+										<option value="slopeDeg">Slope (degrees)</option>
+										<option value="slopeAspectDeg">Aspect (degrees)</option>
 										<option value="monthFraction">Date</option>
 									</select>
 								</div>
 								<div class="axis-selector">
 									<label for="x-axis">X-Axis:</label>
 									<select id="x-axis">
+										<option value="elevationFt">Elevation (ft)</option>
 										<option value="soilTemp">Soil Temperature (°F)</option>
 										<option value="soilMoisture">Soil Moisture</option>
+										<option value="slopeDeg">Slope (degrees)</option>
+										<option value="slopeAspectDeg">Aspect (degrees)</option>
 										<option value="monthFraction">Date</option>
-										<option value="elevationFt">Elevation (ft)</option>
 									</select>
 								</div>
 							</div>
@@ -958,6 +1100,8 @@
 								<option value="elevationFt">Elevation (ft)</option>
 								<option value="soilTemp">Soil Temperature (°F)</option>
 								<option value="soilMoisture">Soil Moisture</option>
+								<option value="slopeDeg">Slope (degrees)</option>
+								<option value="slopeAspectDeg">Aspect (degrees)</option>
 								<option value="month">Month</option>
 								<option value="yearMonth">Year-Month</option>
 							</select>
@@ -996,6 +1140,8 @@
 								<th style="padding: 10px; text-align: center;">Elevation (ft)</th>
 								<th style="padding: 10px; text-align: center;">Soil Temp (°F)</th>
 								<th style="padding: 10px; text-align: center;">Soil Moisture</th>
+								<th style="padding: 10px; text-align: center;">Slope (deg)</th>
+								<th style="padding: 10px; text-align: center;">Aspect (deg)</th>
 							</tr>
 						</thead>
 						<tbody id="table-body">
@@ -1026,10 +1172,12 @@
         // Initialize map
         let map, marker, mapPoints = [];
         let currentView = 'default';
-        let elevationRange = [0, 8000];
-        let tempRange = [0, 100];
-        let moistureRange = [0, 1];
-        let monthRange = [1, 12];
+		let elevationRange = [0, 8000];
+		let tempRange = [0, 100];
+		let moistureRange = [0, 1];
+		let slopeRange = [0, 90];
+		let aspectRange = [0, 360];
+		let monthRange = [1, 12];
 		let highlightedPoint = null;
 		let highlightedChartElements = [];
         
@@ -1218,26 +1366,37 @@
 		}
         
         // Color scales
-        const elevationColorScale = d3.scaleLinear()
-            .domain([0, 1333, 2666, 4000, 5333, 6666, 8000])
-            .range([
-                '#6A0DAD', // Purple at 0 ft
-                '#0000FF', // Blue at 1333 ft
-                '#00FF00', // Green at 2666 ft
-                '#FFA500', // Yellow at 4000 ft
-                '#FFA500', // Orange at 5333 ft
-                '#FF4500', // Red-Orange at 6666 ft
-                '#FF0000'  // Red at 8000 ft
-            ]);
+		const elevationColorScale = d3.scaleLinear()
+			.domain([0, 1333, 2666, 4000, 5333, 6666, 8000])
+			.range([
+				'#6A0DAD', // Purple at 0 ft
+				'#0000FF', // Blue at 1333 ft
+				'#00FF00', // Green at 2666 ft
+				'#FFA500', // Yellow at 4000 ft
+				'#FFA500', // Orange at 5333 ft
+				'#FF4500', // Red-Orange at 6666 ft
+				'#FF0000'  // Red at 8000 ft
+			]);
 
-        const tempColorScale = d3.scaleLinear()
-            .domain([45, 65])
-            .range(['#0000FF', '#FF0000'])
-            .interpolate(d3.interpolateHcl);
+		const tempColorScale = d3.scaleLinear()
+			.domain([45, 65])
+			.range(['#0000FF', '#FF0000'])
+			.interpolate(d3.interpolateHcl);
 
-        const moistureColorScale = d3.scaleLinear()
-            .domain([0.2, 0.4])
-            .range(['#FFD700', '#00008B']); // Gold to Dark Blue
+		const moistureColorScale = d3.scaleLinear()
+			.domain([0.2, 0.4])
+			.range(['#FFD700', '#00008B']); // Gold to Dark Blue
+
+		// Slope degree color scale
+		const slopeColorScale = d3.scaleLinear()
+			.domain([0, 90])
+			.range(['#00FF00', '#FF0000']) // Green to Red
+			.interpolate(d3.interpolateHcl);
+
+		// Slope aspect color scale (circular color scale for 0-360 degrees)
+		const aspectColorScale = d3.scaleLinear()
+			.domain([0, 90, 180, 270, 360])
+			.range(['#FF0000', '#FFFF00', '#00FF00', '#0000FF', '#FF0000']); // Red->Yellow->Green->Blue->Red
 
         // Month colors
         const monthColors = [
@@ -1449,68 +1608,70 @@
         }
         
         // Process NDJSON data based on current settings
-        function processNdjsonData() {
-            chartData = [];
-            originalData = [];
-            
-            // Process each active NDJSON file
-            Object.keys(activeDatasets).forEach(fileId => {
-                const fileData = activeDatasets[fileId];
-                
-                if (fileData.active && fileData.data.length > 0) {
-                    fileData.data.forEach(record => {
-                        // Calculate averages based on settings
-                        const daysToAverage = Math.min(averageDays, record.dates.length);
-                        const startIdx = record.dates.length - daysToAverage;
-                        
-                        // Get soil temperature data for selected depth
-                        const tempData = record.soil_temperature[tempDepth];
-                        const avgTemp = tempData && tempData.length > 0 ?
-                            tempData.slice(startIdx).reduce((sum, val) => sum + val, 0) / daysToAverage :
-                            null;
-                        
-                        // Get soil moisture data for selected depth
-                        const moistureData = record.soil_moisture[moistureDepth];
-                        const avgMoisture = moistureData && moistureData.length > 0 ?
-                            moistureData.slice(startIdx).reduce((sum, val) => sum + val, 0) / daysToAverage :
-                            null;
-                        
-                        // Parse date
-                        const date = new Date(record.date_used);
-                        const month = date.getMonth() + 1;
-                        const monthDay = date.getDate();
-                        const monthFraction = month + (monthDay / 31);
-                        
-                        // Create data point
-                        const dataPoint = {
-                            datasetId: fileId,
-                            datasetName: fileData.fileName,
-                            datasetColor: fileData.color,
-                            observationUrl: record.observation_url,
-                            date: record.date_used,
-                            coordinates: record.coordinates,
-                            elevationFt: record.elevation_ft,
-                            soilTemp: avgTemp,
-                            soilMoisture: avgMoisture,
-                            month: month,
-                            monthName: date.toLocaleString('default', { month: 'short' }),
-                            monthDay: monthDay,
-                            monthFraction: monthFraction,
-                            yearMonth: date.getFullYear() + '-' + String(month).padStart(2, '0'),
-                            latitude: parseFloat(record.coordinates.split(',')[0]),
-                            longitude: parseFloat(record.coordinates.split(',')[1]),
-                            rawData: record
-                        };
-                        
-                        chartData.push(dataPoint);
-                        originalData.push(dataPoint);
-                    });
-                }
-            });
-            
-            // Combine with user data
-            allData = [...originalData, ...userData];
-        }
+		function processNdjsonData() {
+			chartData = [];
+			originalData = [];
+			
+			// Process each active NDJSON file
+			Object.keys(activeDatasets).forEach(fileId => {
+				const fileData = activeDatasets[fileId];
+				
+				if (fileData.active && fileData.data.length > 0) {
+					fileData.data.forEach(record => {
+						// Calculate averages based on settings
+						const daysToAverage = Math.min(averageDays, record.dates.length);
+						const startIdx = record.dates.length - daysToAverage;
+						
+						// Get soil temperature data for selected depth
+						const tempData = record.soil_temperature[tempDepth];
+						const avgTemp = tempData && tempData.length > 0 ?
+							tempData.slice(startIdx).reduce((sum, val) => sum + val, 0) / daysToAverage :
+							null;
+						
+						// Get soil moisture data for selected depth
+						const moistureData = record.soil_moisture[moistureDepth];
+						const avgMoisture = moistureData && moistureData.length > 0 ?
+							moistureData.slice(startIdx).reduce((sum, val) => sum + val, 0) / daysToAverage :
+							null;
+						
+						// Parse date
+						const date = new Date(record.date_used);
+						const month = date.getMonth() + 1;
+						const monthDay = date.getDate();
+						const monthFraction = month + (monthDay / 31);
+						
+						// Create data point
+						const dataPoint = {
+							datasetId: fileId,
+							datasetName: fileData.fileName,
+							datasetColor: fileData.color,
+							observationUrl: record.observation_url,
+							date: record.date_used,
+							coordinates: record.coordinates,
+							elevationFt: record.aws_elevation_ft || record.elevation_ft, // Use aws_elevation_ft if available
+							soilTemp: avgTemp,
+							soilMoisture: avgMoisture,
+							month: month,
+							monthName: date.toLocaleString('default', { month: 'short' }),
+							monthDay: monthDay,
+							monthFraction: monthFraction,
+							yearMonth: date.getFullYear() + '-' + String(month).padStart(2, '0'),
+							latitude: parseFloat(record.coordinates.split(',')[0]),
+							longitude: parseFloat(record.coordinates.split(',')[1]),
+							slopeDeg: record.slope_deg, // Add slope degree
+							slopeAspectDeg: record.slope_aspect_deg, // Add slope aspect
+							rawData: record
+						};
+						
+						chartData.push(dataPoint);
+						originalData.push(dataPoint);
+					});
+				}
+			});
+			
+			// Combine with user data
+			allData = [...originalData, ...userData];
+		}
         
         // Update all charts and map with current data
 		function updateDataDisplay(updateVisualsOnlyFlag = false) {
@@ -1567,51 +1728,110 @@
                 L.DomEvent.disableClickPropagation(div);
                 
                 // View options - updated to include soil moisture
-                div.innerHTML = `
-                    <div class="view-options">
-                        <button class="active" data-view="default">Default</button>
-                        <button data-view="elevation">Elevation</button>
-                        <button data-view="temp">Soil Temp</button>
-                        <button data-view="moisture">Soil Moisture</button>
-                        <button data-view="month">Month</button>
-                    </div>
-                    <div id="elevation-slider" class="slider-container">
-                        <label>Elevation Range (ft)</label>
-                        <div id="elevation-slider-range" class="range-slider"></div>
-                        <div class="range-values">
-                            <span id="elevation-min">0</span>
-                            <span>-</span>
-                            <span id="elevation-max">8000</span>
-                        </div>
-                    </div>
-                    <div id="temp-slider" class="slider-container">
-                        <label>Soil Temp Range (°F)</label>
-                        <div id="temp-slider-range" class="range-slider"></div>
-                        <div class="range-values">
-                            <span id="temp-min">30</span>
-                            <span>-</span>
-                            <span id="temp-max">70</span>
-                        </div>
-                    </div>
-                    <div id="moisture-slider" class="slider-container">
-                        <label>Soil Moisture Range</label>
-                        <div id="moisture-slider-range" class="range-slider"></div>
-                        <div class="range-values">
-                            <span id="moisture-min">0</span>
-                            <span>-</span>
-                            <span id="moisture-max">0.5</span>
-                        </div>
-                    </div>
-                    <div id="month-slider" class="slider-container">
-                        <label>Month Range</label>
-                        <div id="month-slider-range" class="range-slider"></div>
-                        <div class="range-values">
-                            <span id="month-min">Jan</span>
-                            <span>-</span>
-                            <span id="month-max">Dec</span>
-                        </div>
-                    </div>
-                `;
+				div.innerHTML = `
+					<div class="view-options">
+						<button class="active" data-view="default">Default</button>
+						<button data-view="elevation">Elevation</button>
+						<button data-view="temp">Soil Temp</button>
+						<button data-view="moisture">Soil Moisture</button>
+						<button data-view="slope">Slope</button>
+						<button data-view="aspect">Aspect</button>
+						<button data-view="month">Month</button>
+					</div>
+					<div id="elevation-slider" class="slider-container">
+						<label>Elevation Range (ft)</label>
+						<div id="elevation-slider-range" class="range-slider"></div>
+						<div class="range-values">
+							<span id="elevation-min">0</span>
+							<span>-</span>
+							<span id="elevation-max">8000</span>
+						</div>
+					</div>
+					<div id="temp-slider" class="slider-container">
+						<label>Soil Temp Range (°F)</label>
+						<div id="temp-slider-range" class="range-slider"></div>
+						<div class="range-values">
+							<span id="temp-min">30</span>
+							<span>-</span>
+							<span id="temp-max">70</span>
+						</div>
+					</div>
+					<div id="moisture-slider" class="slider-container">
+						<label>Soil Moisture Range</label>
+						<div id="moisture-slider-range" class="range-slider"></div>
+						<div class="range-values">
+							<span id="moisture-min">0</span>
+							<span>-</span>
+							<span id="moisture-max">0.5</span>
+						</div>
+					</div>
+					<!-- Regular slope slider -->
+					<div id="slope-slider" class="slider-container">
+						<label>Slope Range (degrees)</label>
+						<div id="slope-slider-range" class="range-slider"></div>
+						<div class="range-values">
+							<span id="slope-min">0</span>
+							<span>-</span>
+							<span id="slope-max">90</span>
+						</div>
+					</div>
+					<!-- Circular aspect slider -->
+					<div id="aspect-slider" class="slider-container">
+						<label>Aspect Range (degrees)</label>
+						<div class="aspect-circular-container">
+							<div class="aspect-inputs">
+								<div class="aspect-input">
+									<label>Start:</label>
+									<input type="number" id="aspect-start" min="0" max="360" step="1" value="0">
+									<span>°</span>
+								</div>
+								<span>to</span>
+								<div class="aspect-input">
+									<label>End:</label>
+									<input type="number" id="aspect-end" min="0" max="360" step="1" value="359">
+									<span>°</span>
+								</div>
+							</div>
+							<div class="aspect-circle" id="aspect-circle">
+								<div class="aspect-center"></div>
+								
+								<!-- Main compass directions -->
+								<div class="aspect-compass north">N</div>
+								<div class="aspect-compass east">E</div>
+								<div class="aspect-compass south">S</div>
+								<div class="aspect-compass west">W</div>
+								
+								<!-- Intermediate directions -->
+								<div class="aspect-compass northeast">NE</div>
+								<div class="aspect-compass southeast">SE</div>
+								<div class="aspect-compass southwest">SW</div>
+								<div class="aspect-compass northwest">NW</div>
+								
+								<!-- Degree markers -->
+								<div class="aspect-degree zero">0°</div>
+								<div class="aspect-degree ninety">90°</div>
+								<div class="aspect-degree one-eighty">180°</div>
+								<div class="aspect-degree two-seventy">270°</div>
+								
+								<!-- Selected range overlay -->
+								<div class="aspect-selected-overlay" id="aspect-selected-overlay"></div>
+								
+								<!-- Handles -->
+								<div class="aspect-handle start" id="aspect-handle-start"></div>
+								<div class="aspect-handle end" id="aspect-handle-end"></div>
+							</div>
+						</div>
+					</div>
+					<div id="month-slider" class="slider-container">
+						<label>Month Range</label>
+						<div id="month-slider-range" class="range-slider"></div>
+						<div class="range-values">
+							<span id="month-min">Jan</span>
+							<span>-</span>
+							<span id="month-max">Dec</span>
+						</div>
+					</div>
+				`;
                 
                 // Fullscreen button
                 const fullscreenBtn = L.DomUtil.create('button', 'fullscreen-btn', map.getContainer());
@@ -1643,14 +1863,20 @@
 				window.elevationSlider = createRangeSlider('elevation-slider-range', 0, 8000, [0, 8000], 100);
 				window.tempSlider = createRangeSlider('temp-slider-range', 30, 70, [30, 70], 1);
 				window.moistureSlider = createRangeSlider('moisture-slider-range', 0, 0.5, [0, 0.5], 0.01);
+				window.slopeSlider = createRangeSlider('slope-slider-range', 0, 90, [0, 90], 1);
 				window.monthSlider = createRangeSlider('month-slider-range', 1, 365, [1, 365], 1);
-
+				
+				// Initialize circular aspect slider
+				initCircularAspectSlider();
+				
 				// Set initial gradient backgrounds
 				updateSliderBackground(window.elevationSlider, 'elevation');
 				updateSliderBackground(window.tempSlider, 'temp');
 				updateSliderBackground(window.moistureSlider, 'moisture');
+				updateSliderBackground(window.slopeSlider, 'slope');
 				updateSliderBackground(window.monthSlider, 'month');
 				
+				// Existing slider update handlers...
 				window.elevationSlider.on('update', function(values) {
 					elevationRange = values.map(v => parseFloat(v));
 					document.getElementById('elevation-min').textContent = Math.round(values[0]);
@@ -1672,6 +1898,13 @@
 					updateMapPoints();
 				});
 				
+				window.slopeSlider.on('update', function(values) {
+					slopeRange = values.map(v => parseFloat(v));
+					document.getElementById('slope-min').textContent = Math.round(values[0]);
+					document.getElementById('slope-max').textContent = Math.round(values[1]);
+					updateMapPoints();
+				});
+				
 				window.monthSlider.on('update', function(values) {
 					monthRange = values.map(v => Math.round(parseFloat(v)));
 					updateMonthLabels();
@@ -1684,6 +1917,266 @@
 			}, 100);
         }
 
+		function initCircularAspectSlider() {
+			const circle = document.getElementById('aspect-circle');
+			const startHandle = document.getElementById('aspect-handle-start');
+			const endHandle = document.getElementById('aspect-handle-end');
+			const startInput = document.getElementById('aspect-start');
+			const endInput = document.getElementById('aspect-end');
+			const selectedOverlay = document.getElementById('aspect-selected-overlay');
+			
+			if (!circle || !startHandle || !endHandle || !startInput || !endInput || !selectedOverlay) return;
+			
+			const radius = 100; // Half of 200px
+			const centerX = 100;
+			const centerY = 100;
+			
+			function updateHandlePosition(handle, angle) {
+				const radians = (angle - 90) * (Math.PI / 180); // -90 to make 0° at top
+				const x = centerX + radius * Math.cos(radians);
+				const y = centerY + radius * Math.sin(radians);
+				handle.style.left = x + 'px';
+				handle.style.top = y + 'px';
+			}
+			
+			function updateFromInputs() {
+				let startAngle = parseFloat(startInput.value) || 0;
+				let endAngle = parseFloat(endInput.value) || 360;
+				
+				// Normalize angles to 0-360
+				startAngle = ((startAngle % 360) + 360) % 360;
+				endAngle = ((endAngle % 360) + 360) % 360;
+				
+				// Update handle positions
+				updateHandlePosition(startHandle, startAngle);
+				updateHandlePosition(endHandle, endAngle);
+				
+				// Update aspect range
+				aspectRange = [startAngle, endAngle];
+				
+				// Update the selected range visualization
+				updateSelectedRange(startAngle, endAngle);
+				
+				// Update map points
+				updateMapPoints();
+			}
+			
+			function updateSelectedRange(start, end) {
+				// Create a conic gradient for the selected range
+				let gradientStops = '';
+				
+				if (end > start) {
+					// Normal range (no wrap)
+					gradientStops = `
+						transparent 0deg,
+						transparent ${start}deg,
+						rgba(139, 69, 19, 0.3) ${start}deg,
+						rgba(139, 69, 19, 0.3) ${end}deg,
+						transparent ${end}deg,
+						transparent 360deg
+					`;
+				} else {
+					// Wrapped range (e.g., 300° to 60°)
+					gradientStops = `
+						rgba(139, 69, 19, 0.3) 0deg,
+						rgba(139, 69, 19, 0.3) ${end}deg,
+						transparent ${end}deg,
+						transparent ${start}deg,
+						rgba(139, 69, 19, 0.3) ${start}deg,
+						rgba(139, 69, 19, 0.3) 360deg
+					`;
+				}
+				
+				selectedOverlay.style.background = `conic-gradient(${gradientStops})`;
+				
+				// Add a border to the selected section
+				selectedOverlay.style.border = '2px solid #8B4513';
+				selectedOverlay.style.boxSizing = 'border-box';
+			}
+			
+			function getAngleFromPosition(x, y) {
+				const dx = x - centerX;
+				const dy = y - centerY;
+				let angle = Math.atan2(dy, dx) * (180 / Math.PI);
+				angle = (angle + 90 + 360) % 360; // Rotate so 0° is at top
+				return Math.round(angle);
+			}
+			
+			function setupHandleDrag(handle, isStartHandle) {
+				let isDragging = false;
+				
+				handle.addEventListener('mousedown', function(e) {
+					e.stopPropagation();
+					e.preventDefault();
+					isDragging = true;
+					document.addEventListener('mousemove', onMouseMove);
+					document.addEventListener('mouseup', onMouseUp);
+				});
+				
+				handle.addEventListener('touchstart', function(e) {
+					e.stopPropagation();
+					e.preventDefault();
+					isDragging = true;
+					document.addEventListener('touchmove', onTouchMove);
+					document.addEventListener('touchend', onTouchEnd);
+				});
+				
+				function onMouseMove(e) {
+					if (!isDragging) return;
+					
+					const rect = circle.getBoundingClientRect();
+					const x = e.clientX - rect.left;
+					const y = e.clientY - rect.top;
+					
+					const angle = getAngleFromPosition(x, y);
+					
+					if (isStartHandle) {
+						startInput.value = angle;
+					} else {
+						endInput.value = angle;
+					}
+					
+					updateFromInputs();
+				}
+				
+				function onTouchMove(e) {
+					if (!isDragging || !e.touches[0]) return;
+					
+					const rect = circle.getBoundingClientRect();
+					const x = e.touches[0].clientX - rect.left;
+					const y = e.touches[0].clientY - rect.top;
+					
+					const angle = getAngleFromPosition(x, y);
+					
+					if (isStartHandle) {
+						startInput.value = angle;
+					} else {
+						endInput.value = angle;
+					}
+					
+					updateFromInputs();
+				}
+				
+				function onMouseUp() {
+					isDragging = false;
+					document.removeEventListener('mousemove', onMouseMove);
+					document.removeEventListener('mouseup', onMouseUp);
+				}
+				
+				function onTouchEnd() {
+					isDragging = false;
+					document.removeEventListener('touchmove', onTouchMove);
+					document.removeEventListener('touchend', onTouchEnd);
+				}
+			}
+			
+			// Initialize the base gradient (this should NOT change when handles move)
+			function initBaseGradient() {
+				// This creates a FIXED gradient that doesn't shift
+				circle.style.background = `
+					conic-gradient(
+						from 0deg,
+						#ff0000 0deg,
+						#ffff00 90deg,
+						#00ff00 180deg,
+						#0000ff 270deg,
+						#ff0000 360deg
+					)
+				`;
+			}
+			
+			// Initialize everything
+			initBaseGradient();
+			updateFromInputs();
+			
+			// Setup drag for handles
+			setupHandleDrag(startHandle, true);
+			setupHandleDrag(endHandle, false);
+			
+			// Update on input changes
+			startInput.addEventListener('change', updateFromInputs);
+			endInput.addEventListener('change', updateFromInputs);
+			startInput.addEventListener('input', updateFromInputs);
+			endInput.addEventListener('input', updateFromInputs);
+			
+			// Add keyboard controls
+			startInput.addEventListener('keydown', function(e) {
+				if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+					e.preventDefault();
+					const step = e.key === 'ArrowUp' ? 1 : -1;
+					startInput.value = ((parseFloat(startInput.value) || 0) + step + 360) % 360;
+					updateFromInputs();
+				}
+			});
+			
+			endInput.addEventListener('keydown', function(e) {
+				if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+					e.preventDefault();
+					const step = e.key === 'ArrowUp' ? 1 : -1;
+					endInput.value = ((parseFloat(endInput.value) || 0) + step + 360) % 360;
+					updateFromInputs();
+				}
+			});
+		}
+
+	// Helper function to update aspect circle handles
+	function updateAspectCircleHandles(startAngle, endAngle) {
+		const startHandle = document.getElementById('aspect-handle-start');
+		const endHandle = document.getElementById('aspect-handle-end');
+		const selectedOverlay = document.getElementById('aspect-selected-overlay');
+		const circle = document.getElementById('aspect-circle');
+		
+		if (!startHandle || !endHandle || !selectedOverlay || !circle) return;
+		
+		const radius = 100;
+		const centerX = 100;
+		const centerY = 100;
+		
+		// Update handle positions
+		function updateHandlePosition(handle, angle) {
+			const radians = (angle - 90) * (Math.PI / 180);
+			const x = centerX + radius * Math.cos(radians);
+			const y = centerY + radius * Math.sin(radians);
+			handle.style.left = x + 'px';
+			handle.style.top = y + 'px';
+		}
+		
+		updateHandlePosition(startHandle, startAngle);
+		updateHandlePosition(endHandle, endAngle);
+		
+		// Update selected range visualization
+		let gradientStops = '';
+		
+		if (endAngle > startAngle) {
+			// Normal range (no wrap)
+			gradientStops = `
+				transparent 0deg,
+				transparent ${startAngle}deg,
+				rgba(139, 69, 19, 0.3) ${startAngle}deg,
+				rgba(139, 69, 19, 0.3) ${endAngle}deg,
+				transparent ${endAngle}deg,
+				transparent 360deg
+			`;
+		} else {
+			// Wrapped range (e.g., 300° to 60°)
+			gradientStops = `
+				rgba(139, 69, 19, 0.3) 0deg,
+				rgba(139, 69, 19, 0.3) ${endAngle}deg,
+				transparent ${endAngle}deg,
+				transparent ${startAngle}deg,
+				rgba(139, 69, 19, 0.3) ${startAngle}deg,
+				rgba(139, 69, 19, 0.3) 360deg
+			`;
+		}
+		
+		selectedOverlay.style.background = `conic-gradient(${gradientStops})`;
+		selectedOverlay.style.border = '2px solid #8B4513';
+		selectedOverlay.style.boxSizing = 'border-box';
+		
+		// Update global aspect range
+		aspectRange = [startAngle, endAngle];
+	}
+
 		function updateAllSliderBackgrounds() {
 			if (window.elevationSlider) updateSliderBackground(window.elevationSlider, 
 				currentView === 'elevation' ? 'elevation' : 'default');
@@ -1691,6 +2184,9 @@
 				currentView === 'temp' ? 'temp' : 'default');
 			if (window.moistureSlider) updateSliderBackground(window.moistureSlider, 
 				currentView === 'moisture' ? 'moisture' : 'default');
+			if (window.slopeSlider) updateSliderBackground(window.slopeSlider, 
+				currentView === 'slope' ? 'slope' : 'default');
+			// Note: aspect slider doesn't use updateSliderBackground as it's circular
 			if (window.monthSlider) updateSliderBackground(window.monthSlider, 
 				currentView === 'month' ? 'month' : 'default');
 		}
@@ -1710,6 +2206,12 @@
 					break;
 				case 'moisture':
 					baseElement.style.background = 'linear-gradient(to right, #FFD700, #00008B)';
+					break;
+				case 'slope':
+					baseElement.style.background = 'linear-gradient(to right, #00FF00, #FF0000)';
+					break;
+				case 'aspect':
+					baseElement.style.background = 'linear-gradient(to right, #FF0000, #FFFF00, #00FF00, #0000FF, #FF0000)';
 					break;
 				case 'month':
 					// Create gradient that cycles through 12 months across 365 days
@@ -1808,13 +2310,17 @@
 			const elevationSlider = document.getElementById('elevation-slider');
 			const tempSlider = document.getElementById('temp-slider');
 			const moistureSlider = document.getElementById('moisture-slider');
+			const slopeSlider = document.getElementById('slope-slider');
+			const aspectSlider = document.getElementById('aspect-slider');
 			const monthSlider = document.getElementById('month-slider');
-			
+
 			if (elevationSlider) elevationSlider.classList.toggle('active', currentView === 'elevation');
 			if (tempSlider) tempSlider.classList.toggle('active', currentView === 'temp');
 			if (moistureSlider) moistureSlider.classList.toggle('active', currentView === 'moisture');
+			if (slopeSlider) slopeSlider.classList.toggle('active', currentView === 'slope');
+			if (aspectSlider) aspectSlider.classList.toggle('active', currentView === 'aspect');
 			if (monthSlider) monthSlider.classList.toggle('active', currentView === 'month');
-			
+
 			// Get current slider values when switching views
 			if (currentView === 'elevation' && window.elevationSlider) {
 				const values = window.elevationSlider.get();
@@ -1825,6 +2331,9 @@
 			} else if (currentView === 'moisture' && window.moistureSlider) {
 				const values = window.moistureSlider.get();
 				moistureRange = values.map(v => parseFloat(v));
+			} else if (currentView === 'slope' && window.slopeSlider) {
+				const values = window.slopeSlider.get();
+				slopeRange = values.map(v => parseFloat(v));
 			} else if (currentView === 'month' && window.monthSlider) {
 				const values = window.monthSlider.get();
 				monthRange = values.map(v => Math.round(parseFloat(v)));
@@ -1848,12 +2357,36 @@
 				const inMoistureRange = point.soilMoisture !== null && 
 									 point.soilMoisture >= moistureRange[0] && 
 									 point.soilMoisture <= moistureRange[1];
-				let inMonthRange = true; // Default to true for non-month views
+				const inSlopeRange = point.slopeDeg !== null && 
+								  point.slopeDeg !== undefined &&
+								  point.slopeDeg >= slopeRange[0] && 
+								  point.slopeDeg <= slopeRange[1];
+				let inAspectRange = true;
+
+				if (currentView === 'aspect') {
+					const aspect = point.slopeAspectDeg;
+					if (aspect !== null && aspect !== undefined) {
+						const [start, end] = aspectRange;
+						
+						// Handle the wrap-around case
+						if (end >= start) {
+							// Normal range (e.g., 0° to 180°)
+							inAspectRange = aspect >= start && aspect <= end;
+						} else {
+							// Wrapped range (e.g., 300° to 60°)
+							inAspectRange = aspect >= start || aspect <= end;
+						}
+					} else {
+						inAspectRange = false; // No aspect data
+					}
+				}
+
+				let inMonthRange = true;
 				if (currentView === 'month') {
 					inMonthRange = isPointInDayRange(point, monthRange[0], monthRange[1]);
 				}
-				
-				if (!inElevationRange || !inTempRange || !inMoistureRange || !inMonthRange) return;
+
+				if (!inElevationRange || !inTempRange || !inMoistureRange || !inSlopeRange || !inAspectRange || !inMonthRange) return;
 				
 				// Get alpha/opacity from activeDatasets
 				const datasetInfo = activeDatasets[point.datasetId];
@@ -1883,6 +2416,22 @@
 					case 'moisture':
 						color = moistureColorScale(point.soilMoisture);
 						fillColor = color;
+						break;
+					case 'slope':
+						color = slopeColorScale(point.slopeDeg);
+						fillColor = color;
+						break;
+					case 'aspect':
+						if (point.slopeAspectDeg !== null && point.slopeAspectDeg !== undefined) {
+							// Normalize aspect to 0-360
+							const normalizedAspect = ((point.slopeAspectDeg % 360) + 360) % 360;
+							color = aspectColorScale(normalizedAspect);
+							fillColor = color;
+						} else {
+							// No aspect data - use gray
+							color = '#cccccc';
+							fillColor = color;
+						}
 						break;
 					case 'month':
 						// Calculate day of year (1-365) from month and day
@@ -2044,6 +2593,13 @@
 					}
 				});
 			}
+		}
+
+		function aspectToCompass(degrees) {
+			const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 
+							   'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+			const index = Math.round((degrees % 360) / 22.5);
+			return directions[index % 16];
 		}
 
 		function isPointInDayRange(point, startDay, endDay) {
@@ -2280,27 +2836,41 @@
 							const chart = evt.chart;
 							const dimension = document.getElementById('histogram-dimension').value;
 							
-							// Get the tooltip for the clicked element
-							const tooltip = chart.tooltip;
+							// Get the bin label
+							const label = chart.data.labels[element.index];
 							
-							if (tooltip && tooltip.dataPoints && tooltip.dataPoints.length > 0) {
-								// Get the title from the tooltip
-								const tooltipTitle = tooltip.title && tooltip.title.length > 0 
-									? tooltip.title[0] 
-									: null;
-								
-								if (tooltipTitle) {
-									// For month dimension, the tooltip title already has "Month - Week X" format
-									switchToMapViewFromHistogram(dimension, tooltipTitle);
+							// For slope and aspect, ensure we have the full range
+							if (dimension === 'slopeDeg' || dimension === 'slopeAspectDeg') {
+								// Get the tooltip for better context
+								const tooltip = chart.tooltip;
+								if (tooltip && tooltip.dataPoints && tooltip.dataPoints.length > 0) {
+									// Try to get the title from tooltip
+									if (tooltip.title && tooltip.title.length > 0) {
+										switchToMapViewFromHistogram(dimension, tooltip.title[0]);
+									} else {
+										// Use the label
+										switchToMapViewFromHistogram(dimension, label);
+									}
 								} else {
-									// Fallback to using x-axis label
-									const label = chart.data.labels[element.index];
+									// Fallback
 									switchToMapViewFromHistogram(dimension, label);
 								}
 							} else {
-								// Fallback if tooltip is not available
-								const label = chart.data.labels[element.index];
-								switchToMapViewFromHistogram(dimension, label);
+								// Original logic for other dimensions
+								const tooltip = chart.tooltip;
+								if (tooltip && tooltip.dataPoints && tooltip.dataPoints.length > 0) {
+									const tooltipTitle = tooltip.title && tooltip.title.length > 0 
+										? tooltip.title[0] 
+										: null;
+									
+									if (tooltipTitle) {
+										switchToMapViewFromHistogram(dimension, tooltipTitle);
+									} else {
+										switchToMapViewFromHistogram(dimension, label);
+									}
+								} else {
+									switchToMapViewFromHistogram(dimension, label);
+								}
 							}
 						}
 					},
@@ -2376,8 +2946,10 @@
 				'elevationFt': 'elevation',
 				'soilTemp': 'temp',
 				'soilMoisture': 'moisture',
+				'slopeDeg': 'slope',
+				'slopeAspectDeg': 'aspect',
 				'month': 'month',
-				'yearMonth': 'month' // yearMonth also uses month view
+				'yearMonth': 'month'
 			};
 			
 			const view = dimensionToView[dimension];
@@ -2395,7 +2967,7 @@
 			// Set current view
 			currentView = view;
 
-			//Update all slider backgrounds for the new view
+			// Update all slider backgrounds for the new view
 			updateAllSliderBackgrounds();
 			
 			// Parse the label to get range values
@@ -2479,8 +3051,55 @@
 				if (month) {
 					return [month, month]; // Single month range
 				}
+			} else if (dimension === 'slopeDeg' || dimension === 'slopeAspectDeg') {
+				// Handle slope and aspect dimensions
+				// Labels might be: "0 - 10", "10 - 20", "30 - 40 degrees", etc.
+				
+				// Remove any units or extra text
+				const cleanLabel = label.replace(/degrees|°|deg/gi, '').trim();
+				
+				// Try to extract numeric range
+				const rangeMatch = cleanLabel.match(/([\d\.]+)\s*-\s*([\d\.]+)/);
+				if (rangeMatch) {
+					let min = parseFloat(rangeMatch[1]);
+					let max = parseFloat(rangeMatch[2]);
+					
+					// For aspect, ensure values are within 0-360
+					if (dimension === 'slopeAspectDeg') {
+						min = ((min % 360) + 360) % 360;
+						max = ((max % 360) + 360) % 360;
+						
+						// For aspect, we might want to handle the circular nature
+						// For simplicity, just return the range as is
+						// The map filtering logic will handle wrap-around
+					}
+					
+					return [min, max];
+				}
+				
+				// If no range found, try to parse single value
+				const singleMatch = cleanLabel.match(/^([\d\.]+)$/);
+				if (singleMatch) {
+					let value = parseFloat(singleMatch[1]);
+					
+					if (dimension === 'slopeAspectDeg') {
+						value = ((value % 360) + 360) % 360;
+					}
+					
+					// Create a small range around the single value
+					if (dimension === 'slopeDeg') {
+						return [Math.max(0, value - 5), Math.min(90, value + 5)];
+					} else {
+						// For aspect, create a 20-degree range
+						const range = 10;
+						return [
+							((value - range) % 360 + 360) % 360,
+							((value + range) % 360 + 360) % 360
+						];
+					}
+				}
 			} else {
-				// Handle numeric ranges
+				// Handle numeric ranges for other dimensions
 				const rangeMatch = label.match(/([\d\.]+)\s*-\s*([\d\.]+)/);
 				if (rangeMatch) {
 					let min = parseFloat(rangeMatch[1]);
@@ -2506,6 +3125,8 @@
 				'elevationFt': 'elevation-slider',
 				'soilTemp': 'temp-slider',
 				'soilMoisture': 'moisture-slider',
+				'slopeDeg': 'slope-slider',
+				'slopeAspectDeg': 'aspect-slider',
 				'month': 'month-slider',
 				'yearMonth': 'month-slider'
 			};
@@ -2514,7 +3135,8 @@
 			if (!sliderId) return;
 			
 			// Activate the slider container
-			const allSliders = ['elevation-slider', 'temp-slider', 'moisture-slider', 'month-slider'];
+			const allSliders = ['elevation-slider', 'temp-slider', 'moisture-slider', 
+							   'slope-slider', 'aspect-slider', 'month-slider']; // UPDATED
 			allSliders.forEach(id => {
 				const el = document.getElementById(id);
 				if (el) el.classList.remove('active');
@@ -2545,6 +3167,32 @@
 						moistureRange = [minValue, maxValue];
 					}
 					break;
+				case 'slopeDeg':
+					if (window.slopeSlider) {
+						// Ensure values are within 0-90
+						const clampedMin = Math.max(0, Math.min(90, minValue));
+						const clampedMax = Math.max(0, Math.min(90, maxValue));
+						window.slopeSlider.set([clampedMin, clampedMax]);
+						slopeRange = [clampedMin, clampedMax];
+					}
+					break;
+				case 'slopeAspectDeg':
+					// For the circular aspect slider, update the input fields
+					const startInput = document.getElementById('aspect-start');
+					const endInput = document.getElementById('aspect-end');
+					
+					if (startInput && endInput) {
+						// Normalize to 0-360
+						const normalizedMin = ((minValue % 360) + 360) % 360;
+						const normalizedMax = ((maxValue % 360) + 360) % 360;
+						
+						startInput.value = Math.round(normalizedMin);
+						endInput.value = Math.round(normalizedMax);
+						
+						// Update the handles manually
+						updateAspectCircleHandles(normalizedMin, normalizedMax);
+					}
+					break;
 				case 'month':
 				case 'yearMonth':
 					if (window.monthSlider) {
@@ -2573,7 +3221,9 @@
 				'soilTemp': 'Soil Temperature (°F)',
 				'soilMoisture': 'Soil Moisture',
 				'monthFraction': 'Month',
-				'elevationFt': 'Elevation (ft)'
+				'elevationFt': 'Elevation (ft)',
+				'slopeDeg': 'Slope (degrees)',
+				'slopeAspectDeg': 'Aspect (degrees)'
 			};
 			
 			mainChart.options.scales.x.title.text = axisLabels[xProp] || 'X-Axis';
@@ -3039,6 +3689,28 @@
 						labels.push(`${Math.round(binStart)} - ${Math.round(binEnd)} °F`);
 					} else if (dimension === 'soilMoisture') {
 						labels.push(`${binStart.toFixed(2)} - ${binEnd.toFixed(2)}`);
+					} else if (dimension === 'slopeDeg') {
+						// Slope: Show rounded values and categorize
+						const start = Math.round(binStart);
+						const end = Math.round(binEnd);
+						let slopeCategory = '';
+						
+						if (end <= 10) slopeCategory = ' (Gentle)';
+						else if (end <= 20) slopeCategory = ' (Moderate)';
+						else if (end <= 30) slopeCategory = ' (Steep)';
+						else slopeCategory = ' (Very Steep)';
+						
+						labels.push(`${start} - ${end}°${slopeCategory}`);
+					} else if (dimension === 'slopeAspectDeg') {
+						// Aspect: Show degrees and compass direction
+						const start = Math.round(binStart);
+						const end = Math.round(binEnd);
+						
+						// Convert to compass direction for the middle of the range
+						const midPoint = (start + end) / 2;
+						const compassDir = aspectToCompass(midPoint);
+						
+						labels.push(`${start} - ${end}° (${compassDir})`);
 					} else {
 						labels.push(`${binStart.toFixed(1)} - ${binEnd.toFixed(1)}`);
 					}
@@ -3077,6 +3749,8 @@
 				'elevationFt': 'Elevation (ft)',
 				'soilTemp': 'Soil Temperature (°F)',
 				'soilMoisture': 'Soil Moisture',
+				'slopeDeg': 'Slope (degrees)',
+				'slopeAspectDeg': 'Aspect (degrees)',
 				'month': 'Month',
 				'yearMonth': 'Year-Month'
 			};
@@ -3273,13 +3947,15 @@
                     row.style.backgroundColor = '#FFF5F5';
                 }
                 
-                row.innerHTML = `
-                    <td style="padding: 10px; text-align: center;">${point.datasetName || 'User Data'}</td>
-                    <td style="padding: 10px; text-align: center;">${point.date}</td>
-                    <td style="padding: 10px; text-align: center;">${point.elevationFt}</td>
-                    <td style="padding: 10px; text-align: center;">${point.soilTemp ? point.soilTemp.toFixed(1) : 'N/A'}</td>
-                    <td style="padding: 10px; text-align: center;">${point.soilMoisture ? point.soilMoisture.toFixed(3) : 'N/A'}</td>
-                `;
+				row.innerHTML = `
+					<td style="padding: 10px; text-align: center;">${point.datasetName || 'User Data'}</td>
+					<td style="padding: 10px; text-align: center;">${point.date}</td>
+					<td style="padding: 10px; text-align: center;">${point.elevationFt}</td>
+					<td style="padding: 10px; text-align: center;">${point.soilTemp ? point.soilTemp.toFixed(1) : 'N/A'}</td>
+					<td style="padding: 10px; text-align: center;">${point.soilMoisture ? point.soilMoisture.toFixed(3) : 'N/A'}</td>
+					<td style="padding: 10px; text-align: center;">${point.slopeDeg ? point.slopeDeg.toFixed(1) : 'N/A'}</td>
+					<td style="padding: 10px; text-align: center;">${point.slopeAspectDeg ? point.slopeAspectDeg.toFixed(1) : 'N/A'}</td>
+				`;
                 
                 tableBody.appendChild(row);
             });
@@ -3296,6 +3972,23 @@
 			const apiUrl = point.rawData ? point.rawData.open_meteo_api_url : point.openMeteoApiUrl || '#';
 			const docsUrl = point.rawData ? point.rawData.open_meteo_docs_url : point.openMeteoDocsUrl || '#';
 			
+			const slopeHTML =
+				point.slopeDeg != null
+					? `
+					<div class="info-item">
+						<span class="info-label">Slope:</span> ${point.slopeDeg.toFixed(1)}°
+					</div>`
+					: '';
+
+			const aspectHTML =
+				point.slopeAspectDeg != null
+					? `
+					<div class="info-item">
+						<span class="info-label">Aspect:</span>
+						${point.slopeAspectDeg.toFixed(1)}° (${aspectToCompass(point.slopeAspectDeg)})
+					</div>`
+					: '';
+
 			infoContent.innerHTML = `
 				<div class="info-item">
 					<span class="info-label">Dataset:</span> ${point.datasetName || 'User Data'}
@@ -3310,23 +4003,29 @@
 					<span class="info-label">Elevation:</span> ${point.elevationFt} ft
 				</div>
 				<div class="info-item">
-					<span class="info-label">Avg Soil Temp (${averageDays} days):</span> ${point.soilTemp ? point.soilTemp.toFixed(1) : 'N/A'} °F (${tempDepth})
+					<span class="info-label">Avg Soil Temp (${averageDays} days):</span>
+					${point.soilTemp ? point.soilTemp.toFixed(1) : 'N/A'} °F (${tempDepth})
 				</div>
 				<div class="info-item">
-					<span class="info-label">Avg Soil Moisture (${averageDays} days):</span> ${point.soilMoisture ? point.soilMoisture.toFixed(3) : 'N/A'} (${moistureDepth})
+					<span class="info-label">Avg Soil Moisture (${averageDays} days):</span>
+					${point.soilMoisture ? point.soilMoisture.toFixed(3) : 'N/A'} (${moistureDepth})
 				</div>
+				${slopeHTML}
+				${aspectHTML}
 				<div class="info-item">
-					<span class="info-label">Observation Link:</span> 
+					<span class="info-label">Observation Link:</span>
 					<a href="${observationLink}" target="_blank" class="link">${observationLink}</a>
 				</div>
 				<div class="info-item">
-					<span class="info-label">Open-Meteo Docs:</span> 
-					<a href="${docsUrl}" target="_blank" class="link">https://open-meteo.com/docs...</a>
+					<span class="info-label">Open-Meteo Docs:</span>
+					<a href="${docsUrl}" target="_blank" class="link">
+						https://open-meteo.com/docs...
+					</a>
 				</div>
 			`;
 			
 			infoPanel.classList.add('active');
-			
+
 			// Display soil temperature and moisture chart from NDJSON data if available
 			if (point.rawData && point.rawData.dates && point.rawData.soil_temperature && point.rawData.soil_moisture) {
 				displaySoilTempMoistureChart(point.rawData, point);
