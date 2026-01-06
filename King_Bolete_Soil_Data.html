@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=1024, initial-scale=1.0">
     <title>King Bolete Environmental Analysis</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -24,7 +24,7 @@
             background-color: #f5f5f5;
             color: #333;
             line-height: 1.6;
-            padding: 20px;
+            padding: 20px 80px 20px 80px;
             max-width: 1600px;
             margin: 0 auto;
         }
@@ -813,8 +813,11 @@
 		}
 
 		#user-point-color, #highlight-color {
+			display: flex;
+			align-items: center;
 			width: 30px;
-			height: 30px;
+			min-height: 20px;
+			min-width: 20px;
 			border: 1px solid #ddd;
 			border-radius: 4px;
 			cursor: pointer;
@@ -827,7 +830,7 @@
 			border-radius: 4px;
 			padding: 5px 10px;
 			cursor: pointer;
-			font-size: 16px;
+			font-size: 14px;
 		}
 
 		#clear-user-points:hover {
@@ -872,7 +875,7 @@
 			height: 200px;
 			border-radius: 50%;
 			background: conic-gradient(
-				from 0deg,
+				from 180deg,
 				#ff0000 0deg,
 				#ffff00 90deg,
 				#00ff00 180deg,
@@ -1255,7 +1258,7 @@
 		/* Aspect circle */
 		.aspect-circle {
 			background: conic-gradient(
-				from 0deg,
+				from 180deg,
 				#ff0000 0deg,
 				#ffff00 90deg,
 				#00ff00 180deg,
@@ -1315,7 +1318,7 @@
 <body>
 	<header>
 		<h1>King Bolete Environmental Analysis</h1>
-		<p class="subtitle">Visualizing the relationship between elevation, soil temperature, soil moisture, and seasonal patterns</p>
+		<p class="subtitle">Visualizing the relationship between elevation, soil temperature, soil moisture, slope aspect, and seasonal patterns</p>
 		<div class="theme-switch-container">
 			<button id="theme-toggle" class="theme-toggle-btn" title="Toggle dark/light mode">
 				<i class="fas fa-moon"></i>
@@ -1325,7 +1328,7 @@
 	</header>
     
     <div class="description">
-        <p>This interactive dashboard explores environmental factors associated with King Bolete observations using only open (non-obscured) observation data. The scatter plots below show relationships between elevation, soil temperature, soil moisture, slope aspect, and time of year. Click on any point to view detailed information about that observation.</p>
+        <p>This interactive dashboard explores environmental factors associated with King Bolete observations using only open (non-obscured) observation data. The map and plots below show relationships between elevation, soil temperature, soil moisture, slope aspect, and time of year. Click on any point to view detailed information about that observation.</p>
     </div>
     
 	<div class="main-container">    
@@ -1394,9 +1397,13 @@
 				<div class="input-header">
 					<h2 class="input-title">Location Data</h2>
 					<div style="display: flex; gap: 10px;">
-						<button id="clear-user-points" title="Clear user points">🗑️</button>
+						<label style="display: flex; align-items: center; gap: 5px; white-space: nowrap; max-height: 30px; font-size: 14px;">Added Point:</label>
 						<input type="color" id="user-point-color" value="#FF6B6B" title="User point color">
+						<input type="number" id="user-point-size" value="5" min="1" max="20" title="User point size" style="max-width: 80px; max-height: 30px; align-items: center;">
+						<label style="display: flex; align-items: center; gap: 5px; white-space: nowrap; max-height: 50px; font-size: 14px;">Selected Point:</label>
 						<input type="color" id="highlight-color" value="#FFA500" title="Highlight color">
+						<input type="number" id="highlight-point-size" value="5" min="1" max="20" title="Highlight point size" style="max-width: 80px; max-height: 30px; align-items: center;">
+						<button id="clear-user-points" title="Clear user points" style="margin-left: 40px; max-height: 30px; align-items: center;">🗑️</button>
 						<label style="display: flex; align-items: center; gap: 5px; font-size: 12px;">
 							<input type="checkbox" id="disable-scroll" checked> Scroll
 						</label>
@@ -1481,7 +1488,7 @@
 								<option value="yearMonth">Year-Month</option>
 							</select>
 							<label for="bin-count" style="font-size: 16px; margin-left: 5px;">Bins:</label>
-							<input type="number" id="bin-count" min="5" max="100" value="30" style="width: 100px;">
+							<input type="number" id="bin-count" min="1" max="100" value="30" style="width: 100px;">
 							<label for="bin-offset" style="font-size: 16px; margin-left: 5px;">Offset:</label>
 							<input type="number" id="bin-offset" min="0" max="100" value="0" style="width: 100px;">
 						</div>
@@ -1529,6 +1536,7 @@
     </div>
     
     <footer>
+		<p>Github: <a href="https://github.com/BobTheFish1238/hrib-elev" target="_blank" class="link">hrib-elev</a> </p>
         <p>Data Sources: iNaturalist observations & Open-Meteo Historical Weather API</p>
         <p>Note: The Open-Meteo API provides soil temperature data with a spatial resolution of 9 km for recent years (IFS model) or 0.25° (~25 km) for historical data (ERA5 model).</p>
     </footer>
@@ -1642,6 +1650,9 @@
 		let userPointColor = '#FF6B6B';
 		let highlightColor = '#FFA500';
 		let enableScroll = true;
+		let userPointSize = 5;
+		let highlightPointSize = 5;
+		let pointSize = 2;
 
 		// Available tile layers
 		const tileLayers = {
@@ -1955,7 +1966,7 @@
 		};
 
 
-		// Define layer groups for organization (same as before)
+		// Define layer groups for organization
 		const layerGroups = {
 			watercolor: ['watercolor', 'watercolor_muted', 'watercolor_gray', 'watercolor_darkgray'],
 			osm: ['osm_std', 'osm_de', 'osm_fr', 'osm_hot', 'osm_lightgray', 'osm_medgray', 'osm_medgray2', 'osm_darkgray', 'osm_darkest'],
@@ -2005,6 +2016,45 @@
 			};
 		}
 
+		// Function to make number inputs scrollable with mouse wheel
+		function makeInputScrollable(inputElement, min, max, step = 1) {
+			inputElement.addEventListener('wheel', function(e) {
+				e.preventDefault();
+				
+				let currentValue = parseInt(this.value) || min;
+				let newValue;
+				
+				if (e.deltaY < 0) {
+					// Scrolling up - increase value
+					newValue = Math.min(currentValue + step, max);
+				} else {
+					// Scrolling down - decrease value
+					newValue = Math.max(currentValue - step, min);
+				}
+				
+				if (newValue !== currentValue) {
+					this.value = newValue;
+					this.dispatchEvent(new Event('input', { bubbles: true }));
+				}
+			});
+			
+			inputElement.addEventListener('keydown', function(e) {
+				if (e.key === 'ArrowUp') {
+					e.preventDefault();
+					let currentValue = parseInt(this.value) || min;
+					let newValue = Math.min(currentValue + step, max);
+					this.value = newValue;
+					this.dispatchEvent(new Event('input', { bubbles: true }));
+				} else if (e.key === 'ArrowDown') {
+					e.preventDefault();
+					let currentValue = parseInt(this.value) || min;
+					let newValue = Math.max(currentValue - step, min);
+					this.value = newValue;
+					this.dispatchEvent(new Event('input', { bubbles: true }));
+				}
+			});
+		}
+
 		// Function to highlight a point across all visualizations
 		function highlightPoint(point) {
 			// Remove previous highlights
@@ -2035,7 +2085,7 @@
 							color: userPointColor,
 							fillOpacity: 0.9,
 							weight: 3,
-							radius: 7
+							radius: userPointSize
 						});
 					} else {
 						// Regular points
@@ -2044,7 +2094,7 @@
 							color: highlightColor,
 							fillOpacity: 0.9,
 							weight: 3,
-							radius: 5
+							radius: highlightPointSize
 						});
 					}
 					
@@ -2068,8 +2118,8 @@
 					backgroundColor: highlightColor,
 					borderColor: highlightColor,
 					borderWidth: 1,
-					pointRadius: 4,
-					pointHoverRadius: 4,
+					pointRadius: highlightPointSize,
+					pointHoverRadius: highlightPointSize,
 					order: -1,
 					datasetId: 'highlighted_point'
 				};
@@ -2254,6 +2304,7 @@
 					activeDatasets[fileId] = {
 						active: isWashingtonEdulis, // Enable only Washington_Boletus_edulis.ndjson
 						color: fileColor,
+						pointSize: pointSize,
 						filePath: filePath,
 						fileName: fileName,
 						folderName: folderName,
@@ -2275,9 +2326,10 @@
 						<div class="file-name" title="${fileName}">${fileName}</div>
 						<div class="file-count">0</div>
 						<div style="display: flex; align-items: center; gap: 5px;">
-							<input type="color" class="color-picker" value="${fileColor.substring(0, 7)}" data-file-id="${fileId}" style="width: 24px; height: 24px;">
+							<input type="color" class="color-picker" value="${fileColor.substring(0, 7)}" data-file-id="${fileId}" style="min-width: 24px; height: 24px;">
 							<input type="range" class="alpha-slider" min="0" max="100" value="100" data-file-id="${fileId}" style="width: 60px;">
 							<span class="alpha-percent" data-file-id="${fileId}" style="font-size: 11px; min-width: 25px;">100%</span>
+							<input type="number" class="point-size-input" value="${pointSize}" min="1" max="10" data-file-id="${fileId}" style="max-width: 80px; max-height: 30px; font-size: 14px;">
 						</div>
 					`;
 					
@@ -2352,6 +2404,36 @@
 				// Only update visual elements, not reprocess data
 				updateDataDisplay(true); // true = visual update only
 			}, 150); // 150ms debounce delay
+
+			document.querySelectorAll('.point-size-input').forEach(input => {
+				makeInputScrollable(input, 1, 10, 1);
+				input.addEventListener('input', function() {
+					const fileId = this.dataset.fileId;
+					const size = parseInt(this.value) || pointSize;
+					
+					if (activeDatasets[fileId]) {
+						activeDatasets[fileId].pointSize = size;
+						updateVisualsOnly(); // This will update both charts and map
+					}
+				});
+				
+				// Set initial size
+				const fileId = input.dataset.fileId;
+				if (activeDatasets[fileId]) {
+					activeDatasets[fileId].pointSize = parseInt(input.value) || pointSize;
+				}
+			});
+
+			// Add event listeners for global point size controls
+			document.getElementById('user-point-size').addEventListener('input', function() {
+				userPointSize = parseInt(this.value) || 5;
+				updateDataDisplay(true);
+			});
+
+			document.getElementById('highlight-point-size').addEventListener('input', function() {
+				highlightPointSize = parseInt(this.value) || 5;
+				updateDataDisplay(true);
+			});
 
 			document.querySelectorAll('.color-picker, .alpha-slider').forEach(input => {
 				input.addEventListener('input', function() {
@@ -2535,13 +2617,9 @@
 				// Create map points with fresh data
 				updateMapPoints(); // This will create the initial markers
 			} else {
-				// Just update colors/visuals
+				// Just update colors/visuals AND sizes
 				updateChartColors();
-				updateVisualsOnly(); // This will update histogram colors too
-				// Only update map point colors if markers already exist
-				if (mapPoints.length > 0) {
-					updateMapPointColors();
-				}
+				updateVisualsOnly(); // This will update histogram colors too AND map points
 			}
 		}
         
@@ -3054,7 +3132,7 @@
 				// This creates a FIXED gradient that doesn't shift
 				circle.style.background = `
 					conic-gradient(
-						from 0deg,
+						from 180deg,
 						#ff0000 0deg,
 						#ffff00 90deg,
 						#00ff00 180deg,
@@ -3293,6 +3371,9 @@
 			const aspectSlider = document.getElementById('aspect-slider');
 			const monthSlider = document.getElementById('month-slider');
 
+			const userMarkerRadius = userPointSize;
+			const highlightedRadius = highlightPointSize;
+
 			if (elevationSlider) elevationSlider.classList.toggle('active', currentView === 'elevation');
 			if (tempSlider) tempSlider.classList.toggle('active', currentView === 'temp');
 			if (moistureSlider) moistureSlider.classList.toggle('active', currentView === 'moisture');
@@ -3379,6 +3460,12 @@
 						opacity = parseInt(alphaHex, 16) / 255;
 					}
 				}
+
+				// Get point size based on dataset
+				let pointRadius = pointSize; // Default
+				if (point.datasetId && activeDatasets[point.datasetId]) {
+					pointRadius = activeDatasets[point.datasetId].pointSize || pointSize;
+				}
 				
 				// Set color based on current view
 				let color, fillColor;
@@ -3404,7 +3491,8 @@
 						if (point.slopeAspectDeg !== null && point.slopeAspectDeg !== undefined) {
 							// Normalize aspect to 0-360
 							const normalizedAspect = ((point.slopeAspectDeg % 360) + 360) % 360;
-							color = aspectColorScale(normalizedAspect);
+							const shiftedAspect = (normalizedAspect + 180) % 360;
+							color = aspectColorScale(shiftedAspect);
 							fillColor = color;
 						} else {
 							// No aspect data - use gray
@@ -3468,7 +3556,7 @@
 				if (isHighlighted) {
 					// Highlighted point - use highlight color with full opacity
 					const marker = L.circleMarker([point.latitude, point.longitude], {
-						radius: point.datasetId === 'user_data' ? 7 : 5,
+						radius: highlightPointSize, // Use highlight point size
 						color: highlightColor,
 						fillColor: highlightColor,
 						fillOpacity: 0.9,
@@ -3483,7 +3571,7 @@
 				} else {
 					// Regular point - use calculated color and opacity
 					const marker = L.circleMarker([point.latitude, point.longitude], {
-						radius: point.datasetId === 'user_data' ? 5 : 3,
+						radius: pointRadius, // Use calculated point size
 						color: fillColor,
 						fillColor: fillColor,
 						fillOpacity: opacity, // Use the calculated opacity
@@ -3530,7 +3618,7 @@
 						if (isHighlighted) {
 							// Highlighted user point
 							const marker = L.circleMarker([point.latitude, point.longitude], {
-								radius: 7,
+								radius: highlightPointSize, // Use highlight point size
 								color: userPointColor,
 								fillColor: userPointColor,
 								fillOpacity: 0.9,
@@ -3550,7 +3638,7 @@
 						} else {
 							// Regular user point
 							const marker = L.circleMarker([point.latitude, point.longitude], {
-								radius: 5,
+								radius: userPointSize, // Use user point size
 								color: userPointColor,
 								fillColor: userPointColor,
 								fillOpacity: 0.8,
@@ -4280,6 +4368,7 @@
 			
 			// Update chart data
 			updateChartData(xProp, yProp);
+			updateChartsForTheme();
 			updateChartColors();
 		}
 
@@ -4289,9 +4378,14 @@
 			const datasetsMap = {};
 			
 			chartData.forEach(point => {
+				if (!point.datasetId) {
+					console.warn('Point missing datasetId:', point);
+					return; // Skip points without datasetId
+				}
+				
 				if (!datasetsMap[point.datasetId]) {
 					datasetsMap[point.datasetId] = {
-						label: point.datasetName,
+						label: point.datasetName || point.datasetId,
 						data: [],
 						backgroundColor: point.datasetColor,
 						borderColor: point.datasetColor,
@@ -4316,8 +4410,8 @@
 					backgroundColor: userPointColor,
 					borderColor: userPointColor,
 					borderWidth: 1,
-					pointRadius: 4,
-					pointHoverRadius: 4,
+					pointRadius: userPointSize,
+					pointHoverRadius: userPointSize + 1,
 					order: 0,
 					datasetId: 'user_data'
 				});
@@ -4335,8 +4429,8 @@
 					backgroundColor: highlightColor,
 					borderColor: highlightColor,
 					borderWidth: 1,
-					pointRadius: 4,
-					pointHoverRadius: 4,
+					pointRadius: highlightPointSize,
+					pointHoverRadius: highlightPointSize + 1,
 					order: -1,
 					datasetId: 'highlighted_point'
 				};
@@ -4359,11 +4453,25 @@
 						...point // Include all point properties
 					}));
 				
+				// Set point size based on dataset type
+				let pointRadius, pointHoverRadius;
+				
+				if (dataset.datasetId === 'user_data') {
+					pointRadius = userPointSize;
+					pointHoverRadius = userPointSize + 1;
+				} else if (activeDatasets[dataset.datasetId]) {
+					pointRadius = activeDatasets[dataset.datasetId].pointSize || pointSize;
+					pointHoverRadius = pointRadius + 1;
+				} else {
+					pointRadius = pointSize;
+					pointHoverRadius = pointSize + 1;
+				}
+				
 				return {
 					...dataset,
 					data: filteredData,
-					pointRadius: dataset.datasetId === 'user_data' ? 3 : 2,
-					pointHoverRadius: dataset.datasetId === 'user_data' ? 3 : 2,
+					pointRadius: pointRadius,
+					pointHoverRadius: pointHoverRadius,
 					order: dataset.datasetId === 'user_data' ? 0 : 1
 				};
 			});
@@ -4748,6 +4856,7 @@
 			};
 			
 			histogramChart.options.scales.x.title.text = dimensionLabels[dimension] || 'Value';
+			updateChartsForTheme();
 			histogramChart.update();
 		}
         
@@ -4755,7 +4864,7 @@
 			// Save current highlight state
 			const currentHighlight = highlightedPoint;
 			
-			// Update main chart colors
+			// Update main chart colors and sizes
 			updateChartColors();
 			
 			// Update histogram colors
@@ -4785,16 +4894,14 @@
 				}
 			}
 			
-			// Update map point colors if markers exist
-			if (mapPoints.length > 0) {
-				updateMapPointColors();
-			}
+			// Update ALL map points - not just colors
+			updateMapPoints(); // This will recreate all points with updated sizes
 			
 			// Restore highlight if there was one
 			if (currentHighlight) {
 				setTimeout(() => {
 					highlightPoint(currentHighlight);
-				}, 50);
+				}, 100);
 			}
 		}
 
@@ -4816,10 +4923,14 @@
 						// User data
 						dataset.backgroundColor = userPointColor;
 						dataset.borderColor = userPointColor;
+						dataset.pointRadius = userPointSize;
+						dataset.pointHoverRadius = userPointSize + 1;
 					} else if (firstPoint.datasetId && activeDatasets[firstPoint.datasetId]) {
 						// NDJSON dataset
 						dataset.backgroundColor = activeDatasets[firstPoint.datasetId].color;
 						dataset.borderColor = activeDatasets[firstPoint.datasetId].color;
+						dataset.pointRadius = activeDatasets[firstPoint.datasetId].pointSize || pointSize;
+						dataset.pointHoverRadius = (activeDatasets[firstPoint.datasetId].pointSize || pointSize) + 1;
 					}
 				});
 				
@@ -4837,69 +4948,8 @@
 			// First, remove all highlights temporarily
 			removeHighlights();
 			
-			// If we're in a view mode, completely redraw map points with correct colors
-			if (currentView && currentView !== 'default') {
-				updateMapPoints(); // This will recreate all points with correct view-based colors
-			} else {
-				// In default mode, update existing markers with new colors
-				mapPoints.forEach(marker => {
-					const datasetId = marker._datasetId;
-					
-					// Handle user data points
-					if (datasetId === 'user_data') {
-						marker.setStyle({
-							color: userPointColor,
-							fillColor: userPointColor,
-							fillOpacity: 0.8,
-							weight: 2,
-							radius: 5
-						});
-						return;
-					}
-					
-					if (datasetId && activeDatasets[datasetId]) {
-						const datasetInfo = activeDatasets[datasetId];
-						const color = datasetInfo.color;
-						
-						// Extract alpha from color string
-						let fillOpacity = 0.8; // default
-						if (color.length === 9) { // #RRGGBBAA format
-							const alphaHex = color.substring(7, 9);
-							fillOpacity = parseInt(alphaHex, 16) / 255;
-						}
-						
-						marker.setStyle({
-							color: color,
-							fillColor: color,
-							fillOpacity: fillOpacity,
-							weight: 0,
-							radius: 3
-						});
-					} else {
-						// Try to find the marker's corresponding data point
-						const latlng = marker.getLatLng();
-						
-						// Look for user data points that match this marker's location
-						const userPoint = userData.find(point => 
-							Math.abs(point.latitude - latlng.lat) < 0.0001 && 
-							Math.abs(point.longitude - latlng.lng) < 0.0001
-						);
-						
-						if (userPoint) {
-							// This is a user point
-							marker.setStyle({
-								color: userPointColor,
-								fillColor: userPointColor,
-								fillOpacity: 0.8,
-								weight: 2,
-								radius: 5
-							});
-							// Update the datasetId for future reference
-							marker._datasetId = 'user_data';
-						}
-					}
-				});
-			}
+			// Simply update all map points
+			updateMapPoints();
 			
 			// Re-apply highlight if there was one
 			if (currentHighlight) {
@@ -5403,6 +5453,38 @@
         
 		// Theme switching functionality
 		document.addEventListener('DOMContentLoaded', function() {
+			// User and highlight point sizes
+			['user-point-size', 'highlight-point-size'].forEach(id => {
+				const input = document.getElementById(id);
+				if (input) makeInputScrollable(input, 1, 20, 1);
+			});
+			
+			// Bin controls
+			const binCountInput = document.getElementById('bin-count');
+			if (binCountInput) {
+				makeInputScrollable(binCountInput, 1, 100, 1, function() {
+					// Force histogram update when scrolled
+					updateHistogram();
+				});
+				
+				// Ensure both input and change events trigger update
+				binCountInput.addEventListener('input', updateHistogram);
+				binCountInput.addEventListener('change', updateHistogram);
+			}
+
+			// Apply to bin offset input
+			const binOffsetInput = document.getElementById('bin-offset');
+			if (binOffsetInput) {
+				makeInputScrollable(binOffsetInput, 0, 100, 1, function() {
+					// Force histogram update when scrolled
+					updateHistogram();
+				});
+				
+				// Ensure both input and change events trigger update
+				binOffsetInput.addEventListener('input', updateHistogram);
+				binOffsetInput.addEventListener('change', updateHistogram);
+			}
+
 			const themeToggle = document.getElementById('theme-toggle');
 			const themeIcon = themeToggle.querySelector('i');
 			const themeLabel = themeToggle.querySelector('.theme-label');
