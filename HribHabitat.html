@@ -12,7 +12,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
         * {
             box-sizing: border-box;
@@ -658,7 +658,6 @@
         }
 
         .noUi-target {
-            background-color: none !important;
             border: 1px solid #ddd !important;
             box-shadow: none !important;
         }
@@ -2405,13 +2404,24 @@
 					mainFolderContent.appendChild(subFolderDiv);
 					
 					// Add toggle event for sub-folder
-					subFolderHeader.querySelector('.folder-toggle').addEventListener('click', function(e) {
-						e.stopPropagation(); // Prevent main folder toggle
-						const icon = this.querySelector('i');
+					const toggleSubFolder = function(e) {
+						if (e) e.stopPropagation(); // Prevent main folder toggle
+						const icon = subFolderHeader.querySelector('.folder-toggle i');
 						subFolderContent.classList.toggle('collapsed');
 						icon.classList.toggle('fa-chevron-up');
 						icon.classList.toggle('fa-chevron-down');
+					};
+
+					// Click on sub-folder header toggles
+					subFolderHeader.addEventListener('click', function(e) {
+						// Don't toggle if clicking on control buttons (All/None)
+						if (!e.target.closest('.folder-controls') && !e.target.closest('.control-btn')) {
+							toggleSubFolder(e);
+						}
 					});
+
+					// Click on toggle button also toggles
+					subFolderHeader.querySelector('.folder-toggle').addEventListener('click', toggleSubFolder);
 					
 					// Add sub-folder select all/none buttons
 					subFolderHeader.querySelector('.folder-select-all').addEventListener('click', function(e) {
@@ -2432,12 +2442,23 @@
 				directoryContent.appendChild(mainFolderDiv);
 				
 				// Add toggle event for main folder
-				mainFolderHeader.querySelector('.folder-toggle').addEventListener('click', function() {
-					const icon = this.querySelector('i');
+				const toggleMainFolder = function() {
+					const icon = mainFolderHeader.querySelector('.folder-toggle i');
 					mainFolderContent.classList.toggle('collapsed');
 					icon.classList.toggle('fa-chevron-up');
 					icon.classList.toggle('fa-chevron-down');
+				};
+
+				// Click on folder header toggles
+				mainFolderHeader.addEventListener('click', function(e) {
+					// Don't toggle if clicking on control buttons (All/None)
+					if (!e.target.closest('.folder-controls') && !e.target.closest('.control-btn')) {
+						toggleMainFolder();
+					}
 				});
+
+				// Click on toggle button also toggles
+				mainFolderHeader.querySelector('.folder-toggle').addEventListener('click', toggleMainFolder);
 				
 				// Add main folder-level select all/none buttons
 				mainFolderHeader.querySelector('.folder-select-all').addEventListener('click', function(e) {
@@ -4425,7 +4446,7 @@
 
 		// Set default axis selections
 		function setDefaultAxes() {
-			document.getElementById('x-axis').value = 'soilTemp';
+			document.getElementById('x-axis').value = 'monthFraction';
 			document.getElementById('y-axis').value = 'elevationFt';
 			updateMainChart();
 		}
