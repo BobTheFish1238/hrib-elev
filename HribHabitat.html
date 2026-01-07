@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=1024, initial-scale=1.0">
-    <title>King Bolete Environmental Analysis</title>
+    <title>HribHabitat</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
@@ -43,7 +43,6 @@
         }
         
         .subtitle {
-            color: #666;
             font-size: 1.2rem;
             font-style: italic;
         }
@@ -159,7 +158,7 @@
 
 		.chart-selector label, .axis-selector label {
 			margin-bottom: 0;
-			min-width: 80px;
+			white-space: nowrap;
 			text-align: right;
 			font-size: 16px;
 			font-weight: 600;
@@ -390,7 +389,7 @@
 			background: none;
 			border: none;
 			color: #8B4513;
-			font-size: 1.2rem;
+			font-size: 0.8rem;
 			cursor: pointer;
 			padding: 5px;
 		}
@@ -404,7 +403,7 @@
         
 		.directory-controls {
 			display: flex;
-			gap: 10px;
+			gap: 8px;
 			margin-left: auto;
 		}
 		
@@ -435,7 +434,7 @@
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
-			padding: 10px 15px;
+			padding: 5px 10px;
 			background-color: #f8f8f8;
 			cursor: pointer;
 			border-bottom: 1px solid #eee;
@@ -466,8 +465,8 @@
         .ndjson-file {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 8px;
+            gap: 5px;
+            padding: 0px 8px;
             border-radius: 5px;
             margin-bottom: 5px;
             transition: background-color 0.2s;
@@ -992,6 +991,8 @@
 			--loading-color: #8B4513;
 			--slider-bg: #f0f0f0;
 			--slider-border: #ddd;
+			--hrib-color: #8B4513;
+			--habitat-color: #ac713a;
 		}
 		
 		[data-theme="dark"] {
@@ -1011,6 +1012,8 @@
 			--loading-color: #D9AE86;
 			--slider-bg: #2d2d2d;
 			--slider-border: #555;
+			--hrib-color: #ac713a;
+			--habitat-color: #D9AE86;
 		}
 		
 		/* Apply CSS variables to elements */
@@ -1038,7 +1041,15 @@
 		h1, h2, h3, .graph-title, .directory-title, .settings-title, .input-title, .info-title {
 			color: var(--header-color);
 		}
-		
+
+		.site-title .hrib {
+			color: var(--hrib-color);
+		}
+
+		.site-title .habitat {
+			color: var(--habitat-color);
+		}
+
 		.subtitle {
 			color: var(--text-color);
 			opacity: 0.8;
@@ -1157,7 +1168,7 @@
 			background: var(--card-bg);
 			color: var(--text-color);
 			border: 1px solid var(--border-color);
-			padding: 8px 16px;
+			padding: 8px 8px;
 			border-radius: 20px;
 			cursor: pointer;
 			font-size: 14px;
@@ -1317,7 +1328,9 @@
 </head>
 <body>
 	<header>
-		<h1>King Bolete Environmental Analysis</h1>
+		<h1 class="site-title">
+			<span class="hrib">Hrib</span><span class="habitat">Habitat</span>
+		</h1>
 		<p class="subtitle">Visualizing the relationship between elevation, soil temperature, soil moisture, slope aspect, and seasonal patterns</p>
 		<div class="theme-switch-container">
 			<button id="theme-toggle" class="theme-toggle-btn" title="Toggle dark/light mode">
@@ -1328,7 +1341,7 @@
 	</header>
     
     <div class="description">
-        <p>This interactive dashboard explores environmental factors associated with King Bolete observations using only open (non-obscured) observation data. The map and plots below show relationships between elevation, soil temperature, soil moisture, slope aspect, and time of year. Click on any point to view detailed information about that observation.</p>
+        <p>This interactive dashboard explores environmental factors associated with mushroom observations using only open (non-obscured) observation data. The map and plots below show relationships between elevation, soil temperature, soil moisture, slope aspect, and time of year. Click on any point to view detailed information about that observation.</p>
     </div>
     
 	<div class="main-container">    
@@ -1537,6 +1550,7 @@
     
     <footer>
 		<p>Github: <a href="https://github.com/BobTheFish1238/hrib-elev" target="_blank" class="link">hrib-elev</a> </p>
+        <p>(Observations data is updated periodically)</p>
         <p>Data Sources: iNaturalist observations & Open-Meteo Historical Weather API</p>
         <p>Note: The Open-Meteo API provides soil temperature data with a spatial resolution of 9 km for recent years (IFS model) or 0.25° (~25 km) for historical data (ERA5 model).</p>
     </footer>
@@ -2240,24 +2254,43 @@
         ];
         
         // NDJSON directory structure
-        const ndjsonStructure = {
-            "Boletus_edulis": [
-                "Washington_Boletus_edulis.ndjson",
-                "Oregon_Boletus_edulis.ndjson",
-                "California_Boletus_edulis.ndjson"
-            ],
-            "Boletus_rex-veris": [
-                "Washington_Boletus_rex-veris.ndjson",
-                "Oregon_Boletus_rex-veris.ndjson",
-                "California_Boletus_rex-veris.ndjson"
-            ]
-        };
+		const ndjsonStructure = {
+			"Boletus": {
+				"Boletus_edulis": [
+					{name: "Washington_Boletus_edulis.ndjson", modified: "2026-01-02"},
+					{name: "Oregon_Boletus_edulis.ndjson",  modified: "2026-01-02"},
+					{name: "California_Boletus_edulis.ndjson", modified: "2026-01-03"}
+				],
+				"Boletus_rex-veris": [
+					{name: "Washington_Boletus_rex-veris.ndjson", modified: "2026-01-02"},
+					{name: "Oregon_Boletus_rex-veris.ndjson", modified: "2026-01-02"},
+					{name: "California_Boletus_rex-veris.ndjson", modified: "2026-01-03"}
+				]
+			},
+			"Morchella": {
+				"Morchella_angusticeps": [
+					{name: "Washington_Morchella_angusticeps.ndjson", modified: "2026-01-06"},
+					{name: "Oregon_Morchella_angusticeps.ndjson", modified: "2026-01-06"},
+					{name: "California_Morchella_angusticeps.ndjson", modified: "2026-01-06"}
+				],
+				"Morchella_importuna": [
+					{name: "Washington_Morchella_importuna.ndjson", modified: "2026-01-06"},
+					{name: "Oregon_Morchella_importuna.ndjson", modified: "2026-01-06"},
+					{name: "California_Morchella_importuna.ndjson", modified: "2026-01-06"}
+				]
+			}
+		};
         
         // Default colors for NDJSON files
-        const defaultColors = [
-            '#8B4513', '#1E90FF', '#32CD32', '#FF4500', '#9370DB',
-            '#FFD700', '#00CED1', '#FF69B4', '#9ACD32', '#FF6347'
-        ];
+		const defaultColors = [
+			'#8B4513', '#1E90FF', '#32CD32', '#FF4500', '#9370DB',
+			'#FFD700', '#00CED1', '#FF69B4', '#9ACD32', '#FF6347',
+			'#8A2BE2', '#DC143C', '#00FA9A', '#FF8C00', '#9932CC',
+			'#8FBC8F', '#483D8B', '#2F4F4F', '#D2691E', '#6495ED',
+			'#FFF8DC', '#DC143C', '#00FFFF', '#00008B', '#008B8B',
+			'#B8860B', '#A9A9A9', '#006400', '#BDB76B', '#8B008B',
+			'#556B2F', '#FF8C00', '#9932CC', '#8B0000', '#E9967A'
+		];
         
         // Initialize NDJSON directory
 		function initNdjsonDirectory() {
@@ -2266,99 +2299,156 @@
 			
 			let colorIndex = 0;
 			
-			Object.keys(ndjsonStructure).forEach(folderName => {
-				const folderDiv = document.createElement('div');
-				folderDiv.className = 'folder';
+			Object.keys(ndjsonStructure).forEach(mainFolderName => {
+				const mainFolderDiv = document.createElement('div');
+				mainFolderDiv.className = 'folder';
 				
-				const folderHeader = document.createElement('div');
-				folderHeader.className = 'folder-header';
-				folderHeader.innerHTML = `
+				const mainFolderHeader = document.createElement('div');
+				mainFolderHeader.className = 'folder-header';
+				mainFolderHeader.innerHTML = `
 					<div class="folder-name">
 						<i class="fas fa-folder"></i>
-						${folderName}
+						${mainFolderName}
 					</div>
 					<div class="folder-controls">
-						<button class="control-btn folder-select-all" data-folder="${folderName}">All</button>
-						<button class="control-btn folder-select-none" data-folder="${folderName}">None</button>
+						<button class="control-btn folder-select-all" data-folder="${mainFolderName}">All</button>
+						<button class="control-btn folder-select-none" data-folder="${mainFolderName}">None</button>
 						<button class="toggle-btn folder-toggle">
 							<i class="fas fa-chevron-down"></i>
 						</button>
 					</div>
 				`;
 				
-				const folderContent = document.createElement('div');
-				folderContent.className = 'folder-content collapsed';
+				const mainFolderContent = document.createElement('div');
+				mainFolderContent.className = 'folder-content collapsed';
 				
-				ndjsonStructure[folderName].forEach(fileName => {
-					const filePath = `ndjson/${folderName}/${fileName}`;
-					const fileId = filePath.replace(/\//g, '_').replace(/\./g, '_');
+				Object.keys(ndjsonStructure[mainFolderName]).forEach(subFolderName => {
+					const subFolderDiv = document.createElement('div');
+					subFolderDiv.className = 'folder';
+					subFolderDiv.style.margin = '5px 0';
+					subFolderDiv.style.border = '1px solid #eee';
 					
-					// Generate a color for this file
-					const fileColor = defaultColors[colorIndex % defaultColors.length];
-					colorIndex++;
-					
-					// Check if this is Washington_Boletus_edulis.ndjson to enable by default
-					const isWashingtonEdulis = fileName === 'Washington_Boletus_edulis.ndjson';
-					
-					// Store initial state - enable Washington_Boletus_edulis.ndjson by default
-					activeDatasets[fileId] = {
-						active: isWashingtonEdulis, // Enable only Washington_Boletus_edulis.ndjson
-						color: fileColor,
-						pointSize: pointSize,
-						filePath: filePath,
-						fileName: fileName,
-						folderName: folderName,
-						data: []
-					};
-					
-					const fileDiv = document.createElement('div');
-					fileDiv.className = 'ndjson-file';
-					fileDiv.dataset.fileId = fileId;
-					
-					// Set up toggle with checkmark if active by default
-					const toggleActiveClass = isWashingtonEdulis ? 'active' : '';
-					const checkmarkDisplay = isWashingtonEdulis ? 'block' : 'none';
-					
-					fileDiv.innerHTML = `
-						<div class="file-toggle ${toggleActiveClass}" data-file-id="${fileId}">
-							<i class="fas fa-check" style="font-size: 10px; display: ${checkmarkDisplay};"></i>
+					const subFolderHeader = document.createElement('div');
+					subFolderHeader.className = 'folder-header';
+					subFolderHeader.style.padding = '5px 10px';
+					subFolderHeader.style.backgroundColor = 'var(--slider-bg, #f5f5f5)';
+					subFolderHeader.innerHTML = `
+						<div class="folder-name">
+							<i class="fas fa-folder"></i>
+							${subFolderName}
 						</div>
-						<div class="file-name" title="${fileName}">${fileName}</div>
-						<div class="file-count">0</div>
-						<div style="display: flex; align-items: center; gap: 5px;">
-							<input type="color" class="color-picker" value="${fileColor.substring(0, 7)}" data-file-id="${fileId}" style="min-width: 24px; height: 24px;">
-							<input type="range" class="alpha-slider" min="0" max="100" value="100" data-file-id="${fileId}" style="width: 60px;">
-							<span class="alpha-percent" data-file-id="${fileId}" style="font-size: 11px; min-width: 25px;">100%</span>
-							<input type="number" class="point-size-input" value="${pointSize}" min="1" max="10" data-file-id="${fileId}" style="max-width: 80px; max-height: 30px; font-size: 14px;">
+						<div class="folder-controls">
+							<button class="control-btn folder-select-all" data-folder="${subFolderName}">All</button>
+							<button class="control-btn folder-select-none" data-folder="${subFolderName}">None</button>
+							<button class="toggle-btn folder-toggle">
+								<i class="fas fa-chevron-down"></i>
+							</button>
 						</div>
 					`;
 					
-					folderContent.appendChild(fileDiv);
+					const subFolderContent = document.createElement('div');
+					subFolderContent.className = 'folder-content collapsed';
+					
+					ndjsonStructure[mainFolderName][subFolderName].forEach(fileObj => {
+						const fileName = fileObj.name;
+						const modifiedDate = fileObj.modified;
+						const filePath = `ndjson/${mainFolderName}/${subFolderName}/${fileName}`;
+						const fileId = filePath.replace(/\//g, '_').replace(/\./g, '_');
+						
+						// Generate a color for this file
+						const fileColor = defaultColors[colorIndex % defaultColors.length];
+						colorIndex++;
+						
+						// Check if this is Washington_Boletus_edulis.ndjson to enable by default
+						const isWashingtonEdulis = fileName === 'Washington_Boletus_edulis.ndjson';
+						
+						// Store initial state - enable Washington_Boletus_edulis.ndjson by default
+						activeDatasets[fileId] = {
+							active: isWashingtonEdulis, // Enable only Washington_Boletus_edulis.ndjson
+							color: fileColor,
+							pointSize: pointSize,
+							filePath: filePath,
+							fileName: fileName,
+							folderName: mainFolderName,
+							subFolderName: subFolderName,
+							data: []
+						};
+						
+						const fileDiv = document.createElement('div');
+						fileDiv.className = 'ndjson-file';
+						fileDiv.dataset.fileId = fileId;
+						
+						// Set up toggle with checkmark if active by default
+						const toggleActiveClass = isWashingtonEdulis ? 'active' : '';
+						const checkmarkDisplay = isWashingtonEdulis ? 'block' : 'none';
+						
+						fileDiv.innerHTML = `
+							<div class="file-toggle ${toggleActiveClass}" data-file-id="${fileId}">
+								<i class="fas fa-check" style="font-size: 10px; display: ${checkmarkDisplay};"></i>
+							</div>
+							<div class="file-name" title="${fileName}${modifiedDate ? '\nModified: ' + modifiedDate : ''}">${fileName}</div>
+							<div class="file-count">0</div>
+							<div style="display: flex; align-items: center; gap: 5px;">
+								<input type="color" class="color-picker" value="${fileColor.substring(0, 7)}" data-file-id="${fileId}" style="min-width: 24px; height: 24px;">
+								<input type="range" class="alpha-slider" min="0" max="100" value="100" data-file-id="${fileId}" style="width: 60px;">
+								<span class="alpha-percent" data-file-id="${fileId}" style="font-size: 11px; min-width: 25px;">100%</span>
+								<input type="number" class="point-size-input" value="${pointSize}" min="1" max="10" data-file-id="${fileId}" style="max-width: 80px; max-height: 30px; font-size: 14px;">
+							</div>
+						`;
+						
+						subFolderContent.appendChild(fileDiv);
+					});
+					
+					subFolderDiv.appendChild(subFolderHeader);
+					subFolderDiv.appendChild(subFolderContent);
+					mainFolderContent.appendChild(subFolderDiv);
+					
+					// Add toggle event for sub-folder
+					subFolderHeader.querySelector('.folder-toggle').addEventListener('click', function(e) {
+						e.stopPropagation(); // Prevent main folder toggle
+						const icon = this.querySelector('i');
+						subFolderContent.classList.toggle('collapsed');
+						icon.classList.toggle('fa-chevron-up');
+						icon.classList.toggle('fa-chevron-down');
+					});
+					
+					// Add sub-folder select all/none buttons
+					subFolderHeader.querySelector('.folder-select-all').addEventListener('click', function(e) {
+						e.stopPropagation(); // Prevent folder toggle
+						const folder = this.dataset.folder;
+						selectAllInSubFolder(mainFolderName, folder, true);
+					});
+					
+					subFolderHeader.querySelector('.folder-select-none').addEventListener('click', function(e) {
+						e.stopPropagation(); // Prevent folder toggle
+						const folder = this.dataset.folder;
+						selectAllInSubFolder(mainFolderName, folder, false);
+					});
 				});
 				
-				folderDiv.appendChild(folderHeader);
-				folderDiv.appendChild(folderContent);
-				directoryContent.appendChild(folderDiv);
+				mainFolderDiv.appendChild(mainFolderHeader);
+				mainFolderDiv.appendChild(mainFolderContent);
+				directoryContent.appendChild(mainFolderDiv);
 				
-				// Add toggle event for folder
-				folderHeader.querySelector('.folder-toggle').addEventListener('click', function() {
+				// Add toggle event for main folder
+				mainFolderHeader.querySelector('.folder-toggle').addEventListener('click', function() {
 					const icon = this.querySelector('i');
-					folderContent.classList.toggle('collapsed');
+					mainFolderContent.classList.toggle('collapsed');
 					icon.classList.toggle('fa-chevron-up');
 					icon.classList.toggle('fa-chevron-down');
 				});
 				
-				// Add folder-level select all/none buttons
-				folderHeader.querySelector('.folder-select-all').addEventListener('click', function(e) {
+				// Add main folder-level select all/none buttons
+				mainFolderHeader.querySelector('.folder-select-all').addEventListener('click', function(e) {
 					e.stopPropagation(); // Prevent folder toggle
 					const folder = this.dataset.folder;
-					selectAllInFolder(folder, true);
+					selectAllInMainFolder(folder, true);
 				});
 				
-				folderHeader.querySelector('.folder-select-none').addEventListener('click', function(e) {
+				mainFolderHeader.querySelector('.folder-select-none').addEventListener('click', function(e) {
 					e.stopPropagation(); // Prevent folder toggle
 					const folder = this.dataset.folder;
-					selectAllInFolder(folder, false);
+					selectAllInMainFolder(folder, false);
 				});
 			});
 			
@@ -2495,6 +2585,54 @@
 				// Load data if selecting and not loaded yet
 				if (select && fileData.data.length === 0) {
 					loadNdjsonFile(fileId, fileData.filePath);
+				}
+			});
+			
+			// Update the display
+			updateDataDisplay(false);
+		}
+
+		function selectAllInMainFolder(mainFolderName, select) {
+			Object.keys(activeDatasets).forEach(fileId => {
+				const fileData = activeDatasets[fileId];
+				if (fileData.folderName === mainFolderName) {
+					fileData.active = select;
+					
+					// Update the UI toggle
+					const toggle = document.querySelector(`.file-toggle[data-file-id="${fileId}"]`);
+					if (toggle) {
+						toggle.classList.toggle('active', select);
+						toggle.querySelector('i').style.display = select ? 'block' : 'none';
+					}
+					
+					// Load data if selecting and not loaded yet
+					if (select && fileData.data.length === 0) {
+						loadNdjsonFile(fileId, fileData.filePath);
+					}
+				}
+			});
+			
+			// Update the display
+			updateDataDisplay(false);
+		}
+
+		function selectAllInSubFolder(mainFolderName, subFolderName, select) {
+			Object.keys(activeDatasets).forEach(fileId => {
+				const fileData = activeDatasets[fileId];
+				if (fileData.folderName === mainFolderName && fileData.subFolderName === subFolderName) {
+					fileData.active = select;
+					
+					// Update the UI toggle
+					const toggle = document.querySelector(`.file-toggle[data-file-id="${fileId}"]`);
+					if (toggle) {
+						toggle.classList.toggle('active', select);
+						toggle.querySelector('i').style.display = select ? 'block' : 'none';
+					}
+					
+					// Load data if selecting and not loaded yet
+					if (select && fileData.data.length === 0) {
+						loadNdjsonFile(fileId, fileData.filePath);
+					}
 				}
 			});
 			
@@ -2711,7 +2849,7 @@
 						<button data-view="moisture">Soil Moisture</button>
 						<button data-view="slope">Slope</button>
 						<button data-view="aspect">Aspect</button>
-						<button data-view="month">Month</button>
+						<button data-view="month">Date</button>
 					</div>
 					${layerSelectHTML}
 					<div id="elevation-slider" class="slider-container">
@@ -2799,7 +2937,7 @@
 						</div>
 					</div>
 					<div id="month-slider" class="slider-container">
-						<label>Month Range</label>
+						<label>Date Range</label>
 						<div id="month-slider-range" class="range-slider"></div>
 						<div class="range-values">
 							<span id="month-min">Jan</span>
@@ -3993,7 +4131,7 @@
 							stacked: true,
 							title: {
 								display: true,
-								text: 'Count',
+								text: 'Observations',
 								font: {
 									weight: 'bold'
 								}
@@ -4420,7 +4558,7 @@
 			// Add highlighted point dataset if exists
 			if (highlightedPoint) {
 				const highlightDataset = {
-					label: `Obs: ${highlightedPoint.observationUrl ? highlightedPoint.observationUrl.split('/').pop() : 'User Point'}`,
+					label: `id: ${highlightedPoint.observationUrl ? highlightedPoint.observationUrl.split('/').pop() : 'User Point'}`,
 					data: [{
 						x: highlightedPoint[xProp],
 						y: highlightedPoint[yProp],
@@ -5087,6 +5225,7 @@
 			if (enableScroll) {
 				infoPanel.scrollIntoView({ behavior: 'smooth' });
 			}
+			updateChartsForTheme();
 		}
         
         // Create the soil temperature and moisture chart from NDJSON data
