@@ -92,6 +92,7 @@
             width: 100%;
             max-width: 100%;
             overflow: hidden;
+			min-height: 500px;
         }
         
         .graph-container:hover {
@@ -118,11 +119,12 @@
             text-align: center;
         }
         
-        .chart-wrapper {
-            position: relative;
-            height: 400px;
-            width: 100%;
-        }
+		.chart-wrapper canvas#mainChart,
+		.chart-wrapper canvas#histogramChart {
+			position: relative;
+			min-height: 500px;
+			width: 100%;
+		}
 
 		/* Chart header and controls */
 		.chart-header {
@@ -444,10 +446,12 @@
         
         .folder-name {
             font-weight: 600;
+			font-size: 0.85em;
             color: #555;
             display: flex;
             align-items: center;
             gap: 8px;
+            white-space: nowrap;
         }
         
         .folder-content {
@@ -496,7 +500,7 @@
         
         .file-name {
             flex: 1;
-            font-size: 14px;
+			font-size: 0.65em;
             color: #333;
             white-space: nowrap;
             overflow: hidden;
@@ -1100,6 +1104,12 @@
 		.input-header label,
 		.folder-name {
 			color: var(--text-color);
+		}
+
+		.sci-name {
+			color: #aaa;
+			font-style: italic;
+			font-size: 0.8em;
 		}
 
 		
@@ -2256,28 +2266,65 @@
         // NDJSON directory structure
 		const ndjsonStructure = {
 			"Boletus": {
-				"Boletus_edulis": [
+				"King Bolete (Boletus edulis)": [
 					{name: "Washington_Boletus_edulis.ndjson", modified: "2026-01-02"},
 					{name: "Oregon_Boletus_edulis.ndjson",  modified: "2026-01-02"},
 					{name: "California_Boletus_edulis.ndjson", modified: "2026-01-03"}
 				],
-				"Boletus_rex-veris": [
+				"Spring King Bolete (Boletus rex-veris)": [
 					{name: "Washington_Boletus_rex-veris.ndjson", modified: "2026-01-02"},
 					{name: "Oregon_Boletus_rex-veris.ndjson", modified: "2026-01-02"},
 					{name: "California_Boletus_rex-veris.ndjson", modified: "2026-01-03"}
+				],
+				"Fib King (Boletus fibrillosus)": [
+					{name: "Washington_Boletus_fibrillosus.ndjson", modified: "2026-01-07"},
+					{name: "Oregon_Boletus_fibrillosus.ndjson", modified: "2026-01-07"},
+					{name: "California_Boletus_fibrillosus.ndjson", modified: "2026-01-07"}
+				],
+				"Barrow's Bolete (Boletus barrowsii)": [
+					{name: "Washington_Boletus_barrowsii.ndjson", modified: "2026-01-07"},
+					{name: "Oregon_Boletus_barrowsii.ndjson", modified: "2026-01-07"},
+					{name: "California_Boletus_barrowsii.ndjson", modified: "2026-01-07"}
 				]
 			},
-			"Morchella": {
-				"Morchella_angusticeps": [
-					{name: "Washington_Morchella_angusticeps.ndjson", modified: "2026-01-06"},
-					{name: "Oregon_Morchella_angusticeps.ndjson", modified: "2026-01-06"},
-					{name: "California_Morchella_angusticeps.ndjson", modified: "2026-01-06"}
+			"Black Morels (Morchella sect. Distantes)": {
+				"Black Morel (Morchella angusticeps)": [
+					{name: "Washington_Morchella_angusticeps.ndjson", modified: "2026-01-06"}
 				],
-				"Morchella_importuna": [
+				"Landscaping Black Morel (Morchella importuna)": [
 					{name: "Washington_Morchella_importuna.ndjson", modified: "2026-01-06"},
 					{name: "Oregon_Morchella_importuna.ndjson", modified: "2026-01-06"},
 					{name: "California_Morchella_importuna.ndjson", modified: "2026-01-06"}
-				]
+				],
+				"Morchella brunnea": [
+					{name: "Washington_Morchella_brunnea.ndjson", modified: "2026-01-07"},
+					{name: "Oregon_Morchella_brunnea.ndjson", modified: "2026-01-07"},
+					{name: "California_Morchella_brunnea.ndjson", modified: "2026-01-07"}
+				],
+				"Morchella norvegiensis": [
+					{name: "Washington_Morchella_norvegiensis.ndjson", modified: "2026-01-07"},
+					{name: "Oregon_Morchella_norvegiensis.ndjson", modified: "2026-01-07"}
+				],
+				"Morchella populiphila": [
+					{name: "Washington_Morchella_populiphila.ndjson", modified: "2026-01-07"},
+					{name: "Oregon_Morchella_populiphila.ndjson", modified: "2026-01-07"},
+					{name: "California_Morchella_populiphila.ndjson", modified: "2026-01-07"}
+				],
+				"Natural Black Morel (Morchella snyderi)": [
+					{name: "Washington_Morchella_snyderi.ndjson", modified: "2026-01-07"},
+					{name: "Oregon_Morchella_snyderi.ndjson", modified: "2026-01-07"},
+					{name: "California_Morchella_snyderi.ndjson", modified: "2026-01-07"}
+				],
+				"Gray Morel (Morchella tomentosa)": [
+					{name: "Washington_Morchella_tomentosa.ndjson", modified: "2026-01-07"},
+					{name: "Oregon_Morchella_tomentosa.ndjson", modified: "2026-01-07"},
+					{name: "California_Morchella_tomentosa.ndjson", modified: "2026-01-07"}
+				],
+				"Mountain Blond Morel (Morchella tridentina)": [
+					{name: "Washington_Morchella_tridentina.ndjson", modified: "2026-01-07"},
+					{name: "Oregon_Morchella_tridentina.ndjson", modified: "2026-01-07"},
+					{name: "California_Morchella_tridentina.ndjson", modified: "2026-01-07"}
+				],
 			}
 		};
         
@@ -2292,6 +2339,14 @@
 			'#556B2F', '#FF8C00', '#9932CC', '#8B0000', '#E9967A'
 		];
         
+		function formatFolderName(name) {
+			// Matches text followed by (something)
+			return name.replace(
+				/\s*(\([^)]+\))$/,
+				' <span class="sci-name">$1</span>'
+			);
+		}
+
         // Initialize NDJSON directory
 		function initNdjsonDirectory() {
 			const directoryContent = document.getElementById('ndjson-folder-structure');
@@ -2308,7 +2363,7 @@
 				mainFolderHeader.innerHTML = `
 					<div class="folder-name">
 						<i class="fas fa-folder"></i>
-						${mainFolderName}
+						${formatFolderName(mainFolderName)}
 					</div>
 					<div class="folder-controls">
 						<button class="control-btn folder-select-all" data-folder="${mainFolderName}">All</button>
@@ -2335,7 +2390,7 @@
 					subFolderHeader.innerHTML = `
 						<div class="folder-name">
 							<i class="fas fa-folder"></i>
-							${subFolderName}
+							${formatFolderName(subFolderName)}
 						</div>
 						<div class="folder-controls">
 							<button class="control-btn folder-select-all" data-folder="${subFolderName}">All</button>
@@ -4492,7 +4547,9 @@
 			} else if (xProp === 'elevationFt') {
 				// Set elevation max to 12000
 				mainChart.options.scales.x.max = 12000;
-				mainChart.options.scales.x.ticks = {};
+				mainChart.options.scales.x.ticks = {
+					stepSize: 1000
+				};
 				mainChart.options.scales.x.min = 0;
 			} else {
 				mainChart.options.scales.x.ticks = {};
@@ -4518,7 +4575,9 @@
 			} else if (yProp === 'elevationFt') {
 				// Set elevation max to 12000
 				mainChart.options.scales.y.max = 12000;
-				mainChart.options.scales.y.ticks = {};
+				mainChart.options.scales.y.ticks = {
+					stepSize: 1000
+				};
 				mainChart.options.scales.y.min = 0;
 			} else {
 				mainChart.options.scales.y.ticks = {};
