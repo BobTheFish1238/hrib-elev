@@ -361,10 +361,15 @@
 			padding: 20px;
 			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 			height: 100%;
-			max-height: 325px;
+			max-height: 450px;
 			overflow-y: auto;
 			display: flex;
 			flex-direction: column;
+		}
+
+		.ndjson-directory,
+		.settings-section {
+			margin-bottom: 25px;
 		}
         
 		.directory-header {
@@ -442,6 +447,7 @@
 			cursor: pointer;
 			border-bottom: 1px solid #eee;
 			position: relative;
+			width: 100%;
 		}
         
         .folder-name {
@@ -477,10 +483,6 @@
             transition: background-color 0.2s;
         }
         
-        .ndjson-file:hover {
-            background-color: #f5f5f5;
-        }
-        
         .file-toggle {
             width: 20px;
             height: 20px;
@@ -506,6 +508,20 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
+		.file-name-group {
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			white-space: nowrap;
+		}
+
+		.file-controls {
+			display: flex;
+			align-items: center;
+			margin-left: auto;
+			gap: 5px;
+		}
         
         .file-count {
             font-size: 12px;
@@ -560,20 +576,6 @@
 
 		#apply-settings {
 			margin-top: auto;
-		}
-
-		/* Side-by-side container */
-		.side-by-side-container {
-			display: grid;
-			grid-template-columns: 1fr 1fr;
-			gap: 25px;
-			margin-bottom: 25px;
-		}
-
-		@media (max-width: 1200px) {
-			.side-by-side-container {
-				grid-template-columns: 1fr;
-			}
 		}
         
         /* Styles for map controls */
@@ -1357,63 +1359,60 @@
 	<div class="main-container">    
 		<!-- Main content area -->
 		<div>
-			<!-- Side-by-side containers -->
-			<div class="side-by-side-container">
-				<!-- NDJSON Data Files container -->
-				<div class="ndjson-directory">
-					<div class="directory-header">
-						<div class="directory-title">Data Files</div>
-						<div class="directory-controls">
-							<button class="control-btn" id="select-all-btn">All</button>
-							<button class="control-btn" id="select-none-btn">None</button>
-						</div>
+			<!-- NDJSON Data Files container -->
+			<div class="ndjson-directory">
+				<div class="directory-header">
+					<div class="directory-title">Data Files</div>
+					<div class="directory-controls">
+						<button class="control-btn" id="select-all-btn">All</button>
+						<button class="control-btn" id="select-none-btn">None</button>
 					</div>
-					<div class="directory-content" id="directory-content">
-						<!-- Directory content will be populated by JavaScript -->
-						<div class="loading" id="directory-loading">Loading NDJSON directory...</div>
-						<div id="ndjson-folder-structure"></div>
+				</div>
+				<div class="directory-content" id="directory-content">
+					<!-- Directory content will be populated by JavaScript -->
+					<div class="loading" id="directory-loading">Loading NDJSON directory...</div>
+					<div id="ndjson-folder-structure"></div>
+				</div>
+			</div>
+			<!-- Data Settings container -->
+			<div class="settings-section">
+				<h3 class="settings-title">Data Settings</h3>
+				
+				<div class="setting-group">
+					<div class="setting-row">
+						<div class="setting-label">Average Days:</div>
+						<select id="average-days">
+							<option value="1">1 day</option>
+							<option value="3">3 days</option>
+							<option value="7" selected>7 days</option>
+							<option value="10">10 days</option>
+							<option value="14">14 days</option>
+						</select>
+					</div>
+					
+					<div class="setting-row">
+						<div class="setting-label">Soil Temp Depth:</div>
+						<select id="temp-depth">
+							<option value="0_to_7cm">0-7 cm</option>
+							<option value="7_to_28cm" selected>7-28 cm</option>
+							<option value="28_to_100cm">28-100 cm</option>
+							<option value="0_to_100cm">0-100 cm</option>
+						</select>
+					</div>
+					
+					<div class="setting-row">
+						<div class="setting-label">Soil Moisture Depth:</div>
+						<select id="moisture-depth">
+							<option value="0_to_7cm">0-7 cm</option>
+							<option value="7_to_28cm" selected>7-28 cm</option>
+							<option value="28_to_100cm">28-100 cm</option>
+							<option value="0_to_100cm">0-100 cm</option>
+						</select>
 					</div>
 				</div>
 				
-				<!-- Data Settings container -->
-				<div class="settings-section">
-					<h3 class="settings-title">Data Settings</h3>
-					
-					<div class="setting-group">
-						<div class="setting-row">
-							<div class="setting-label">Average Days:</div>
-							<select id="average-days">
-								<option value="1">1 day</option>
-								<option value="3">3 days</option>
-								<option value="7" selected>7 days</option>
-								<option value="10">10 days</option>
-								<option value="14">14 days</option>
-							</select>
-						</div>
-						
-						<div class="setting-row">
-							<div class="setting-label">Soil Temp Depth:</div>
-							<select id="temp-depth">
-								<option value="0_to_7cm">0-7 cm</option>
-								<option value="7_to_28cm" selected>7-28 cm</option>
-								<option value="28_to_100cm">28-100 cm</option>
-								<option value="0_to_100cm">0-100 cm</option>
-							</select>
-						</div>
-						
-						<div class="setting-row">
-							<div class="setting-label">Soil Moisture Depth:</div>
-							<select id="moisture-depth">
-								<option value="0_to_7cm">0-7 cm</option>
-								<option value="7_to_28cm" selected>7-28 cm</option>
-								<option value="28_to_100cm">28-100 cm</option>
-								<option value="0_to_100cm">0-100 cm</option>
-							</select>
-						</div>
-					</div>
-					
-					<button id="apply-settings" style="width: 100%;">Apply Settings</button>
-				</div>
+				<button id="apply-settings" style="width: 100%;">Apply Settings</button>
+			</div>
 			</div>
 			
 			<div class="input-section">
@@ -1426,10 +1425,10 @@
 						<label style="display: flex; align-items: center; gap: 5px; white-space: nowrap; max-height: 50px; font-size: 14px;">Selected Point:</label>
 						<input type="color" id="highlight-color" value="#FFA500" title="Highlight color">
 						<input type="number" id="highlight-point-size" value="5" min="1" max="20" title="Highlight point size" style="max-width: 80px; max-height: 30px; align-items: center;">
-						<button id="clear-user-points" title="Clear user points" style="margin-left: 40px; max-height: 30px; align-items: center;">🗑️</button>
-						<label style="display: flex; align-items: center; gap: 5px; font-size: 12px;">
-							<input type="checkbox" id="disable-scroll" checked> Scroll
+						<label style="display: flex; align-items: center; gap: 5px; font-size: 12px; margin-left: 10px; margin-right: 10px; white-space: nowrap;">
+							<input type="checkbox" id="disable-scroll"> Disable Scroll
 						</label>
+						<button id="clear-user-points" title="Clear user points" style="max-height: 30px; align-items: center;">🗑️</button>
 					</div>
 				</div>
                 <p style="font-size: 18px;">Enter coordinates manually or click on the map to select a location. The system will retrieve the soil and elevation data from the Open-Meteo Historical Weather API.</p>
@@ -1452,7 +1451,7 @@
                     
                     <div class="input-field" style="flex: 1 1 200px;">
                         <label>&nbsp;</label>
-                        <button id="fetch-data" style="width: 100%;">Get Soil Temperature & Elevation</button>
+                        <button id="fetch-data" style="width: 100%;">Get Soil Data & Elevation</button>
                     </div>
                 </div>
                 
@@ -2289,12 +2288,12 @@
 			},
 			"Black Morels (Morchella sect. Distantes)": {
 				"Black Morel (Morchella angusticeps)": [
-					{name: "Washington_Morchella_angusticeps.ndjson", modified: "2026-01-06"}
+					{name: "Washington_Morchella_angusticeps.ndjson", modified: "2026-01-07"}
 				],
 				"Landscaping Black Morel (Morchella importuna)": [
-					{name: "Washington_Morchella_importuna.ndjson", modified: "2026-01-06"},
-					{name: "Oregon_Morchella_importuna.ndjson", modified: "2026-01-06"},
-					{name: "California_Morchella_importuna.ndjson", modified: "2026-01-06"}
+					{name: "Washington_Morchella_importuna.ndjson", modified: "2026-01-07"},
+					{name: "Oregon_Morchella_importuna.ndjson", modified: "2026-01-07"},
+					{name: "California_Morchella_importuna.ndjson", modified: "2026-01-07"}
 				],
 				"Morchella brunnea": [
 					{name: "Washington_Morchella_brunnea.ndjson", modified: "2026-01-07"},
@@ -2357,6 +2356,10 @@
 			Object.keys(ndjsonStructure).forEach(mainFolderName => {
 				const mainFolderDiv = document.createElement('div');
 				mainFolderDiv.className = 'folder';
+				mainFolderDiv.dataset.folderName = mainFolderName;
+				
+				// Create folder controls for main folder
+				const mainFolderControls = createFolderControls(mainFolderName, null, true);
 				
 				const mainFolderHeader = document.createElement('div');
 				mainFolderHeader.className = 'folder-header';
@@ -2365,6 +2368,7 @@
 						<i class="fas fa-folder"></i>
 						${formatFolderName(mainFolderName)}
 					</div>
+					${mainFolderControls}
 					<div class="folder-controls">
 						<button class="control-btn folder-select-all" data-folder="${mainFolderName}">All</button>
 						<button class="control-btn folder-select-none" data-folder="${mainFolderName}">None</button>
@@ -2376,12 +2380,19 @@
 				
 				const mainFolderContent = document.createElement('div');
 				mainFolderContent.className = 'folder-content collapsed';
+				mainFolderContent.dataset.folderName = mainFolderName;
 				
 				Object.keys(ndjsonStructure[mainFolderName]).forEach(subFolderName => {
 					const subFolderDiv = document.createElement('div');
 					subFolderDiv.className = 'folder';
 					subFolderDiv.style.margin = '5px 0';
 					subFolderDiv.style.border = '1px solid #eee';
+					subFolderDiv.dataset.folderName = mainFolderName;
+					subFolderDiv.dataset.subFolderName = subFolderName;
+					
+					// Create folder controls for sub-folder
+					const isKingBolete = subFolderName.includes('King Bolete (Boletus edulis)');
+					const subFolderControls = createFolderControls(mainFolderName, subFolderName, false, isKingBolete);
 					
 					const subFolderHeader = document.createElement('div');
 					subFolderHeader.className = 'folder-header';
@@ -2392,6 +2403,7 @@
 							<i class="fas fa-folder"></i>
 							${formatFolderName(subFolderName)}
 						</div>
+						${subFolderControls}
 						<div class="folder-controls">
 							<button class="control-btn folder-select-all" data-folder="${subFolderName}">All</button>
 							<button class="control-btn folder-select-none" data-folder="${subFolderName}">None</button>
@@ -2403,6 +2415,8 @@
 					
 					const subFolderContent = document.createElement('div');
 					subFolderContent.className = 'folder-content collapsed';
+					subFolderContent.dataset.folderName = mainFolderName;
+					subFolderContent.dataset.subFolderName = subFolderName;
 					
 					ndjsonStructure[mainFolderName][subFolderName].forEach(fileObj => {
 						const fileName = fileObj.name;
@@ -2414,40 +2428,62 @@
 						const fileColor = defaultColors[colorIndex % defaultColors.length];
 						colorIndex++;
 						
-						// Check if this is Washington_Boletus_edulis.ndjson to enable by default
+						// Check if this is a Boletus edulis file to enable by default
 						const isWashingtonEdulis = fileName === 'Washington_Boletus_edulis.ndjson';
+						const isOregonEdulis = fileName === 'Oregon_Boletus_edulis.ndjson';
+						const isCaliforniaEdulis = fileName === 'California_Boletus_edulis.ndjson';
+
+						// Enable all three Boletus edulis files by default
+						const enableByDefault = isWashingtonEdulis || isOregonEdulis || isCaliforniaEdulis;
 						
 						// Store initial state - enable Washington_Boletus_edulis.ndjson by default
 						activeDatasets[fileId] = {
-							active: isWashingtonEdulis, // Enable only Washington_Boletus_edulis.ndjson
+							active: enableByDefault, // Enable all Boletus edulis files
 							color: fileColor,
 							pointSize: pointSize,
 							filePath: filePath,
 							fileName: fileName,
 							folderName: mainFolderName,
 							subFolderName: subFolderName,
-							data: []
+							data: [],
+							useFolderColor: false,
+							useFolderPointSize: false
 						};
 						
 						const fileDiv = document.createElement('div');
 						fileDiv.className = 'ndjson-file';
 						fileDiv.dataset.fileId = fileId;
+						fileDiv.dataset.folderName = mainFolderName;
+						fileDiv.dataset.subFolderName = subFolderName;
 						
 						// Set up toggle with checkmark if active by default
-						const toggleActiveClass = isWashingtonEdulis ? 'active' : '';
-						const checkmarkDisplay = isWashingtonEdulis ? 'block' : 'none';
+						const toggleActiveClass = enableByDefault ? 'active' : '';
+						const checkmarkDisplay = enableByDefault ? 'block' : 'none';
 						
 						fileDiv.innerHTML = `
 							<div class="file-toggle ${toggleActiveClass}" data-file-id="${fileId}">
 								<i class="fas fa-check" style="font-size: 10px; display: ${checkmarkDisplay};"></i>
 							</div>
-							<div class="file-name" title="${fileName}${modifiedDate ? '\nModified: ' + modifiedDate : ''}">${fileName}</div>
-							<div class="file-count">0</div>
-							<div style="display: flex; align-items: center; gap: 5px;">
-								<input type="color" class="color-picker" value="${fileColor.substring(0, 7)}" data-file-id="${fileId}" style="min-width: 24px; height: 24px;">
-								<input type="range" class="alpha-slider" min="0" max="100" value="100" data-file-id="${fileId}" style="width: 60px;">
-								<span class="alpha-percent" data-file-id="${fileId}" style="font-size: 11px; min-width: 25px;">100%</span>
-								<input type="number" class="point-size-input" value="${pointSize}" min="1" max="10" data-file-id="${fileId}" style="max-width: 80px; max-height: 30px; font-size: 14px;">
+
+							<div class="file-name-group">
+								<div class="file-name" title="${fileName}${modifiedDate ? '\nModified: ' + modifiedDate : ''}">
+									${fileName}
+								</div>
+								<div class="file-count">0</div>
+							</div>
+
+							<div class="file-controls">
+								<div style="display: flex; align-items: center; gap: 2px;">
+									<input type="checkbox" class="color-control-checkbox" data-file-id="${fileId}" ${isKingBolete ? 'disabled' : ''} checked>
+									<input type="color" class="color-picker" value="${fileColor.substring(0, 7)}" data-file-id="${fileId}" style="min-width: 24px; height: 24px;" ${isKingBolete ? 'disabled' : ''}>
+									<input type="range" class="alpha-slider" min="0" max="100" value="100" data-file-id="${fileId}" style="width: 60px;" ${isKingBolete ? 'disabled' : ''}>
+									<span class="alpha-percent" data-file-id="${fileId}" style="font-size: 11px; min-width: 25px;">100%</span>
+								</div>
+
+								<div style="display: flex; align-items: center; gap: 2px; margin-left: 20px;">
+									<input type="checkbox" class="size-control-checkbox" data-file-id="${fileId}" ${isKingBolete ? 'disabled' : ''} checked>
+									<input type="number" class="point-size-input" value="${pointSize}" min="1" max="10" data-file-id="${fileId}" style="max-width: 80px; max-height: 30px; font-size: 14px;" ${isKingBolete ? 'disabled' : ''}>
+								</div>
 							</div>
 						`;
 						
@@ -2469,8 +2505,10 @@
 
 					// Click on sub-folder header toggles
 					subFolderHeader.addEventListener('click', function(e) {
-						// Don't toggle if clicking on control buttons (All/None)
-						if (!e.target.closest('.folder-controls') && !e.target.closest('.control-btn')) {
+						// Don't toggle if clicking on control buttons (All/None) or folder controls
+						if (!e.target.closest('.folder-controls') && 
+							!e.target.closest('.control-btn') &&
+							!e.target.closest('.folder-controls-container')) {
 							toggleSubFolder(e);
 						}
 					});
@@ -2506,8 +2544,10 @@
 
 				// Click on folder header toggles
 				mainFolderHeader.addEventListener('click', function(e) {
-					// Don't toggle if clicking on control buttons (All/None)
-					if (!e.target.closest('.folder-controls') && !e.target.closest('.control-btn')) {
+					// Don't toggle if clicking on control buttons (All/None) or folder controls
+					if (!e.target.closest('.folder-controls') && 
+						!e.target.closest('.control-btn') &&
+						!e.target.closest('.folder-controls-container')) {
 						toggleMainFolder();
 					}
 				});
@@ -2529,7 +2569,62 @@
 				});
 			});
 			
-			// Add event listeners for file toggles and color pickers
+			// Add event listeners for file toggles and controls
+			setupFileControls();
+			
+			// Hide loading message
+			document.getElementById('directory-loading').style.display = 'none';
+		}
+
+		// Helper function to create folder controls
+		function createFolderControls(folderName, subFolderName, isMainFolder = false, isKingBolete = false) {
+			const folderKey = subFolderName ? `${folderName}_${subFolderName}` : folderName;
+			const controlsId = subFolderName ? `folder-controls-${folderName}-${subFolderName}` : `folder-controls-${folderName}`;
+			
+			// Generate different colors for each folder
+			const folderColors = [
+				'#8B4513', '#1E90FF', '#32CD32', '#FF4500', '#9370DB',
+				'#FFD700', '#00CED1', '#FF69B4', '#9ACD32', '#FF6347',
+				'#8A2BE2', '#DC143C', '#00FA9A', '#FF8C00', '#9932CC'
+			];
+			
+			// Create a consistent hash for the folder to get a color
+			const hash = Array.from(folderKey).reduce((acc, char) => {
+				return char.charCodeAt(0) + ((acc << 5) - acc);
+			}, 0);
+			const colorIndex = Math.abs(hash) % folderColors.length;
+			const folderColor = folderColors[colorIndex];
+			
+			// Default: enable King Bolete folder controls
+			const colorChecked = isKingBolete ? 'checked' : '';
+			const sizeChecked = isKingBolete ? 'checked' : '';
+			
+			return `
+				<div class="folder-controls-right-container" style="display: flex; flex-grow: 1; justify-content: flex-end; align-items: center; gap: 15px; margin-right: 10px;">
+					<div class="folder-controls-container" id="${controlsId}" style="display: flex; align-items: center; gap: 8px;">
+						<div style="display: flex; align-items: center; gap: 2px;">
+							<input type="checkbox" class="folder-color-control" 
+								data-folder="${folderKey}" ${colorChecked}>
+							<input type="color" class="folder-color-picker" 
+								data-folder="${folderKey}" value="${folderColor}" style="width: 24px; height: 24px;" ${isKingBolete ? '' : 'disabled'}>
+							<input type="range" class="folder-alpha-slider" min="0" max="100" value="100" 
+								data-folder="${folderKey}" style="width: 50px;" ${isKingBolete ? '' : 'disabled'}>
+							<span class="folder-alpha-percent" data-folder="${folderKey}" style="font-size: 10px;">100%</span>
+						</div>
+						<div style="display: flex; align-items: center; gap: 2px; margin-left: 20px;">
+							<input type="checkbox" class="folder-size-control" 
+								data-folder="${folderKey}" ${sizeChecked}>
+							<input type="number" class="folder-point-size" value="${pointSize}" min="1" max="10" 
+								data-folder="${folderKey}" style="width: 80px; font-size: 12px;" ${isKingBolete ? '' : 'disabled'}>
+						</div>
+					</div>
+				</div>
+			`;
+		}
+
+		// Setup file controls and event listeners
+		function setupFileControls() {
+			// File toggle event listeners
 			document.querySelectorAll('.file-toggle').forEach(toggle => {
 				toggle.addEventListener('click', function() {
 					const fileId = this.dataset.fileId;
@@ -2550,6 +2645,226 @@
 				});
 			});
 			
+			// Folder control event listeners
+			setupFolderControlListeners();
+			
+			// File control event listeners
+			setupFileControlListeners();
+		}
+
+		// Setup folder control listeners
+		function setupFolderControlListeners() {
+			// Folder color control checkboxes
+			document.querySelectorAll('.folder-color-control').forEach(checkbox => {
+				checkbox.addEventListener('change', function() {
+					const folderKey = this.dataset.folder;
+					const isChecked = this.checked;
+					const [folderName, subFolderName] = folderKey.includes('_') ? folderKey.split('_') : [folderKey, null];
+					
+					// Enable/disable color picker and alpha slider
+					const colorPicker = document.querySelector(`.folder-color-picker[data-folder="${folderKey}"]`);
+					const alphaSlider = document.querySelector(`.folder-alpha-slider[data-folder="${folderKey}"]`);
+					
+					if (colorPicker) colorPicker.disabled = !isChecked;
+					if (alphaSlider) alphaSlider.disabled = !isChecked;
+					
+					// Get current folder color value
+					let folderColorValue = null;
+					if (isChecked && colorPicker && alphaSlider) {
+						const rgb = colorPicker.value;
+						const alpha = parseInt(alphaSlider.value);
+						const alphaHex = alpha === 100 ? '' : Math.round(alpha * 2.55).toString(16).padStart(2, '0');
+						folderColorValue = rgb + alphaHex;
+					}
+					
+					// Update all files in this folder
+					updateFilesInFolder(folderName, subFolderName, 'color', isChecked, folderColorValue);
+					
+					// If enabling folder color, disable individual file color controls in this folder
+					if (isChecked) {
+						disableFileControlsInFolder(folderName, subFolderName, 'color');
+						
+						// If this is a main folder (no subfolder), lock all sub-folder checkboxes
+						if (!subFolderName) {
+							lockSubFolderControls(folderName, 'color', true);
+						}
+					} else {
+						enableFileControlsInFolder(folderName, subFolderName, 'color');
+						// When disabling folder color, files should revert to their individual colors
+						revertFilesToIndividualColors(folderName, subFolderName);
+						
+						// If this is a main folder (no subfolder), unlock all sub-folder checkboxes
+						if (!subFolderName) {
+							lockSubFolderControls(folderName, 'color', false);
+						}
+					}
+					
+					// Update display immediately
+					updateDataDisplay(true);
+				});
+			});
+			
+			// Folder size control checkboxes
+			document.querySelectorAll('.folder-size-control').forEach(checkbox => {
+				checkbox.addEventListener('change', function() {
+					const folderKey = this.dataset.folder;
+					const isChecked = this.checked;
+					const [folderName, subFolderName] = folderKey.includes('_') ? folderKey.split('_') : [folderKey, null];
+					
+					// Enable/disable point size input
+					const sizeInput = document.querySelector(`.folder-point-size[data-folder="${folderKey}"]`);
+					if (sizeInput) sizeInput.disabled = !isChecked;
+					
+					// Get current folder size value
+					let folderSizeValue = null;
+					if (isChecked && sizeInput) {
+						folderSizeValue = parseInt(sizeInput.value) || pointSize;
+					}
+					
+					// Update all files in this folder
+					updateFilesInFolder(folderName, subFolderName, 'size', isChecked, folderSizeValue);
+					
+					// If enabling folder size, disable individual file size controls in this folder
+					if (isChecked) {
+						disableFileControlsInFolder(folderName, subFolderName, 'size');
+						
+						// If this is a main folder (no subfolder), lock all sub-folder checkboxes
+						if (!subFolderName) {
+							lockSubFolderControls(folderName, 'size', true);
+						}
+					} else {
+						enableFileControlsInFolder(folderName, subFolderName, 'size');
+						// When disabling folder size, files should revert to their individual sizes
+						revertFilesToIndividualSizes(folderName, subFolderName);
+						
+						// If this is a main folder (no subfolder), unlock all sub-folder checkboxes
+						if (!subFolderName) {
+							lockSubFolderControls(folderName, 'size', false);
+						}
+					}
+					
+					// Update display immediately
+					updateDataDisplay(true);
+				});
+			});
+			
+			// Folder color picker and alpha slider
+			document.querySelectorAll('.folder-color-picker, .folder-alpha-slider').forEach(input => {
+				input.addEventListener('input', function() {
+					const folderKey = this.dataset.folder;
+					const [folderName, subFolderName] = folderKey.includes('_') ? folderKey.split('_') : [folderKey, null];
+					
+					// Check if folder color control is enabled
+					const folderColorCheckbox = document.querySelector(`.folder-color-control[data-folder="${folderKey}"]`);
+					if (!folderColorCheckbox || !folderColorCheckbox.checked) return;
+					
+					// Get the current values
+					const colorPicker = document.querySelector(`.folder-color-picker[data-folder="${folderKey}"]`);
+					const alphaSlider = document.querySelector(`.folder-alpha-slider[data-folder="${folderKey}"]`);
+					const alphaPercent = document.querySelector(`.folder-alpha-percent[data-folder="${folderKey}"]`);
+					
+					if (!colorPicker || !alphaSlider) return;
+					
+					const rgb = colorPicker.value;
+					const alpha = parseInt(alphaSlider.value);
+					const alphaHex = alpha === 100 ? '' : Math.round(alpha * 2.55).toString(16).padStart(2, '0');
+					const finalColor = rgb + alphaHex;
+					
+					if (alphaPercent) {
+						alphaPercent.textContent = alpha + '%';
+					}
+					
+					// Update all files in this folder
+					updateFilesInFolder(folderName, subFolderName, 'color', true, finalColor);
+					
+					// Update display
+					updateDataDisplay(true);
+				});
+			});
+			
+			// Folder point size input
+			document.querySelectorAll('.folder-point-size').forEach(input => {
+				makeInputScrollable(input, 1, 10, 1);
+				input.addEventListener('input', function() {
+					const folderKey = this.dataset.folder;
+					const [folderName, subFolderName] = folderKey.includes('_') ? folderKey.split('_') : [folderKey, null];
+					
+					// Check if folder size control is enabled
+					const folderSizeCheckbox = document.querySelector(`.folder-size-control[data-folder="${folderKey}"]`);
+					if (!folderSizeCheckbox || !folderSizeCheckbox.checked) return;
+					
+					const size = parseInt(this.value) || pointSize;
+					
+					// Update all files in this folder
+					updateFilesInFolder(folderName, subFolderName, 'size', true, size);
+					
+					// Update display
+					updateDataDisplay(true);
+				});
+			});
+		}
+
+		function lockSubFolderControls(mainFolderName, type, lock) {
+			// Find all sub-folders within this main folder
+			const subFolders = document.querySelectorAll(`.folder[data-folder-name="${mainFolderName}"] .folder-header`);
+			
+			subFolders.forEach(subFolderHeader => {
+				const subFolderName = subFolderHeader.closest('.folder').dataset.subFolderName;
+				if (subFolderName) {
+					const folderKey = `${mainFolderName}_${subFolderName}`;
+					
+					if (type === 'color') {
+						const checkbox = subFolderHeader.querySelector(`.folder-color-control[data-folder="${folderKey}"]`);
+						const colorPicker = subFolderHeader.querySelector(`.folder-color-picker[data-folder="${folderKey}"]`);
+						const alphaSlider = subFolderHeader.querySelector(`.folder-alpha-slider[data-folder="${folderKey}"]`);
+						
+						if (checkbox) checkbox.disabled = lock;
+						if (colorPicker) colorPicker.disabled = lock;
+						if (alphaSlider) alphaSlider.disabled = lock;
+						
+						// Add visual indicator for disabled state
+						if (lock) {
+							if (checkbox) checkbox.style.opacity = '0.5';
+							if (colorPicker) colorPicker.style.opacity = '0.5';
+							if (alphaSlider) alphaSlider.style.opacity = '0.5';
+						} else {
+							if (checkbox) checkbox.style.opacity = '';
+							if (colorPicker) colorPicker.style.opacity = '';
+							if (alphaSlider) alphaSlider.style.opacity = '';
+							
+							// If sub-folder checkbox was previously checked, re-enable it
+							if (checkbox && checkbox.checked) {
+								if (colorPicker) colorPicker.disabled = false;
+								if (alphaSlider) alphaSlider.disabled = false;
+							}
+						}
+					} else if (type === 'size') {
+						const checkbox = subFolderHeader.querySelector(`.folder-size-control[data-folder="${folderKey}"]`);
+						const sizeInput = subFolderHeader.querySelector(`.folder-point-size[data-folder="${folderKey}"]`);
+						
+						if (checkbox) checkbox.disabled = lock;
+						if (sizeInput) sizeInput.disabled = lock;
+						
+						// Add visual indicator for disabled state
+						if (lock) {
+							if (checkbox) checkbox.style.opacity = '0.5';
+							if (sizeInput) sizeInput.style.opacity = '0.5';
+						} else {
+							if (checkbox) checkbox.style.opacity = '';
+							if (sizeInput) sizeInput.style.opacity = '';
+							
+							// If sub-folder checkbox was previously checked, re-enable it
+							if (checkbox && checkbox.checked) {
+								if (sizeInput) sizeInput.disabled = false;
+							}
+						}
+					}
+				}
+			});
+		}
+
+		// Setup file control listeners
+		function setupFileControlListeners() {
 			const debouncedUpdate = debounce((fileId) => {
 				const colorPicker = document.querySelector(`.color-picker[data-file-id="${fileId}"]`);
 				const alphaSlider = document.querySelector(`.alpha-slider[data-file-id="${fileId}"]`);
@@ -2563,15 +2878,73 @@
 				
 				// Update only the color in activeDatasets
 				activeDatasets[fileId].color = rgb + alphaHex;
+				activeDatasets[fileId].useFolderColor = false;
 				
 				if (alphaPercent) {
 					alphaPercent.textContent = alpha + '%';
 				}
 				
 				// Only update visual elements, not reprocess data
-				updateDataDisplay(true); // true = visual update only
-			}, 150); // 150ms debounce delay
-
+				updateDataDisplay(true);
+			}, 150);
+			
+			// File color control checkboxes
+			document.querySelectorAll('.color-control-checkbox').forEach(checkbox => {
+				checkbox.addEventListener('change', function() {
+					const fileId = this.dataset.fileId;
+					const isChecked = this.checked;
+					
+					// Enable/disable color picker and alpha slider
+					const colorPicker = document.querySelector(`.color-picker[data-file-id="${fileId}"]`);
+					const alphaSlider = document.querySelector(`.alpha-slider[data-file-id="${fileId}"]`);
+					
+					if (colorPicker) colorPicker.disabled = !isChecked;
+					if (alphaSlider) alphaSlider.disabled = !isChecked;
+					
+					// Update activeDatasets
+					if (activeDatasets[fileId]) {
+						activeDatasets[fileId].useFolderColor = !isChecked;
+						
+						// If enabling individual control, get the current color from the picker
+						if (isChecked && colorPicker && alphaSlider) {
+							const rgb = colorPicker.value;
+							const alpha = parseInt(alphaSlider.value);
+							const alphaHex = alpha === 100 ? '' : Math.round(alpha * 2.55).toString(16).padStart(2, '0');
+							activeDatasets[fileId].color = rgb + alphaHex;
+						}
+					}
+					
+					// Update display immediately
+					updateDataDisplay(true);
+				});
+			});
+			
+			// File size control checkboxes
+			document.querySelectorAll('.size-control-checkbox').forEach(checkbox => {
+				checkbox.addEventListener('change', function() {
+					const fileId = this.dataset.fileId;
+					const isChecked = this.checked;
+					
+					// Enable/disable point size input
+					const sizeInput = document.querySelector(`.point-size-input[data-file-id="${fileId}"]`);
+					if (sizeInput) sizeInput.disabled = !isChecked;
+					
+					// Update activeDatasets
+					if (activeDatasets[fileId]) {
+						activeDatasets[fileId].useFolderPointSize = !isChecked;
+						
+						// If enabling individual control, get the current size from the input
+						if (isChecked && sizeInput) {
+							activeDatasets[fileId].pointSize = parseInt(sizeInput.value) || pointSize;
+						}
+					}
+					
+					// Update display immediately
+					updateDataDisplay(true);
+				});
+			});
+			
+			// File point size inputs
 			document.querySelectorAll('.point-size-input').forEach(input => {
 				makeInputScrollable(input, 1, 10, 1);
 				input.addEventListener('input', function() {
@@ -2580,15 +2953,10 @@
 					
 					if (activeDatasets[fileId]) {
 						activeDatasets[fileId].pointSize = size;
-						updateVisualsOnly(); // This will update both charts and map
+						activeDatasets[fileId].useFolderPointSize = false;
+						updateVisualsOnly();
 					}
 				});
-				
-				// Set initial size
-				const fileId = input.dataset.fileId;
-				if (activeDatasets[fileId]) {
-					activeDatasets[fileId].pointSize = parseInt(input.value) || pointSize;
-				}
 			});
 
 			// Add event listeners for global point size controls
@@ -2601,7 +2969,8 @@
 				highlightPointSize = parseInt(this.value) || 5;
 				updateDataDisplay(true);
 			});
-
+			
+			// File color pickers and alpha sliders
 			document.querySelectorAll('.color-picker, .alpha-slider').forEach(input => {
 				input.addEventListener('input', function() {
 					const fileId = this.dataset.fileId;
@@ -2609,7 +2978,7 @@
 				});
 			});
 			
-			// Add global select all/none buttons
+			// Global select all/none buttons
 			document.getElementById('select-all-btn').addEventListener('click', function() {
 				selectAllFiles(true);
 			});
@@ -2617,9 +2986,199 @@
 			document.getElementById('select-none-btn').addEventListener('click', function() {
 				selectAllFiles(false);
 			});
+		}
+
+		// Helper function to revert files to individual colors
+		function revertFilesToIndividualColors(folderName, subFolderName) {
+			const selector = subFolderName 
+				? `.ndjson-file[data-folder-name="${folderName}"][data-sub-folder-name="${subFolderName}"]`
+				: `.ndjson-file[data-folder-name="${folderName}"]`;
 			
-			// Hide loading message
-			document.getElementById('directory-loading').style.display = 'none';
+			document.querySelectorAll(selector).forEach(fileDiv => {
+				const fileId = fileDiv.dataset.fileId;
+				const fileData = activeDatasets[fileId];
+				
+				if (fileData) {
+					// First check if main folder has color enabled
+					const mainFolderColorCheckbox = document.querySelector(`.folder-color-control[data-folder="${fileData.folderName}"]`);
+					if (mainFolderColorCheckbox && mainFolderColorCheckbox.checked) {
+						// Use main folder color
+						const folderColorPicker = document.querySelector(`.folder-color-picker[data-folder="${fileData.folderName}"]`);
+						const folderAlphaSlider = document.querySelector(`.folder-alpha-slider[data-folder="${fileData.folderName}"]`);
+						
+						if (folderColorPicker && folderAlphaSlider) {
+							const rgb = folderColorPicker.value;
+							const alpha = parseInt(folderAlphaSlider.value);
+							const alphaHex = alpha === 100 ? '' : Math.round(alpha * 2.55).toString(16).padStart(2, '0');
+							fileData.color = rgb + alphaHex;
+							fileData.useFolderColor = true;
+						}
+						return; // Skip checking sub-folders if main folder is enabled
+					}
+					
+					// Check if this file is in a sub-folder that has its own enabled color
+					const subFolderKey = `${fileData.folderName}_${fileData.subFolderName}`;
+					const subFolderColorCheckbox = document.querySelector(`.folder-color-control[data-folder="${subFolderKey}"]`);
+					
+					if (subFolderColorCheckbox && subFolderColorCheckbox.checked) {
+						// Use sub-folder color instead of individual file color
+						const folderColorPicker = document.querySelector(`.folder-color-picker[data-folder="${subFolderKey}"]`);
+						const folderAlphaSlider = document.querySelector(`.folder-alpha-slider[data-folder="${subFolderKey}"]`);
+						
+						if (folderColorPicker && folderAlphaSlider) {
+							const rgb = folderColorPicker.value;
+							const alpha = parseInt(folderAlphaSlider.value);
+							const alphaHex = alpha === 100 ? '' : Math.round(alpha * 2.55).toString(16).padStart(2, '0');
+							fileData.color = rgb + alphaHex;
+							fileData.useFolderColor = true;
+						}
+					} else {
+						// Get the individual color from the file's color picker
+						const colorPicker = fileDiv.querySelector('.color-picker');
+						const alphaSlider = fileDiv.querySelector('.alpha-slider');
+						
+						if (colorPicker && alphaSlider) {
+							const rgb = colorPicker.value;
+							const alpha = parseInt(alphaSlider.value);
+							const alphaHex = alpha === 100 ? '' : Math.round(alpha * 2.55).toString(16).padStart(2, '0');
+							fileData.color = rgb + alphaHex;
+							fileData.useFolderColor = false;
+						}
+					}
+				}
+			});
+		}
+
+		// Helper function to revert files to individual sizes
+		function revertFilesToIndividualSizes(folderName, subFolderName) {
+			const selector = subFolderName 
+				? `.ndjson-file[data-folder-name="${folderName}"][data-sub-folder-name="${subFolderName}"]`
+				: `.ndjson-file[data-folder-name="${folderName}"]`;
+			
+			document.querySelectorAll(selector).forEach(fileDiv => {
+				const fileId = fileDiv.dataset.fileId;
+				const fileData = activeDatasets[fileId];
+				
+				if (fileData) {
+					// First check if main folder has size enabled
+					const mainFolderSizeCheckbox = document.querySelector(`.folder-size-control[data-folder="${fileData.folderName}"]`);
+					if (mainFolderSizeCheckbox && mainFolderSizeCheckbox.checked) {
+						// Use main folder size
+						const folderSizeInput = document.querySelector(`.folder-point-size[data-folder="${fileData.folderName}"]`);
+						if (folderSizeInput) {
+							fileData.pointSize = parseInt(folderSizeInput.value) || pointSize;
+							fileData.useFolderPointSize = true;
+						}
+						return; // Skip checking sub-folders if main folder is enabled
+					}
+					
+					// Check if this file is in a sub-folder that has its own enabled size
+					const subFolderKey = `${fileData.folderName}_${fileData.subFolderName}`;
+					const subFolderSizeCheckbox = document.querySelector(`.folder-size-control[data-folder="${subFolderKey}"]`);
+					
+					if (subFolderSizeCheckbox && subFolderSizeCheckbox.checked) {
+						// Use sub-folder size instead of individual file size
+						const folderSizeInput = document.querySelector(`.folder-point-size[data-folder="${subFolderKey}"]`);
+						if (folderSizeInput) {
+							fileData.pointSize = parseInt(folderSizeInput.value) || pointSize;
+							fileData.useFolderPointSize = true;
+						}
+					} else {
+						// Get the individual size from the file's size input
+						const sizeInput = fileDiv.querySelector('.point-size-input');
+						if (sizeInput) {
+							fileData.pointSize = parseInt(sizeInput.value) || pointSize;
+							fileData.useFolderPointSize = false;
+						}
+					}
+				}
+			});
+		}
+
+		// Helper function to update files in a folder
+		function updateFilesInFolder(folderName, subFolderName, type, useFolderValue, value = null) {
+			Object.keys(activeDatasets).forEach(fileId => {
+				const fileData = activeDatasets[fileId];
+				
+				// Check if file belongs to this folder
+				const inFolder = subFolderName 
+					? fileData.folderName === folderName && fileData.subFolderName === subFolderName
+					: fileData.folderName === folderName;
+				
+				if (inFolder) {
+					if (type === 'color') {
+						fileData.useFolderColor = useFolderValue;
+						if (useFolderValue && value !== null) {
+							fileData.color = value;
+						} else if (!useFolderValue) {
+							// When not using folder color, revert to individual color
+							// This will be handled by revertFilesToIndividualColors
+						}
+					} else if (type === 'size') {
+						fileData.useFolderPointSize = useFolderValue;
+						if (useFolderValue && value !== null) {
+							fileData.pointSize = value;
+						} else if (!useFolderValue) {
+							// When not using folder size, revert to individual size
+							// This will be handled by revertFilesToIndividualSizes
+						}
+					}
+				}
+			});
+		}
+
+		// Helper function to disable file controls in a folder
+		function disableFileControlsInFolder(folderName, subFolderName, type) {
+			const selector = subFolderName 
+				? `.ndjson-file[data-folder-name="${folderName}"][data-sub-folder-name="${subFolderName}"]`
+				: `.ndjson-file[data-folder-name="${folderName}"]`;
+			
+			document.querySelectorAll(selector).forEach(fileDiv => {
+				const fileId = fileDiv.dataset.fileId;
+				
+				if (type === 'color') {
+					const checkbox = fileDiv.querySelector('.color-control-checkbox');
+					const colorPicker = fileDiv.querySelector('.color-picker');
+					const alphaSlider = fileDiv.querySelector('.alpha-slider');
+					
+					if (checkbox) checkbox.disabled = true;
+					if (colorPicker) colorPicker.disabled = true;
+					if (alphaSlider) alphaSlider.disabled = true;
+				} else if (type === 'size') {
+					const checkbox = fileDiv.querySelector('.size-control-checkbox');
+					const sizeInput = fileDiv.querySelector('.point-size-input');
+					
+					if (checkbox) checkbox.disabled = true;
+					if (sizeInput) sizeInput.disabled = true;
+				}
+			});
+		}
+
+		// Helper function to enable file controls in a folder
+		function enableFileControlsInFolder(folderName, subFolderName, type) {
+			const selector = subFolderName 
+				? `.ndjson-file[data-folder-name="${folderName}"][data-sub-folder-name="${subFolderName}"]`
+				: `.ndjson-file[data-folder-name="${folderName}"]`;
+			
+			document.querySelectorAll(selector).forEach(fileDiv => {
+				const fileId = fileDiv.dataset.fileId;
+				
+				if (type === 'color') {
+					const checkbox = fileDiv.querySelector('.color-control-checkbox');
+					const colorPicker = fileDiv.querySelector('.color-picker');
+					const alphaSlider = fileDiv.querySelector('.alpha-slider');
+					
+					if (checkbox) checkbox.disabled = false;
+					if (colorPicker) colorPicker.disabled = false;
+					if (alphaSlider) alphaSlider.disabled = false;
+				} else if (type === 'size') {
+					const checkbox = fileDiv.querySelector('.size-control-checkbox');
+					const sizeInput = fileDiv.querySelector('.point-size-input');
+					
+					if (checkbox) checkbox.disabled = false;
+					if (sizeInput) sizeInput.disabled = false;
+				}
+			});
 		}
 
 		// Add these helper functions to your JavaScript
@@ -2718,42 +3277,74 @@
 		}
         
         // Load NDJSON file
-        async function loadNdjsonFile(fileId, filePath) {
-            try {
-                const response = await fetch(filePath);
-                if (!response.ok) {
-                    throw new Error(`Failed to load ${filePath}: ${response.status}`);
-                }
-                
-                const text = await response.text();
-                const lines = text.trim().split('\n');
-                const data = lines.map(line => JSON.parse(line));
-                
-                // Store the data
-                activeDatasets[fileId].data = data;
-                
-                // Update count display
-                const fileElement = document.querySelector(`.ndjson-file[data-file-id="${fileId}"]`);
-                if (fileElement) {
-                    fileElement.querySelector('.file-count').textContent = data.length;
-                }
-                
-                // Update the display
-                updateDataDisplay();
-                
-            } catch (error) {
-                console.error(`Error loading NDJSON file ${filePath}:`, error);
-                alert(`Error loading ${filePath}: ${error.message}`);
-                
-                // Deactivate the file
-                activeDatasets[fileId].active = false;
-                const toggle = document.querySelector(`.file-toggle[data-file-id="${fileId}"]`);
-                if (toggle) {
-                    toggle.classList.remove('active');
-                    toggle.querySelector('i').style.display = 'none';
-                }
-            }
-        }
+		async function loadNdjsonFile(fileId, filePath) {
+			try {
+				const response = await fetch(filePath);
+				if (!response.ok) {
+					throw new Error(`Failed to load ${filePath}: ${response.status}`);
+				}
+				
+				const text = await response.text();
+				const lines = text.trim().split('\n');
+				const data = lines.map(line => JSON.parse(line));
+				
+				// Store the data
+				activeDatasets[fileId].data = data;
+				
+				// Check if folder color should be applied
+				const fileData = activeDatasets[fileId];
+				const folderKey = fileData.subFolderName ? 
+					`${fileData.folderName}_${fileData.subFolderName}` : 
+					fileData.folderName;
+				
+				const folderColorCheckbox = document.querySelector(`.folder-color-control[data-folder="${folderKey}"]`);
+				if (folderColorCheckbox && folderColorCheckbox.checked) {
+					// Apply folder color
+					const folderColorPicker = document.querySelector(`.folder-color-picker[data-folder="${folderKey}"]`);
+					const folderAlphaSlider = document.querySelector(`.folder-alpha-slider[data-folder="${folderKey}"]`);
+					
+					if (folderColorPicker && folderAlphaSlider) {
+						const rgb = folderColorPicker.value;
+						const alpha = parseInt(folderAlphaSlider.value);
+						const alphaHex = alpha === 100 ? '' : Math.round(alpha * 2.55).toString(16).padStart(2, '0');
+						activeDatasets[fileId].color = rgb + alphaHex;
+						activeDatasets[fileId].useFolderColor = true;
+					}
+				}
+				
+				// Check if folder size should be applied
+				const folderSizeCheckbox = document.querySelector(`.folder-size-control[data-folder="${folderKey}"]`);
+				if (folderSizeCheckbox && folderSizeCheckbox.checked) {
+					// Apply folder size
+					const folderSizeInput = document.querySelector(`.folder-point-size[data-folder="${folderKey}"]`);
+					if (folderSizeInput) {
+						activeDatasets[fileId].pointSize = parseInt(folderSizeInput.value) || pointSize;
+						activeDatasets[fileId].useFolderPointSize = true;
+					}
+				}
+				
+				// Update count display
+				const fileElement = document.querySelector(`.ndjson-file[data-file-id="${fileId}"]`);
+				if (fileElement) {
+					fileElement.querySelector('.file-count').textContent = data.length;
+				}
+				
+				// Update the display
+				updateDataDisplay();
+				
+			} catch (error) {
+				console.error(`Error loading NDJSON file ${filePath}:`, error);
+				alert(`Error loading ${filePath}: ${error.message}`);
+				
+				// Deactivate the file
+				activeDatasets[fileId].active = false;
+				const toggle = document.querySelector(`.file-toggle[data-file-id="${fileId}"]`);
+				if (toggle) {
+					toggle.classList.remove('active');
+					toggle.querySelector('i').style.display = 'none';
+				}
+			}
+		}
         
         // Process NDJSON data based on current settings
 		function processNdjsonData() {
@@ -4536,6 +5127,7 @@
 						}
 						return '';
 					},
+					labelOffset: 20,
 					stepSize: 1,
 					autoSkip: false,
 					maxRotation: 45,
@@ -4568,6 +5160,7 @@
 						}
 						return '';
 					},
+					labelOffset: -15,
 					stepSize: 1
 				};
 				mainChart.options.scales.y.min = 1;
@@ -5325,10 +5918,15 @@
 			}
 			
 			let dates, temps, moistures;
+			let usedTempVariable = '';
+			let usedMoistureVariable = '';
 			
-			// Check if this is NDJSON data (has dates array) or API data (has daily.time)
+			// Check data structure type
 			if (data.dates && data.soil_temperature && data.soil_moisture) {
 				// NDJSON data structure
+				usedTempVariable = `soil_temperature_${tempDepth}`;
+				usedMoistureVariable = `soil_moisture_${moistureDepth}`;
+				
 				dates = data.dates;
 				
 				// Get temperature data for the selected depth
@@ -5368,7 +5966,10 @@
 				}
 				
 			} else if (data.daily) {
-				// API data structure
+				// Historical API data structure
+				usedTempVariable = `soil_temperature_${tempDepth}_mean`;
+				usedMoistureVariable = `soil_moisture_${moistureDepth}_mean`;
+				
 				dates = data.daily.time;
 				
 				// Get temperature data for the selected depth
@@ -5406,29 +6007,165 @@
 					default:
 						moistures = data.daily.soil_moisture_7_to_28cm_mean;
 				}
+			} else if (data.hourly) {
+				// Forecast API data structure (hourly data)
+				dates = data.hourly.time;
+				
+				// Get temperature data for the selected depth - use exact forecast API variables
+				switch(tempDepth) {
+					case '0_to_7cm':
+						// Use soil_temperature_6cm for 0-7cm approximation
+						usedTempVariable = 'soil_temperature_6cm';
+						temps = data.hourly.soil_temperature_6cm;
+						break;
+					case '7_to_28cm':
+						// Use soil_temperature_18cm for 7-28cm approximation
+						usedTempVariable = 'soil_temperature_18cm';
+						temps = data.hourly.soil_temperature_18cm;
+						break;
+					case '28_to_100cm':
+						// Use soil_temperature_54cm for 28-100cm approximation
+						usedTempVariable = 'soil_temperature_54cm';
+						temps = data.hourly.soil_temperature_54cm;
+						break;
+					case '0_to_100cm':
+						// Average all available temperature depths
+						usedTempVariable = 'soil_temperature_0cm + 6cm + 18cm + 54cm average';
+						const allTemps = [];
+						if (data.hourly.soil_temperature_0cm) allTemps.push(data.hourly.soil_temperature_0cm);
+						if (data.hourly.soil_temperature_6cm) allTemps.push(data.hourly.soil_temperature_6cm);
+						if (data.hourly.soil_temperature_18cm) allTemps.push(data.hourly.soil_temperature_18cm);
+						if (data.hourly.soil_temperature_54cm) allTemps.push(data.hourly.soil_temperature_54cm);
+						
+						// Calculate hourly averages across depths
+						if (allTemps.length > 0) {
+							const hourlyCount = allTemps[0].length;
+							temps = [];
+							for (let i = 0; i < hourlyCount; i++) {
+								let sum = 0;
+								let count = 0;
+								allTemps.forEach(depthTemps => {
+									if (depthTemps[i] !== undefined) {
+										sum += depthTemps[i];
+										count++;
+									}
+								});
+								temps.push(sum / count);
+							}
+						} else {
+							temps = [];
+						}
+						break;
+					default:
+						usedTempVariable = 'soil_temperature_18cm';
+						temps = data.hourly.soil_temperature_18cm;
+				}
+				
+				// Get moisture data for the selected depth - use exact forecast API variables
+				switch(moistureDepth) {
+					case '0_to_7cm':
+						// Use average of soil_moisture_0_to_1cm, 1_to_3cm, 3_to_9cm for 0-7cm approximation
+						usedMoistureVariable = 'soil_moisture_0_to_1cm + 1_to_3cm + 3_to_9cm average';
+						const moisture0to7cm = [];
+						const hourlyCount = data.hourly.time.length;
+						
+						for (let i = 0; i < hourlyCount; i++) {
+							let sum = 0;
+							let count = 0;
+							
+							if (data.hourly.soil_moisture_0_to_1cm && data.hourly.soil_moisture_0_to_1cm[i] !== undefined) {
+								sum += data.hourly.soil_moisture_0_to_1cm[i];
+								count++;
+							}
+							if (data.hourly.soil_moisture_1_to_3cm && data.hourly.soil_moisture_1_to_3cm[i] !== undefined) {
+								sum += data.hourly.soil_moisture_1_to_3cm[i];
+								count++;
+							}
+							if (data.hourly.soil_moisture_3_to_9cm && data.hourly.soil_moisture_3_to_9cm[i] !== undefined) {
+								sum += data.hourly.soil_moisture_3_to_9cm[i];
+								count++;
+							}
+							
+							moisture0to7cm.push(count > 0 ? sum / count : null);
+						}
+						moistures = moisture0to7cm;
+						break;
+						
+					case '7_to_28cm':
+						// Use soil_moisture_9_to_27cm for 7-28cm approximation
+						usedMoistureVariable = 'soil_moisture_9_to_27cm';
+						moistures = data.hourly.soil_moisture_9_to_27cm;
+						break;
+						
+					case '28_to_100cm':
+						// Use soil_moisture_27_to_81cm for 28-100cm approximation
+						usedMoistureVariable = 'soil_moisture_27_to_81cm';
+						moistures = data.hourly.soil_moisture_27_to_81cm;
+						break;
+						
+					case '0_to_100cm':
+						// Average all available moisture depths
+						usedMoistureVariable = 'soil_moisture_all_depths_average';
+						const allMoistures = [];
+						if (data.hourly.soil_moisture_0_to_1cm) allMoistures.push(data.hourly.soil_moisture_0_to_1cm);
+						if (data.hourly.soil_moisture_1_to_3cm) allMoistures.push(data.hourly.soil_moisture_1_to_3cm);
+						if (data.hourly.soil_moisture_3_to_9cm) allMoistures.push(data.hourly.soil_moisture_3_to_9cm);
+						if (data.hourly.soil_moisture_9_to_27cm) allMoistures.push(data.hourly.soil_moisture_9_to_27cm);
+						if (data.hourly.soil_moisture_27_to_81cm) allMoistures.push(data.hourly.soil_moisture_27_to_81cm);
+						
+						// Calculate hourly averages across depths
+						if (allMoistures.length > 0) {
+							const hourlyCount = allMoistures[0].length;
+							moistures = [];
+							for (let i = 0; i < hourlyCount; i++) {
+								let sum = 0;
+								let count = 0;
+								allMoistures.forEach(depthMoistures => {
+									if (depthMoistures[i] !== undefined) {
+										sum += depthMoistures[i];
+										count++;
+									}
+								});
+								moistures.push(count > 0 ? sum / count : null);
+							}
+						} else {
+							moistures = [];
+						}
+						break;
+						
+					default:
+						usedMoistureVariable = 'soil_moisture_9_to_27cm';
+						moistures = data.hourly.soil_moisture_9_to_27cm;
+				}
+				
 			} else {
 				console.error('Unknown data structure:', data);
 				return;
 			}
 			
+			// Update chart title to show which variables are being used
+			if (data.hourly && chartTitle) {
+				chartTitle.textContent = `Soil Temperature & Moisture Trend (Last ${averageDays} Days) - Forecast API: ${usedTempVariable}, ${usedMoistureVariable}`;
+			}
+			
 			// LIMIT DATA TO ONLY THE LAST averageDays
-			const daysToShow = Math.min(averageDays, dates.length);
-			const startIdx = dates.length - daysToShow;
+			// For hourly data, we need to convert days to hours (averageDays * 24)
+			const isHourlyData = data.hourly !== undefined;
+			const dataPointsToShow = isHourlyData ? averageDays * 24 : averageDays;
+			const startIdx = Math.max(0, dates.length - dataPointsToShow);
 			
-			// Slice the arrays to only show the specified number of days
+			// Slice the arrays to only show the specified number of data points
 			dates = dates.slice(startIdx);
-			temps = temps.slice(startIdx);
-			moistures = moistures.slice(startIdx);
+			temps = temps ? temps.slice(startIdx) : [];
+			moistures = moistures ? moistures.slice(startIdx) : [];
 			
-			// Format dates
-			const formattedDates = dates.map(dateStr => {
-				const d = new Date(dateStr);
-				return `${d.getMonth() + 1}/${d.getDate()}`;
-			});
+			// Filter out null/undefined values for average calculation
+			const validTemps = temps.filter(temp => temp != null);
+			const validMoistures = moistures.filter(moisture => moisture != null);
 			
 			// Calculate averages based on the sliced data
-			const avgTemp = temps.reduce((sum, temp) => sum + temp, 0) / temps.length;
-			const avgMoisture = moistures.reduce((sum, moisture) => sum + moisture, 0) / moistures.length;
+			const avgTemp = validTemps.length > 0 ? validTemps.reduce((sum, temp) => sum + temp, 0) / validTemps.length : 0;
+			const avgMoisture = validMoistures.length > 0 ? validMoistures.reduce((sum, moisture) => sum + moisture, 0) / validMoistures.length : 0;
 			
 			// Make sure container is visible before creating chart
 			soilTempChartContainer.style.display = 'block';
@@ -5437,10 +6174,17 @@
 			window.soilTempChart = new Chart(ctx, {
 				type: 'line',
 				data: {
-					labels: formattedDates,
+					labels: dates.map(dateStr => {
+						const d = new Date(dateStr);
+						if (isHourlyData) {
+							return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours()}:00`;
+						} else {
+							return `${d.getMonth() + 1}/${d.getDate()}`;
+						}
+					}),
 					datasets: [
 						{
-							label: `Soil Temperature (${tempDepth}) °F`,
+							label: `Soil Temperature (${usedTempVariable}) °F`,
 							data: temps,
 							borderColor: '#8B4513',
 							backgroundColor: 'rgba(139, 69, 19, 0.1)',
@@ -5450,7 +6194,7 @@
 							yAxisID: 'y-temp'
 						},
 						{
-							label: `Soil Moisture (${moistureDepth})`,
+							label: `Soil Moisture (${usedMoistureVariable})`,
 							data: moistures,
 							borderColor: '#1E90FF',
 							backgroundColor: 'rgba(30, 144, 255, 0.1)',
@@ -5460,7 +6204,7 @@
 							yAxisID: 'y-moisture'
 						},
 						{
-							label: 'Avg Temp',
+							label: `Avg Temp: ${avgTemp.toFixed(1)}°F`,
 							data: temps.map(() => avgTemp),
 							borderColor: '#8B4513',
 							borderWidth: 1,
@@ -5470,7 +6214,7 @@
 							yAxisID: 'y-temp'
 						},
 						{
-							label: 'Avg Moisture',
+							label: `Avg Moisture: ${avgMoisture.toFixed(3)}`,
 							data: moistures.map(() => avgMoisture),
 							borderColor: '#1E90FF',
 							borderWidth: 1,
@@ -5521,7 +6265,7 @@
 						x: {
 							title: {
 								display: true,
-								text: `Date`
+								text: isHourlyData ? 'Date & Time (Local)' : 'Date'
 							},
 							grid: {
 								color: 'rgba(0, 0, 0, 0.05)'
@@ -5572,104 +6316,199 @@
 		}
         
         // Fetch data from Open-Meteo API for user-added points
-        async function fetchOpenMeteoData(latitude, longitude, date) {
+		async function fetchOpenMeteoData(latitude, longitude, date) {
 			removeHighlights();
-            const loadingDiv = document.getElementById('loading');
-            loadingDiv.style.display = 'block';
-            
-            try {
-                const observationDate = new Date(date);
-                const startDate = new Date(observationDate);
-                startDate.setDate(observationDate.getDate() - averageDays);
-                
-                const startDateStr = startDate.toISOString().split('T')[0];
-                const endDateStr = observationDate.toISOString().split('T')[0];
-                
-                const apiUrl = `https://archive-api.open-meteo.com/v1/archive?latitude=${latitude}&longitude=${longitude}&start_date=${startDateStr}&end_date=${endDateStr}&daily=soil_temperature_0_to_7cm_mean,soil_temperature_7_to_28cm_mean,soil_temperature_28_to_100cm_mean,soil_temperature_0_to_100cm_mean,soil_moisture_0_to_7cm_mean,soil_moisture_7_to_28cm_mean,soil_moisture_28_to_100cm_mean,soil_moisture_0_to_100cm_mean&timezone=America%2FLos_Angeles&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch`;
-                
-                const response = await fetch(apiUrl);
-                
-                if (!response.ok) {
-                    throw new Error(`API error: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                
-                // Calculate averages for all depths
-                const depthAverages = {};
-                
-                // Temperature averages
-                ['0_to_7cm', '7_to_28cm', '28_to_100cm', '0_to_100cm'].forEach(depth => {
-                    const key = `soil_temperature_${depth}_mean`;
-                    if (data.daily[key]) {
-                        const temps = data.daily[key];
-                        depthAverages[`temp_${depth}`] = temps.reduce((sum, temp) => sum + temp, 0) / temps.length;
-                    }
-                });
-                
-                // Moisture averages
-                ['0_to_7cm', '7_to_28cm', '28_to_100cm', '0_to_100cm'].forEach(depth => {
-                    const key = `soil_moisture_${depth}_mean`;
-                    if (data.daily[key]) {
-                        const moistures = data.daily[key];
-                        depthAverages[`moisture_${depth}`] = moistures.reduce((sum, moisture) => sum + moisture, 0) / moistures.length;
-                    }
-                });
-                
-                // Get elevation
-                const elevation = data.elevation;
-                const elevationFt = elevation * 3.28084;
-                
-                // Extract date components
-                const dayOfMonth = observationDate.getDate();
-                const monthFraction = observationDate.getMonth() + (dayOfMonth / 31);
-                
-                // Create new data point
-                const newPoint = {
-                    datasetId: 'user_data',
-                    datasetName: 'User Data',
-                    datasetColor: userPointColor,
-                    observationUrl: '#',
-                    date: endDateStr,
-                    coordinates: `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
-                    elevationFt: Math.round(elevationFt),
-                    soilTemp: depthAverages[`temp_${tempDepth}`],
-                    soilMoisture: depthAverages[`moisture_${moistureDepth}`],
-                    month: observationDate.getMonth() + 1,
-                    monthName: observationDate.toLocaleString('default', { month: 'short' }),
-                    monthDay: dayOfMonth,
-                    monthFraction: monthFraction,
-                    yearMonth: observationDate.getFullYear() + '-' + 
-                                String(observationDate.getMonth() + 1).padStart(2, '0'),
-                    latitude: latitude,
-                    longitude: longitude,
-                    openMeteoApiUrl: apiUrl,
-                    openMeteoDocsUrl: apiUrl.replace('archive-api.open-meteo.com/v1/archive', 'open-meteo.com/en/docs/historical-weather-api'),
-                    depthAverages: depthAverages
-                };
-                
-                // Clear previous user data and add new point
-                userData = [newPoint];
-                allData = [...originalData, ...userData];
-                
+			const loadingDiv = document.getElementById('loading');
+			loadingDiv.style.display = 'block';
+			
+			try {
+				const observationDate = new Date(date);
+				const startDate = new Date(observationDate);
+				startDate.setDate(observationDate.getDate() - averageDays);
+				
+				const startDateStr = startDate.toISOString().split('T')[0];
+				const endDateStr = observationDate.toISOString().split('T')[0];
+				
+				// Calculate if we need forecast API (within last 5 days from today)
+				const today = new Date();
+				const fiveDaysAgo = new Date();
+				fiveDaysAgo.setDate(today.getDate() - 5);
+				
+				let apiUrl, docsUrl;
+				let isForecastAPI = false;
+				
+				if (observationDate > fiveDaysAgo) {
+					// Use forecast API for recent dates (within last 5 days)
+					isForecastAPI = true;
+					apiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=soil_temperature_0cm,soil_temperature_6cm,soil_temperature_18cm,soil_temperature_54cm,soil_moisture_0_to_1cm,soil_moisture_1_to_3cm,soil_moisture_3_to_9cm,soil_moisture_9_to_27cm,soil_moisture_27_to_81cm&past_days=${averageDays}&forecast_days=0&temperature_unit=fahrenheit`;
+					docsUrl = `https://open-meteo.com/en/docs?latitude=${latitude}&longitude=${longitude}&forecast_days=0&past_days=${averageDays}&hourly=soil_temperature_0cm,soil_temperature_6cm,soil_temperature_18cm,soil_temperature_54cm,soil_moisture_0_to_1cm,soil_moisture_1_to_3cm,soil_moisture_3_to_9cm,soil_moisture_9_to_27cm,soil_moisture_27_to_81cm&temperature_unit=fahrenheit`;
+				} else {
+					// Use historical API for older dates
+					apiUrl = `https://archive-api.open-meteo.com/v1/archive?latitude=${latitude}&longitude=${longitude}&start_date=${startDateStr}&end_date=${endDateStr}&daily=soil_temperature_0_to_7cm_mean,soil_temperature_7_to_28cm_mean,soil_temperature_28_to_100cm_mean,soil_temperature_0_to_100cm_mean,soil_moisture_0_to_7cm_mean,soil_moisture_7_to_28cm_mean,soil_moisture_28_to_100cm_mean,soil_moisture_0_to_100cm_mean&timezone=America%2FLos_Angeles&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch`;
+					docsUrl = apiUrl.replace('archive-api.open-meteo.com/v1/archive', 'open-meteo.com/en/docs/historical-weather-api');
+				}
+				
+				const response = await fetch(apiUrl);
+				
+				if (!response.ok) {
+					throw new Error(`API error: ${response.status}`);
+				}
+				
+				const data = await response.json();
+				
+				// Calculate averages based on which API was used
+				const depthAverages = {};
+				
+				if (isForecastAPI) {
+					// Forecast API - hourly data with different depth parameters
+					const hourlyData = data.hourly;
+					
+					// Map forecast API depths to our depth categories
+					// We'll use 6cm as 0-7cm, 18cm as 7-28cm, 54cm as 28-100cm
+					// And average appropriate depths for 0-100cm
+					
+					if (hourlyData.soil_temperature_6cm) {
+						// 0-7cm ≈ 6cm
+						const temps = hourlyData.soil_temperature_6cm;
+						depthAverages['temp_0_to_7cm'] = temps.reduce((sum, temp) => sum + temp, 0) / temps.length;
+					}
+					
+					if (hourlyData.soil_temperature_18cm) {
+						// 7-28cm ≈ 18cm
+						const temps = hourlyData.soil_temperature_18cm;
+						depthAverages['temp_7_to_28cm'] = temps.reduce((sum, temp) => sum + temp, 0) / temps.length;
+					}
+					
+					if (hourlyData.soil_temperature_54cm) {
+						// 28-100cm ≈ 54cm
+						const temps = hourlyData.soil_temperature_54cm;
+						depthAverages['temp_28_to_100cm'] = temps.reduce((sum, temp) => sum + temp, 0) / temps.length;
+					}
+					
+					// Calculate 0-100cm average from available depths
+					const tempDepths = [];
+					if (hourlyData.soil_temperature_0cm) tempDepths.push(...hourlyData.soil_temperature_0cm);
+					if (hourlyData.soil_temperature_6cm) tempDepths.push(...hourlyData.soil_temperature_6cm);
+					if (hourlyData.soil_temperature_18cm) tempDepths.push(...hourlyData.soil_temperature_18cm);
+					if (hourlyData.soil_temperature_54cm) tempDepths.push(...hourlyData.soil_temperature_54cm);
+					
+					if (tempDepths.length > 0) {
+						depthAverages['temp_0_to_100cm'] = tempDepths.reduce((sum, temp) => sum + temp, 0) / tempDepths.length;
+					}
+					
+					// Soil moisture - similar mapping
+					if (hourlyData.soil_moisture_1_to_3cm) {
+						// 0-7cm ≈ average of 0-1cm, 1-3cm, 3-9cm
+						const moistures = [
+							...(hourlyData.soil_moisture_0_to_1cm || []),
+							...hourlyData.soil_moisture_1_to_3cm,
+							...(hourlyData.soil_moisture_3_to_9cm || [])
+						];
+						if (moistures.length > 0) {
+							depthAverages['moisture_0_to_7cm'] = moistures.reduce((sum, m) => sum + m, 0) / moistures.length;
+						}
+					}
+					
+					if (hourlyData.soil_moisture_9_to_27cm) {
+						// 7-28cm ≈ 9-27cm
+						const moistures = hourlyData.soil_moisture_9_to_27cm;
+						depthAverages['moisture_7_to_28cm'] = moistures.reduce((sum, m) => sum + m, 0) / moistures.length;
+					}
+					
+					if (hourlyData.soil_moisture_27_to_81cm) {
+						// 28-100cm ≈ 27-81cm
+						const moistures = hourlyData.soil_moisture_27_to_81cm;
+						depthAverages['moisture_28_to_100cm'] = moistures.reduce((sum, m) => sum + m, 0) / moistures.length;
+					}
+					
+					// Calculate 0-100cm moisture average from all available depths
+					const moistureDepths = [];
+					if (hourlyData.soil_moisture_0_to_1cm) moistureDepths.push(...hourlyData.soil_moisture_0_to_1cm);
+					if (hourlyData.soil_moisture_1_to_3cm) moistureDepths.push(...hourlyData.soil_moisture_1_to_3cm);
+					if (hourlyData.soil_moisture_3_to_9cm) moistureDepths.push(...hourlyData.soil_moisture_3_to_9cm);
+					if (hourlyData.soil_moisture_9_to_27cm) moistureDepths.push(...hourlyData.soil_moisture_9_to_27cm);
+					if (hourlyData.soil_moisture_27_to_81cm) moistureDepths.push(...hourlyData.soil_moisture_27_to_81cm);
+					
+					if (moistureDepths.length > 0) {
+						depthAverages['moisture_0_to_100cm'] = moistureDepths.reduce((sum, m) => sum + m, 0) / moistureDepths.length;
+					}
+					
+				} else {
+					// Historical API - daily data
+					// Temperature averages
+					['0_to_7cm', '7_to_28cm', '28_to_100cm', '0_to_100cm'].forEach(depth => {
+						const key = `soil_temperature_${depth}_mean`;
+						if (data.daily[key]) {
+							const temps = data.daily[key];
+							depthAverages[`temp_${depth}`] = temps.reduce((sum, temp) => sum + temp, 0) / temps.length;
+						}
+					});
+					
+					// Moisture averages
+					['0_to_7cm', '7_to_28cm', '28_to_100cm', '0_to_100cm'].forEach(depth => {
+						const key = `soil_moisture_${depth}_mean`;
+						if (data.daily[key]) {
+							const moistures = data.daily[key];
+							depthAverages[`moisture_${depth}`] = moistures.reduce((sum, moisture) => sum + moisture, 0) / moistures.length;
+						}
+					});
+				}
+				
+				// Get elevation
+				const elevation = data.elevation;
+				const elevationFt = elevation * 3.28084;
+				
+				// Extract date components - FIXED: monthFraction was off by 1
+				const dayOfMonth = observationDate.getDate();
+				const monthFraction = (observationDate.getMonth() + 1) + (dayOfMonth / 31); // Now month starts at 1 (Jan), not 0
+				
+				// Create new data point
+				const newPoint = {
+					datasetId: 'user_data',
+					datasetName: 'User Data',
+					datasetColor: userPointColor,
+					observationUrl: '#',
+					date: endDateStr,
+					coordinates: `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
+					elevationFt: Math.round(elevationFt),
+					soilTemp: depthAverages[`temp_${tempDepth}`],
+					soilMoisture: depthAverages[`moisture_${moistureDepth}`],
+					month: observationDate.getMonth() + 1,
+					monthName: observationDate.toLocaleString('default', { month: 'short' }),
+					monthDay: dayOfMonth,
+					monthFraction: monthFraction, // Now correct: 12.xx for December, not 11.xx
+					yearMonth: observationDate.getFullYear() + '-' + 
+								String(observationDate.getMonth() + 1).padStart(2, '0'),
+					latitude: latitude,
+					longitude: longitude,
+					openMeteoApiUrl: apiUrl,
+					openMeteoDocsUrl: docsUrl,
+					depthAverages: depthAverages,
+					isForecastData: isForecastAPI // Add flag for reference
+				};
+				
+				// Clear previous user data and add new point
+				userData = [newPoint];
+				allData = [...originalData, ...userData];
+				
 				updateCharts(); // Just update charts with current data
 				updateChartColors();
 				populateDataTable(); // Update table
 
 				// Update map points to include the new user point
 				updateMapPoints();
-                
-                // Show info for the new point
-                showPointInfo(newPoint);
+				
+				// Show info for the new point
+				showPointInfo(newPoint);
 				removeHighlights();
-                
-            } catch (error) {
-                console.error('Error fetching Open-Meteo data:', error);
-                alert(`Error fetching data: ${error.message}\n\nNote: The Open-Meteo API may not have data for the selected date range or location. Try a different date or coordinates.`);
-            } finally {
-                loadingDiv.style.display = 'none';
-            }
-        }
+				
+			} catch (error) {
+				console.error('Error fetching Open-Meteo data:', error);
+				alert(`Error fetching data: ${error.message}\n\nNote: The Open-Meteo API may not have data for the selected date range or location. Try a different date or coordinates.`);
+			} finally {
+				loadingDiv.style.display = 'none';
+			}
+		}
         
 		// Theme switching functionality
 		document.addEventListener('DOMContentLoaded', function() {
@@ -5887,19 +6726,32 @@
 					updateHistogram();
 				}, 100);
 				
-				// Load Washington_Boletus_edulis.ndjson automatically since it's enabled by default
+				// Load all three King Bolete files automatically since they're enabled by default
 				setTimeout(() => {
-					// Find the Washington_Boletus_edulis.ndjson file
-					const washingtonEdulisId = Object.keys(activeDatasets).find(key => 
-						activeDatasets[key].fileName === 'Washington_Boletus_edulis.ndjson'
-					);
+					const kingBoleteFiles = ['Washington_Boletus_edulis.ndjson', 
+											 'Oregon_Boletus_edulis.ndjson', 
+											 'California_Boletus_edulis.ndjson'];
 					
-					if (washingtonEdulisId && activeDatasets[washingtonEdulisId].active) {
-						loadNdjsonFile(washingtonEdulisId, activeDatasets[washingtonEdulisId].filePath).then(() => {
-							// After loading data, create the map points
-							updateMapPoints();
-						});
-					}
+					let loadedCount = 0;
+					const totalFiles = kingBoleteFiles.length;
+					
+					kingBoleteFiles.forEach(fileName => {
+						// Find each King Bolete file
+						const fileId = Object.keys(activeDatasets).find(key => 
+							activeDatasets[key].fileName === fileName
+						);
+						
+						if (fileId && activeDatasets[fileId].active) {
+							loadNdjsonFile(fileId, activeDatasets[fileId].filePath).then(() => {
+								loadedCount++;
+								
+								// After loading all files, create the map points
+								if (loadedCount === totalFiles) {
+									updateMapPoints();
+								}
+							});
+						}
+					});
 				}, 300); // Small delay to ensure everything is initialized
 				
 				// Add event listener for the fetch data button
@@ -5961,7 +6813,7 @@
 				document.getElementById('clear-user-points').addEventListener('click', clearUserPoints);
 				
 				document.getElementById('disable-scroll').addEventListener('change', function(e) {
-					enableScroll = e.target.checked;
+					enableScroll = !e.target.checked;
 				});
 				
 				// Set default date to current date
