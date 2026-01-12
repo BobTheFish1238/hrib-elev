@@ -418,7 +418,7 @@
 		.folder-controls {
 			display: flex;
 			gap: 8px;
-			margin-left: auto;
+			margin-left: 20px;
 		}
 		
 		.control-btn {
@@ -458,7 +458,17 @@
             align-items: center;
             gap: 8px;
             white-space: nowrap;
+			min-width: 0;
         }
+
+		.folder-count {
+			font-size: 11px;
+			padding: 1px 5px;
+			border-radius: 8px;
+			margin-left: 5px;
+			flex-shrink: 0;
+			white-space: nowrap;
+		}
         
         .folder-content {
             padding: 10px;
@@ -1048,6 +1058,12 @@
 			color: var(--header-color);
 		}
 
+		.site-title {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
 		.site-title .hrib {
 			color: var(--hrib-color);
 		}
@@ -1336,12 +1352,23 @@
 		.map-theme-toggle:hover {
 			background: var(--slider-bg);
 		}
+
+		.hriv-svg {
+			width: 50px;
+			height: 50px;
+			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='100 0 512 512' width='256' height='256'%3E%3C!-- Cap --%3E%3Cdefs%3E%3CradialGradient id='capGradient' cx='50%25' cy='35%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%238b4513'/%3E%3Cstop offset='100%25' stop-color='%235a2d0c'/%3E%3C/radialGradient%3E%3ClinearGradient id='stemGradient' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%23f6e6c8'/%3E%3Cstop offset='100%25' stop-color='%23d2b48c'/%3E%3C/linearGradient%3E%3C/defs%3E%3C!-- Cap --%3E%3Cpath d=' M96 220 C110 140, 200 110, 256 110 C312 110, 402 140, 416 220 C420 250, 390 270, 256 270 C122 270, 92 250, 96 220 Z' fill='url(%23capGradient)' /%3E%3C!-- Cap underside --%3E%3Cellipse cx='256' cy='255' rx='150' ry='22' fill='%23e8d6b0' /%3E%3C!-- Stem --%3E%3Cpath d=' M200 270 C190 330, 190 390, 210 430 C230 465, 282 465, 302 430 C322 390, 322 330, 312 270 Z' fill='url(%23stemGradient)' /%3E%3C!-- Stem texture --%3E%3Cg fill='%23c9a877' opacity='0.7'%3E%3Cellipse cx='240' cy='310' rx='4' ry='8'/%3E%3Cellipse cx='270' cy='330' rx='5' ry='10'/%3E%3Cellipse cx='255' cy='360' rx='4' ry='9'/%3E%3Cellipse cx='235' cy='385' rx='3' ry='7'/%3E%3Cellipse cx='275' cy='395' rx='4' ry='8'/%3E%3C/g%3E%3C/svg%3E%0A");
+			background-size: 50px 50px;
+			background-position: center center;
+			background-repeat: no-repeat;
+		}
     </style>
 </head>
 <body>
 	<header>
 		<h1 class="site-title">
-			<span class="hrib">Hrib</span><span class="habitat">Habitat</span>
+
+			<span class="hrib">Hrib</span><span class="habitat">Habita</span>
+			<div class="hriv-svg"></div>
 		</h1>
 		<p class="subtitle">Visualizing the relationship between elevation, soil temperature, soil moisture, slope aspect, and seasonal patterns</p>
 		<div class="theme-switch-container">
@@ -1431,7 +1458,7 @@
 						<button id="clear-user-points" title="Clear user points" style="max-height: 30px; align-items: center;">🗑️</button>
 					</div>
 				</div>
-                <p style="font-size: 18px;">Enter coordinates manually or click on the map to select a location. The system will retrieve the soil and elevation data from the Open-Meteo Historical Weather API.</p>
+                <p style="font-size: 18px;">Enter coordinates manually or click on the map to select a location. The system will retrieve the soil and elevation data from the Open-Meteo Weather API.</p>
                 
                 <div class="input-group">
                     <div class="input-field" style="flex: 1 1 200px;">
@@ -1560,7 +1587,7 @@
     <footer>
 		<p>Github: <a href="https://github.com/BobTheFish1238/hrib-elev" target="_blank" class="link">hrib-elev</a> </p>
         <p>(Observations data is updated periodically)</p>
-        <p>Data Sources: iNaturalist observations & Open-Meteo Historical Weather API</p>
+        <p>Data Sources: iNaturalist observations & Open-Meteo Weather API</p>
         <p>Note: The Open-Meteo API provides soil temperature data with a spatial resolution of 9 km for recent years (IFS model) or 0.25° (~25 km) for historical data (ERA5 model).</p>
     </footer>
 
@@ -2358,15 +2385,23 @@
 				mainFolderDiv.className = 'folder';
 				mainFolderDiv.dataset.folderName = mainFolderName;
 				
+				// Calculate total files in this main folder
+				let mainFolderFileCount = 0;
+				Object.keys(ndjsonStructure[mainFolderName]).forEach(subFolderName => {
+					mainFolderFileCount += ndjsonStructure[mainFolderName][subFolderName].length;
+				});
+				
 				// Create folder controls for main folder
-				const mainFolderControls = createFolderControls(mainFolderName, null, true);
+				const mainFolderControls = createFolderControls(mainFolderName, null, true, false, mainFolderFileCount);
 				
 				const mainFolderHeader = document.createElement('div');
 				mainFolderHeader.className = 'folder-header';
 				mainFolderHeader.innerHTML = `
 					<div class="folder-name">
 						<i class="fas fa-folder"></i>
-						${formatFolderName(mainFolderName)}
+						<span class="folder-title">${formatFolderName(mainFolderName)}</span>
+						<span class="folder-count" style="font-size: 11px; color: #888; background-color: #f0f0f0; padding: 1px 5px; border-radius: 8px; margin-left: 5px;">0 files</span>
+					</div>
 					</div>
 					${mainFolderControls}
 					<div class="folder-controls">
@@ -2390,9 +2425,12 @@
 					subFolderDiv.dataset.folderName = mainFolderName;
 					subFolderDiv.dataset.subFolderName = subFolderName;
 					
+					// Get file count for this sub-folder
+					const subFolderFileCount = ndjsonStructure[mainFolderName][subFolderName].length;
+					
 					// Create folder controls for sub-folder
 					const isKingBolete = subFolderName.includes('King Bolete (Boletus edulis)');
-					const subFolderControls = createFolderControls(mainFolderName, subFolderName, false, isKingBolete);
+					const subFolderControls = createFolderControls(mainFolderName, subFolderName, false, isKingBolete, subFolderFileCount);
 					
 					const subFolderHeader = document.createElement('div');
 					subFolderHeader.className = 'folder-header';
@@ -2401,7 +2439,8 @@
 					subFolderHeader.innerHTML = `
 						<div class="folder-name">
 							<i class="fas fa-folder"></i>
-							${formatFolderName(subFolderName)}
+							<span class="folder-title">${formatFolderName(subFolderName)}</span>
+							<span class="folder-count" style="font-size: 11px; color: #888; background-color: #f0f0f0; padding: 1px 5px; border-radius: 8px; margin-left: 5px;">0 files</span>
 						</div>
 						${subFolderControls}
 						<div class="folder-controls">
@@ -2474,15 +2513,15 @@
 
 							<div class="file-controls">
 								<div style="display: flex; align-items: center; gap: 2px;">
-									<input type="checkbox" class="color-control-checkbox" data-file-id="${fileId}" ${isKingBolete ? 'disabled' : ''} checked>
-									<input type="color" class="color-picker" value="${fileColor.substring(0, 7)}" data-file-id="${fileId}" style="min-width: 24px; height: 24px;" ${isKingBolete ? 'disabled' : ''}>
-									<input type="range" class="alpha-slider" min="0" max="100" value="100" data-file-id="${fileId}" style="width: 60px;" ${isKingBolete ? 'disabled' : ''}>
+									<input type="checkbox" class="color-control-checkbox" data-file-id="${fileId}" ${isKingBolete ? '' : ''} checked>
+									<input type="color" class="color-picker" value="${fileColor.substring(0, 7)}" data-file-id="${fileId}" style="min-width: 24px; height: 24px;" ${isKingBolete ? '' : ''}>
+									<input type="range" class="alpha-slider" min="0" max="100" value="100" data-file-id="${fileId}" style="width: 60px;" ${isKingBolete ? '' : ''}>
 									<span class="alpha-percent" data-file-id="${fileId}" style="font-size: 11px; min-width: 25px;">100%</span>
 								</div>
 
 								<div style="display: flex; align-items: center; gap: 2px; margin-left: 20px;">
-									<input type="checkbox" class="size-control-checkbox" data-file-id="${fileId}" ${isKingBolete ? 'disabled' : ''} checked>
-									<input type="number" class="point-size-input" value="${pointSize}" min="1" max="10" data-file-id="${fileId}" style="max-width: 80px; max-height: 30px; font-size: 14px;" ${isKingBolete ? 'disabled' : ''}>
+									<input type="checkbox" class="size-control-checkbox" data-file-id="${fileId}" ${isKingBolete ? '' : ''} checked>
+									<input type="number" class="point-size-input" value="${pointSize}" min="1" max="10" data-file-id="${fileId}" style="max-width: 80px; max-height: 30px; font-size: 14px;" ${isKingBolete ? '' : ''}>
 								</div>
 							</div>
 						`;
@@ -2576,8 +2615,81 @@
 			document.getElementById('directory-loading').style.display = 'none';
 		}
 
+		// Function to update folder file counts based on loaded data
+		function updateFolderFileCounts() {
+			// Count active files and total data points per folder
+			const folderStats = {};
+			
+			// Initialize with zeros
+			Object.keys(ndjsonStructure).forEach(mainFolderName => {
+				folderStats[mainFolderName] = { activeFiles: 0, totalPoints: 0 };
+				
+				Object.keys(ndjsonStructure[mainFolderName]).forEach(subFolderName => {
+					const folderKey = `${mainFolderName}_${subFolderName}`;
+					folderStats[folderKey] = { activeFiles: 0, totalPoints: 0 };
+				});
+			});
+			
+			// Count active files and points
+			Object.keys(activeDatasets).forEach(fileId => {
+				const fileData = activeDatasets[fileId];
+				if (fileData.active) {
+					const folderKey = fileData.subFolderName ? 
+						`${fileData.folderName}_${fileData.subFolderName}` : 
+						fileData.folderName;
+					
+					if (folderStats[folderKey]) {
+						folderStats[folderKey].activeFiles++;
+						folderStats[folderKey].totalPoints += fileData.data.length;
+					}
+					
+					// Also update main folder
+					if (folderStats[fileData.folderName]) {
+						folderStats[fileData.folderName].activeFiles++;
+						folderStats[fileData.folderName].totalPoints += fileData.data.length;
+					}
+				}
+			});
+			
+			// Update folder count displays
+			Object.keys(folderStats).forEach(folderKey => {
+				const stats = folderStats[folderKey];
+				const [folderName, subFolderName] = folderKey.includes('_') ? folderKey.split('_') : [folderKey, null];
+				
+				// Find the folder header
+				let folderHeader;
+				if (subFolderName) {
+					folderHeader = document.querySelector(`.folder[data-folder-name="${folderName}"][data-sub-folder-name="${subFolderName}"] .folder-header`);
+				} else {
+					folderHeader = document.querySelector(`.folder[data-folder-name="${folderName}"] .folder-header`);
+				}
+				
+				if (folderHeader) {
+					const countElement = folderHeader.querySelector('.folder-count');
+					if (countElement) {
+						if (stats.totalPoints > 0) {
+							countElement.textContent = `${stats.activeFiles} files / ${stats.totalPoints} points`;
+						} else {
+							countElement.textContent = `${stats.activeFiles} files`;
+						}
+						
+						// Style based on active status
+						if (stats.activeFiles > 0) {
+							countElement.style.backgroundColor = '#e6f7ff';
+							countElement.style.color = '#1890ff';
+							countElement.style.fontWeight = '600';
+						} else {
+							countElement.style.backgroundColor = '#f0f0f0';
+							countElement.style.color = '#888';
+							countElement.style.fontWeight = 'normal';
+						}
+					}
+				}
+			});
+		}
+
 		// Helper function to create folder controls
-		function createFolderControls(folderName, subFolderName, isMainFolder = false, isKingBolete = false) {
+		function createFolderControls(folderName, subFolderName, isMainFolder = false, isKingBolete = false, fileCount = 0, pointCount = 0) {
 			const folderKey = subFolderName ? `${folderName}_${subFolderName}` : folderName;
 			const controlsId = subFolderName ? `folder-controls-${folderName}-${subFolderName}` : `folder-controls-${folderName}`;
 			
@@ -2596,8 +2708,8 @@
 			const folderColor = folderColors[colorIndex];
 			
 			// Default: enable King Bolete folder controls
-			const colorChecked = isKingBolete ? 'checked' : '';
-			const sizeChecked = isKingBolete ? 'checked' : '';
+			const colorChecked = isKingBolete ? '' : ''; // Set to 'checked' to make the color or size checked at default
+			const sizeChecked = isKingBolete ? '' : '';
 			
 			return `
 				<div class="folder-controls-right-container" style="display: flex; flex-grow: 1; justify-content: flex-end; align-items: center; gap: 15px; margin-right: 10px;">
@@ -2637,10 +2749,14 @@
 					if (fileData.active && fileData.data.length === 0) {
 						// Load the NDJSON file
 						loadNdjsonFile(fileId, fileData.filePath).then(() => {
+							// Update folder file counts after loading
+							updateFolderFileCounts();
 						});
 					} else {
 						// Just toggle visibility
 						updateDataDisplay(false);
+						// Update folder file counts
+						updateFolderFileCounts();
 					}
 				});
 			});
@@ -3243,7 +3359,11 @@
 					
 					// Load data if selecting and not loaded yet
 					if (select && fileData.data.length === 0) {
-						loadNdjsonFile(fileId, fileData.filePath);
+						loadNdjsonFile(fileId, fileData.filePath).then(() => {
+							updateFolderFileCounts();
+						});
+					} else {
+						updateFolderFileCounts();
 					}
 				}
 			});
@@ -3267,7 +3387,11 @@
 					
 					// Load data if selecting and not loaded yet
 					if (select && fileData.data.length === 0) {
-						loadNdjsonFile(fileId, fileData.filePath);
+						loadNdjsonFile(fileId, fileData.filePath).then(() => {
+							updateFolderFileCounts();
+						});
+					} else {
+						updateFolderFileCounts();
 					}
 				}
 			});
@@ -3331,6 +3455,9 @@
 				
 				// Update the display
 				updateDataDisplay();
+
+				// Update folder file counts
+				updateFolderFileCounts();
 				
 			} catch (error) {
 				console.error(`Error loading NDJSON file ${filePath}:`, error);
@@ -6748,8 +6875,15 @@
 								// After loading all files, create the map points
 								if (loadedCount === totalFiles) {
 									updateMapPoints();
+									// Update folder counts
+									updateFolderFileCounts();
 								}
 							});
+						} else {
+							loadedCount++;
+							if (loadedCount === totalFiles) {
+								updateFolderFileCounts();
+							}
 						}
 					});
 				}, 300); // Small delay to ensure everything is initialized
