@@ -437,6 +437,22 @@
 			background-color: #8B4513;
 			color: white;
 		}
+
+		input:disabled {
+			cursor: not-allowed;
+			opacity: 0.6;
+		}
+
+		/* For scrollable number inputs specifically */
+		input[type="number"]:disabled {
+			-moz-appearance: textfield;
+		}
+
+		input[type="number"]:disabled::-webkit-inner-spin-button,
+		input[type="number"]:disabled::-webkit-outer-spin-button {
+			-webkit-appearance: none;
+			margin: 0;
+		}
 		
 		.folder-header {
 			display: flex;
@@ -1691,6 +1707,8 @@
 		let monthRange = [1, 12];
 		let highlightedPoint = null;
 		let highlightedChartElements = [];
+		let updateTimeout;
+		let mapUpdateTimeout;
         
         // Settings
         let averageDays = 7;
@@ -2067,40 +2085,47 @@
 		}
 
 		// Function to make number inputs scrollable with mouse wheel
-		function makeInputScrollable(inputElement, min, max, step = 1) {
-			inputElement.addEventListener('wheel', function(e) {
+		function makeInputScrollable(input, min, max, step) {
+			// Store the original disabled property
+			const originalDisabled = input.disabled;
+			
+			// Add wheel event listener
+			input.addEventListener('wheel', function(e) {
+				// Prevent default scrolling behavior
 				e.preventDefault();
 				
-				let currentValue = parseInt(this.value) || min;
-				let newValue;
+				// Don't change value if input is disabled
+				if (this.disabled) return;
 				
+				// Get current value
+				let value = parseInt(this.value) || min;
+				
+				// Adjust value based on scroll direction
 				if (e.deltaY < 0) {
-					// Scrolling up - increase value
-					newValue = Math.min(currentValue + step, max);
+					// Scroll up - increase
+					value = Math.min(max, value + step);
 				} else {
-					// Scrolling down - decrease value
-					newValue = Math.max(currentValue - step, min);
+					// Scroll down - decrease
+					value = Math.max(min, value - step);
 				}
 				
-				if (newValue !== currentValue) {
-					this.value = newValue;
-					this.dispatchEvent(new Event('input', { bubbles: true }));
-				}
-			});
+				// Update input value
+				this.value = value;
+				
+				// Trigger input event to update other parts of the app
+				this.dispatchEvent(new Event('input', { bubbles: true }));
+			}, { passive: false });
 			
-			inputElement.addEventListener('keydown', function(e) {
-				if (e.key === 'ArrowUp') {
-					e.preventDefault();
-					let currentValue = parseInt(this.value) || min;
-					let newValue = Math.min(currentValue + step, max);
-					this.value = newValue;
-					this.dispatchEvent(new Event('input', { bubbles: true }));
-				} else if (e.key === 'ArrowDown') {
-					e.preventDefault();
-					let currentValue = parseInt(this.value) || min;
-					let newValue = Math.max(currentValue - step, min);
-					this.value = newValue;
-					this.dispatchEvent(new Event('input', { bubbles: true }));
+			// Also check min/max constraints on input
+			input.addEventListener('input', function() {
+				if (this.disabled) return;
+				
+				let value = parseInt(this.value) || min;
+				
+				if (value < min) {
+					this.value = min;
+				} else if (value > max) {
+					this.value = max;
 				}
 			});
 		}
@@ -2513,15 +2538,13 @@
 
 							<div class="file-controls">
 								<div style="display: flex; align-items: center; gap: 2px;">
-									<input type="checkbox" class="color-control-checkbox" data-file-id="${fileId}" ${isKingBolete ? '' : ''} checked>
-									<input type="color" class="color-picker" value="${fileColor.substring(0, 7)}" data-file-id="${fileId}" style="min-width: 24px; height: 24px;" ${isKingBolete ? '' : ''}>
-									<input type="range" class="alpha-slider" min="0" max="100" value="100" data-file-id="${fileId}" style="width: 60px;" ${isKingBolete ? '' : ''}>
+									<input type="color" class="color-picker" value="${fileColor.substring(0, 7)}" data-file-id="${fileId}" style="min-width: 24px; height: 24px;">
+									<input type="range" class="alpha-slider" min="0" max="100" value="100" data-file-id="${fileId}" style="width: 60px;">
 									<span class="alpha-percent" data-file-id="${fileId}" style="font-size: 11px; min-width: 25px;">100%</span>
 								</div>
 
 								<div style="display: flex; align-items: center; gap: 2px; margin-left: 20px;">
-									<input type="checkbox" class="size-control-checkbox" data-file-id="${fileId}" ${isKingBolete ? '' : ''} checked>
-									<input type="number" class="point-size-input" value="${pointSize}" min="1" max="10" data-file-id="${fileId}" style="max-width: 80px; max-height: 30px; font-size: 14px;" ${isKingBolete ? '' : ''}>
+									<input type="number" class="point-size-input" value="${pointSize}" min="1" max="10" data-file-id="${fileId}" style="max-width: 80px; max-height: 30px; font-size: 14px;">
 								</div>
 							</div>
 						`;
@@ -2718,16 +2741,16 @@
 							<input type="checkbox" class="folder-color-control" 
 								data-folder="${folderKey}" ${colorChecked}>
 							<input type="color" class="folder-color-picker" 
-								data-folder="${folderKey}" value="${folderColor}" style="width: 24px; height: 24px;" ${isKingBolete ? '' : 'disabled'}>
+								data-folder="${folderKey}" value="${folderColor}" style="width: 24px; height: 24px;" ${'disabled'}>
 							<input type="range" class="folder-alpha-slider" min="0" max="100" value="100" 
-								data-folder="${folderKey}" style="width: 50px;" ${isKingBolete ? '' : 'disabled'}>
+								data-folder="${folderKey}" style="width: 50px;" ${'disabled'}>
 							<span class="folder-alpha-percent" data-folder="${folderKey}" style="font-size: 10px;">100%</span>
 						</div>
 						<div style="display: flex; align-items: center; gap: 2px; margin-left: 20px;">
 							<input type="checkbox" class="folder-size-control" 
 								data-folder="${folderKey}" ${sizeChecked}>
 							<input type="number" class="folder-point-size" value="${pointSize}" min="1" max="10" 
-								data-folder="${folderKey}" style="width: 80px; font-size: 12px;" ${isKingBolete ? '' : 'disabled'}>
+								data-folder="${folderKey}" style="width: 80px; font-size: 12px;" ${'disabled'}>
 						</div>
 					</div>
 				</div>
@@ -2796,8 +2819,8 @@
 					// Update all files in this folder
 					updateFilesInFolder(folderName, subFolderName, 'color', isChecked, folderColorValue);
 					
-					// If enabling folder color, disable individual file color controls in this folder
 					if (isChecked) {
+						// If enabling folder color, disable individual file color controls in this folder
 						disableFileControlsInFolder(folderName, subFolderName, 'color');
 						
 						// If this is a main folder (no subfolder), lock all sub-folder checkboxes
@@ -2805,14 +2828,21 @@
 							lockSubFolderControls(folderName, 'color', true);
 						}
 					} else {
-						enableFileControlsInFolder(folderName, subFolderName, 'color');
-						// When disabling folder color, files should revert to their individual colors
-						revertFilesToIndividualColors(folderName, subFolderName);
-						
-						// If this is a main folder (no subfolder), unlock all sub-folder checkboxes
+						// When disabling folder color...
 						if (!subFolderName) {
+							// This is a main folder being disabled
+							// Only enable file controls for files that are NOT in enabled subfolders
+							enableFileControlsSelectively(folderName, 'color');
+							
+							// Unlock all sub-folder checkboxes
 							lockSubFolderControls(folderName, 'color', false);
+						} else {
+							// This is a subfolder being disabled - enable its individual file controls
+							enableFileControlsInFolder(folderName, subFolderName, 'color');
 						}
+						
+						// Files should revert to their individual colors
+						revertFilesToIndividualColors(folderName, subFolderName);
 					}
 					
 					// Update display immediately
@@ -2840,8 +2870,8 @@
 					// Update all files in this folder
 					updateFilesInFolder(folderName, subFolderName, 'size', isChecked, folderSizeValue);
 					
-					// If enabling folder size, disable individual file size controls in this folder
 					if (isChecked) {
+						// If enabling folder size, disable individual file size controls in this folder
 						disableFileControlsInFolder(folderName, subFolderName, 'size');
 						
 						// If this is a main folder (no subfolder), lock all sub-folder checkboxes
@@ -2849,14 +2879,21 @@
 							lockSubFolderControls(folderName, 'size', true);
 						}
 					} else {
-						enableFileControlsInFolder(folderName, subFolderName, 'size');
+						// When disabling folder size...
+						if (!subFolderName) {
+							// This is a main folder being disabled
+							// Only enable file controls for files that are NOT in enabled subfolders
+							enableFileControlsSelectively(folderName, 'size');
+							
+							// Unlock all sub-folder checkboxes
+							lockSubFolderControls(folderName, 'size', false);
+						} else {
+							// This is a subfolder being disabled - enable its individual file controls
+							enableFileControlsInFolder(folderName, subFolderName, 'size');
+						}
+						
 						// When disabling folder size, files should revert to their individual sizes
 						revertFilesToIndividualSizes(folderName, subFolderName);
-						
-						// If this is a main folder (no subfolder), unlock all sub-folder checkboxes
-						if (!subFolderName) {
-							lockSubFolderControls(folderName, 'size', false);
-						}
 					}
 					
 					// Update display immediately
@@ -2917,6 +2954,66 @@
 					// Update display
 					updateDataDisplay(true);
 				});
+			});
+		}
+
+		// Only enables controls for files that are NOT in subfolders with enabled controls
+		function enableFileControlsSelectively(mainFolderName, type) {
+			// Find all subfolders in this main folder
+			const subFolders = document.querySelectorAll(`.folder[data-folder-name="${mainFolderName}"]`);
+			
+			// Create a set of subfolders that have their controls enabled
+			const enabledSubFolders = new Set();
+			
+			subFolders.forEach(subFolderDiv => {
+				const subFolderName = subFolderDiv.dataset.subFolderName;
+				if (subFolderName) {
+					const folderKey = `${mainFolderName}_${subFolderName}`;
+					let isEnabled = false;
+					
+					if (type === 'color') {
+						const checkbox = subFolderDiv.querySelector(`.folder-color-control[data-folder="${folderKey}"]`);
+						isEnabled = checkbox && checkbox.checked;
+					} else if (type === 'size') {
+						const checkbox = subFolderDiv.querySelector(`.folder-size-control[data-folder="${folderKey}"]`);
+						isEnabled = checkbox && checkbox.checked;
+					}
+					
+					if (isEnabled) {
+						enabledSubFolders.add(subFolderName);
+					}
+				}
+			});
+			
+			// Now enable/disable file controls
+			Object.keys(activeDatasets).forEach(fileId => {
+				const fileData = activeDatasets[fileId];
+				
+				if (fileData.folderName === mainFolderName) {
+					const isInEnabledSubFolder = enabledSubFolders.has(fileData.subFolderName);
+					
+					// Find the file element
+					const fileElement = document.querySelector(`.ndjson-file[data-file-id="${fileId}"]`);
+					if (!fileElement) return;
+					
+					if (type === 'color') {
+						const checkbox = fileElement.querySelector('.color-control-checkbox');
+						const colorPicker = fileElement.querySelector('.color-picker');
+						const alphaSlider = fileElement.querySelector('.alpha-slider');
+						
+						// Only enable if NOT in an enabled subfolder
+						if (checkbox) checkbox.disabled = isInEnabledSubFolder;
+						if (colorPicker) colorPicker.disabled = isInEnabledSubFolder;
+						if (alphaSlider) alphaSlider.disabled = isInEnabledSubFolder;
+					} else if (type === 'size') {
+						const checkbox = fileElement.querySelector('.size-control-checkbox');
+						const sizeInput = fileElement.querySelector('.point-size-input');
+						
+						// Only enable if NOT in an enabled subfolder
+						if (checkbox) checkbox.disabled = isInEnabledSubFolder;
+						if (sizeInput) sizeInput.disabled = isInEnabledSubFolder;
+					}
+				}
 			});
 		}
 
@@ -3541,19 +3638,22 @@
         
         // Update all charts and map with current data
 		function updateDataDisplay(updateVisualsOnlyFlag = false) {
-			if (!updateVisualsOnlyFlag) {
+			clearTimeout(updateTimeout);
+			updateTimeout = setTimeout(() => {
+				if (!updateVisualsOnlyFlag) {
 				// Only process data if needed (when loading new files or changing settings)
-				processNdjsonData();
-				populateDataTable(); // Only needed when data changes
-				updateCharts(); // Full chart update with new data
-				updateHistogram(); // Update histogram with new data
-				// Create map points with fresh data
-				updateMapPoints(); // This will create the initial markers
-			} else {
-				// Just update colors/visuals AND sizes
-				updateChartColors();
-				updateVisualsOnly(); // This will update histogram colors too AND map points
-			}
+					processNdjsonData();
+					populateDataTable(); // Only needed when data changes
+					updateCharts(); // Full chart update with new data
+					updateHistogram(); // Update histogram with new data
+					// Create map points with fresh data
+					updateMapPoints(); // This will create the initial markers
+				} else {
+					// Just update colors/visuals AND sizes
+					updateChartColors();
+					updateVisualsOnly(); // This will update histogram colors too AND map points
+				}
+			}, 100); // 100ms delay
 		}
         
         // Initialize map
