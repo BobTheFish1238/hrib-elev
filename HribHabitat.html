@@ -318,7 +318,7 @@
             font-weight: 600;
             color: #555;
             display: inline-block;
-            width: 275px;
+            width: 375px;
             white-space: nowrap;
         }
         
@@ -756,80 +756,6 @@
             left: 20px;
         }
 
-        /* Legend container styles */
-        .legend-container {
-            position: absolute;
-            bottom: 50px;
-            left: 10px;
-            z-index: 1000;
-            background: white;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            display: none;
-            max-width: 200px;
-            font-size: 12px;
-        }
-
-        .legend-container.active {
-            display: block;
-        }
-
-        .legend-title {
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #333;
-            text-align: center;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
-        }
-
-        .legend-gradient {
-            height: 20px;
-            width: 100%;
-            border-radius: 3px;
-            margin-bottom: 8px;
-            border: 1px solid #ddd;
-        }
-
-        .legend-labels {
-            display: flex;
-            justify-content: space-between;
-            font-size: 10px;
-            color: #555;
-        }
-
-        /* Month legend grid styles */
-        .month-legend-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 4px;
-            margin-top: 5px;
-        }
-
-        .month-legend-item {
-            display: flex;
-            align-items: center;
-            padding: 2px;
-            font-size: 10px;
-        }
-
-        .month-color-box {
-            width: 12px;
-            height: 12px;
-            border-radius: 2px;
-            margin-right: 4px;
-            border: 1px solid rgba(0,0,0,0.1);
-            flex-shrink: 0;
-        }
-
-        .month-label {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            font-size: 9px;
-        }
-
 		.highlighted-point {
 			background-color: #FFA500 !important;
 			border-color: #FFD700 !important;
@@ -905,14 +831,6 @@
 			width: 200px;
 			height: 200px;
 			border-radius: 50%;
-			background: conic-gradient(
-				from 180deg,
-				#ff0000 0deg,
-				#ffff00 90deg,
-				#00ff00 180deg,
-				#0000ff 270deg,
-				#ff0000 360deg
-			);
 			border: 2px solid white;
 			box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 		}
@@ -1192,12 +1110,6 @@
 			background: var(--slider-bg);
 		}
 		
-		/* Legend container */
-		.legend-container {
-			background: var(--card-bg);
-			color: var(--text-color);
-		}
-		
 		/* Theme toggle button */
 		.theme-switch-container {
 			position: absolute;
@@ -1377,6 +1289,13 @@
 			background-position: center center;
 			background-repeat: no-repeat;
 		}
+
+		@media (max-width: 768px) {
+			.map-container.fullscreen .map-controls {
+				transform: scale(0.70);
+				transform-origin: top right;
+			}
+		}
     </style>
 </head>
 <body>
@@ -1396,7 +1315,7 @@
 	</header>
     
     <div class="description">
-        <p>This interactive dashboard explores environmental factors associated with mushroom observations using only open (non-obscured) observation data. The map and plots below show relationships between elevation, soil temperature, soil moisture, slope aspect, and time of year. Click on any point to view detailed information about that observation.</p>
+        <p>This interactive dashboard explores environmental factors associated with mushroom observations using only open (non-obscured) observation data from iNaturalist. The map and charts below show relationships between elevation, soil temperature, soil moisture, slope aspect, and time of year. Click on any point to view detailed information about that observation.</p>
     </div>
     
 	<div class="main-container">    
@@ -1706,6 +1625,7 @@
 		let aspectRange = [0, 360];
 		let monthRange = [1, 12];
 		let highlightedPoint = null;
+		let userPoint = null;
 		let highlightedChartElements = [];
 		let updateTimeout;
 		let mapUpdateTimeout;
@@ -1721,6 +1641,8 @@
 		let userPointSize = 5;
 		let highlightPointSize = 5;
 		let pointSize = 2;
+
+		let positionalAccuracy = 1000;
 
 		// Available tile layers
 		const tileLayers = {
@@ -2067,6 +1989,7 @@
 			populateDataTable();
 			
 			// Clear any highlights and info panel
+			userPoint = null;
 			removeHighlights();
 			document.getElementById('info-panel').classList.remove('active');
 		}
@@ -2640,7 +2563,7 @@
 
 		// Function to update folder file counts based on loaded data
 		function updateFolderFileCounts() {
-			// Count active files and total data points per folder
+			// Count active files and total valid data points per folder
 			const folderStats = {};
 			
 			// Initialize with zeros
@@ -2653,23 +2576,28 @@
 				});
 			});
 			
-			// Count active files and points
+			// Count active files and valid points
 			Object.keys(activeDatasets).forEach(fileId => {
 				const fileData = activeDatasets[fileId];
-				if (fileData.active) {
+				if (fileData.active && fileData.data.length > 0) {
+					// Count only valid points (positional_accuracy < positionalAccuracy)
+					const validPointsCount = fileData.data.filter(record => {
+						return record.positional_accuracy < positionalAccuracy;
+					}).length;
+					
 					const folderKey = fileData.subFolderName ? 
 						`${fileData.folderName}_${fileData.subFolderName}` : 
 						fileData.folderName;
 					
 					if (folderStats[folderKey]) {
 						folderStats[folderKey].activeFiles++;
-						folderStats[folderKey].totalPoints += fileData.data.length;
+						folderStats[folderKey].totalPoints += validPointsCount;
 					}
 					
 					// Also update main folder
 					if (folderStats[fileData.folderName]) {
 						folderStats[fileData.folderName].activeFiles++;
-						folderStats[fileData.folderName].totalPoints += fileData.data.length;
+						folderStats[fileData.folderName].totalPoints += validPointsCount;
 					}
 				}
 			});
@@ -3439,6 +3367,7 @@
 			
 			// Update the display
 			updateDataDisplay(false);
+			updateFolderFileCounts();
 		}
 
 		function selectAllInMainFolder(mainFolderName, select) {
@@ -3544,10 +3473,15 @@
 					}
 				}
 				
-				// Update count display
+				// Count only valid points (positional_accuracy < positionalAccuracy)
+				const validPointsCount = data.filter(record => {
+					return record.positional_accuracy < positionalAccuracy;
+				}).length;
+				
+				// Update count display with filtered count
 				const fileElement = document.querySelector(`.ndjson-file[data-file-id="${fileId}"]`);
 				if (fileElement) {
-					fileElement.querySelector('.file-count').textContent = data.length;
+					fileElement.querySelector('.file-count').textContent = validPointsCount;
 				}
 				
 				// Update the display
@@ -3581,6 +3515,11 @@
 				
 				if (fileData.active && fileData.data.length > 0) {
 					fileData.data.forEach(record => {
+						// FILTER: Skip records with positional_accuracy > positionalAccuracy
+						if (record.positional_accuracy > positionalAccuracy) {
+							return; // Skip this record
+						}
+						
 						// Calculate averages based on settings
 						const daysToAverage = Math.min(averageDays, record.dates.length);
 						const startIdx = record.dates.length - daysToAverage;
@@ -3909,9 +3848,9 @@
 			
 			// Initialize sliders (keep existing code...)
 			setTimeout(() => {
-				window.elevationSlider = createRangeSlider('elevation-slider-range', 0, 12000, [0, 12000], 100);
-				window.tempSlider = createRangeSlider('temp-slider-range', 30, 70, [30, 70], 1);
-				window.moistureSlider = createRangeSlider('moisture-slider-range', 0, 0.5, [0, 0.5], 0.01);
+				window.elevationSlider = createRangeSlider('elevation-slider-range', -1000, 12000, [-1000, 12000], 100);
+				window.tempSlider = createRangeSlider('temp-slider-range', 20, 80, [20, 80], 1);
+				window.moistureSlider = createRangeSlider('moisture-slider-range', 0, 0.6, [0, 0.6], 0.01);
 				window.slopeSlider = createRangeSlider('slope-slider-range', 0, 90, [0, 90], 1);
 				window.monthSlider = createRangeSlider('month-slider-range', 1, 365, [1, 365], 1);
 				
@@ -4434,9 +4373,9 @@
 			}
 			
 			// If not in a filtered view, use default ranges
-			if (currentView !== 'elevation') elevationRange = [0, 12000];
-			if (currentView !== 'temp') tempRange = [30, 70];
-			if (currentView !== 'moisture') moistureRange = [0, 0.5];
+			if (currentView !== 'elevation') elevationRange = [-1000, 12000];
+			if (currentView !== 'temp') tempRange = [20, 80];
+			if (currentView !== 'moisture') moistureRange = [0, 0.6];
 			if (currentView !== 'month') monthRange = [1, 12];
 			
 			// Plot points from all active datasets
@@ -4479,7 +4418,43 @@
 					inMonthRange = isPointInDayRange(point, monthRange[0], monthRange[1]);
 				}
 
+
 				if (!inElevationRange || !inTempRange || !inMoistureRange || !inSlopeRange || !inAspectRange || !inMonthRange) return;
+
+				// Filter check debug:
+				/*
+				if (!inElevationRange || !inTempRange || !inMoistureRange || !inSlopeRange || !inAspectRange || !inMonthRange) {
+					console.log('Point filtered out:', {
+						datasetId: point.datasetId,
+						coordinates: point.coordinates,
+						filtersFailed: {
+							elevation: !inElevationRange,
+							temp: !inTempRange,
+							moisture: !inMoistureRange,
+							slope: !inSlopeRange,
+							aspect: !inAspectRange,
+							month: !inMonthRange
+						},
+						values: {
+							elevation: point.elevationFt,
+							temp: point.soilTemp,
+							moisture: point.soilMoisture,
+							slope: point.slopeDeg,
+							aspect: point.slopeAspectDeg,
+							month: point.month
+						},
+						ranges: {
+							elevation: elevationRange,
+							temp: tempRange,
+							moisture: moistureRange,
+							slope: slopeRange,
+							aspect: aspectRange,
+							month: monthRange
+						}
+					});
+					return;
+				}
+				*/
 				
 				// Get alpha/opacity from activeDatasets
 				const datasetInfo = activeDatasets[point.datasetId];
@@ -4640,7 +4615,7 @@
 						inMonthRange = isPointInDayRange(point, monthRange[0], monthRange[1]);
 					}
 					
-					if (!inElevationRange || !inTempRange || !inMoistureRange || !inMonthRange) return;
+					if (!inElevationRange || !inTempRange || !inMoistureRange || !inSlopeRange || !inAspectRange || !inMonthRange) return;
 					
 					if (point.datasetId === 'user_data') {
 						// User points
@@ -4684,7 +4659,9 @@
 							
 							marker.on('click', (e) => {
 								L.DomEvent.stopPropagation(e);
-								highlightPoint(point);
+								// For user points, just show info without highlighting
+								removeHighlights();
+								highlightedPoint = null;
 								showPointInfo(point);
 							});
 							
@@ -4853,8 +4830,17 @@
 								);
 								
 								if (originalPoint) {
-									highlightPoint(originalPoint);
-									showPointInfo(originalPoint);
+									// Check if this is a user point
+									if (originalPoint.datasetId === 'user_data') {
+										// For user points, just show info without highlighting
+										removeHighlights(); // Clear any existing highlights
+										highlightedPoint = null; // Don't store as highlighted point
+										showPointInfo(originalPoint);
+									} else {
+										// For NDJSON points, highlight as normal
+										highlightPoint(originalPoint);
+										showPointInfo(originalPoint);
+									}
 								}
 							}
 						}
@@ -5172,7 +5158,7 @@
 				const cleanLabel = label.replace(/degrees|°|deg/gi, '').trim();
 				
 				// Try to extract numeric range
-				const rangeMatch = cleanLabel.match(/([\d\.]+)\s*-\s*([\d\.]+)/);
+				const rangeMatch = cleanLabel.match(/(-?[\d\.]+)\s*-\s*(-?[\d\.]+)/);
 				if (rangeMatch) {
 					let min = parseFloat(rangeMatch[1]);
 					let max = parseFloat(rangeMatch[2]);
@@ -5191,7 +5177,7 @@
 				}
 				
 				// If no range found, try to parse single value
-				const singleMatch = cleanLabel.match(/^([\d\.]+)$/);
+				const singleMatch = cleanLabel.match(/^(-?[\d\.]+)$/);
 				if (singleMatch) {
 					let value = parseFloat(singleMatch[1]);
 					
@@ -5213,7 +5199,7 @@
 				}
 			} else {
 				// Handle numeric ranges for other dimensions
-				const rangeMatch = label.match(/([\d\.]+)\s*-\s*([\d\.]+)/);
+				const rangeMatch = label.match(/(-?[\d\.]+)\s*-\s*(-?[\d\.]+)/);
 				if (rangeMatch) {
 					let min = parseFloat(rangeMatch[1]);
 					let max = parseFloat(rangeMatch[2]);
@@ -6044,7 +6030,6 @@
         
         // Show point information in the info panel
 		async function showPointInfo(point) {
-			highlightPoint(point);
 			const infoPanel = document.getElementById('info-panel');
 			const infoContent = document.getElementById('info-content');
 			const soilTempChartContainer = document.getElementById('soil-temp-chart-container');
@@ -6084,12 +6069,12 @@
 					<span class="info-label">Elevation:</span> ${point.elevationFt} ft
 				</div>
 				<div class="info-item">
-					<span class="info-label">Avg Soil Temp (${averageDays} days):</span>
-					${point.soilTemp ? point.soilTemp.toFixed(1) : 'N/A'} °F (${tempDepth})
+					<span class="info-label">Avg Soil Temp (${averageDays} days) (${tempDepth}):</span>
+					${point.soilTemp ? point.soilTemp.toFixed(1) : 'N/A'} °F
 				</div>
 				<div class="info-item">
-					<span class="info-label">Avg Soil Moisture (${averageDays} days):</span>
-					${point.soilMoisture ? point.soilMoisture.toFixed(3) : 'N/A'} (${moistureDepth})
+					<span class="info-label">Avg Soil Moisture (${averageDays} days) (${moistureDepth}):</span>
+					${point.soilMoisture ? point.soilMoisture.toFixed(3) : 'N/A'}
 				</div>
 				${slopeHTML}
 				${aspectHTML}
@@ -6728,6 +6713,7 @@
 				// Show info for the new point
 				showPointInfo(newPoint);
 				removeHighlights();
+				userPoint = newPoint;
 				
 			} catch (error) {
 				console.error('Error fetching Open-Meteo data:', error);
@@ -7061,6 +7047,14 @@
 					tempDepth = document.getElementById('temp-depth').value;
 					moistureDepth = document.getElementById('moisture-depth').value;
 					updateDataDisplay(false); // false = full reprocessing needed
+
+				// If there's a highlighted point, refresh its info with new settings
+				if (highlightedPoint) {
+					showPointInfo(highlightedPoint);
+				} else if (userPoint) {
+					showPointInfo(userPoint);
+					removeHighlights();
+				}
 				});
 			
 				// Initialize with default settings
