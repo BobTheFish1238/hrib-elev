@@ -91,7 +91,6 @@
             transition: transform 0.3s ease;
             width: 100%;
             max-width: 100%;
-            overflow: hidden;
 			min-height: 500px;
         }
         
@@ -119,6 +118,26 @@
             text-align: center;
         }
         
+		#toggle-legend-btn {
+			margin: 5px auto 15px auto;
+			display: block;
+			padding: 8px 16px;
+			background-color: var(--card-bg);
+			color: var(--text-color);
+			border: 1px solid var(--border-color);
+			border-radius: 4px;
+			cursor: pointer;
+			font-size: 14px;
+			font-weight: 600;
+			transition: all 0.3s ease;
+			width: fit-content;
+		}
+
+		#toggle-legend-btn:hover {
+			background-color: var(--slider-bg);
+			transform: translateY(-2px);
+		}
+
 		.chart-wrapper canvas#mainChart,
 		.chart-wrapper canvas#histogramChart {
 			position: relative;
@@ -1453,6 +1472,7 @@
 							</div>
 						</div>
 					</div>
+					<button id="toggle-legend-btn">Toggle Legend</button>
 					<div class="chart-wrapper">
 						<canvas id="mainChart"></canvas>
 					</div>
@@ -1477,6 +1497,7 @@
 							<input type="number" id="bin-offset" min="0" max="100" value="0" style="width: 100px;">
 						</div>
 					</div>
+					<button id="toggle-legend-btn">Toggle Legend</button>
 					<div class="chart-wrapper">
 						<canvas id="histogramChart"></canvas>
 					</div>
@@ -2261,44 +2282,102 @@
 					{name: "California_Boletus_barrowsii.ndjson", modified: "2026-01-07"}
 				]
 			},
-			"Black Morels (Morchella sect. Distantes)": {
-				"Black Morel (Morchella angusticeps)": [
-					{name: "Washington_Morchella_angusticeps.ndjson", modified: "2026-01-07"}
-				],
-				"Landscaping Black Morel (Morchella importuna)": [
-					{name: "Washington_Morchella_importuna.ndjson", modified: "2026-01-07"},
-					{name: "Oregon_Morchella_importuna.ndjson", modified: "2026-01-07"},
-					{name: "California_Morchella_importuna.ndjson", modified: "2026-01-07"}
-				],
-				"Morchella brunnea": [
-					{name: "Washington_Morchella_brunnea.ndjson", modified: "2026-01-07"},
-					{name: "Oregon_Morchella_brunnea.ndjson", modified: "2026-01-07"},
-					{name: "California_Morchella_brunnea.ndjson", modified: "2026-01-07"}
-				],
-				"Morchella norvegiensis": [
-					{name: "Washington_Morchella_norvegiensis.ndjson", modified: "2026-01-07"},
-					{name: "Oregon_Morchella_norvegiensis.ndjson", modified: "2026-01-07"}
-				],
-				"Morchella populiphila": [
-					{name: "Washington_Morchella_populiphila.ndjson", modified: "2026-01-07"},
-					{name: "Oregon_Morchella_populiphila.ndjson", modified: "2026-01-07"},
-					{name: "California_Morchella_populiphila.ndjson", modified: "2026-01-07"}
-				],
-				"Natural Black Morel (Morchella snyderi)": [
-					{name: "Washington_Morchella_snyderi.ndjson", modified: "2026-01-07"},
-					{name: "Oregon_Morchella_snyderi.ndjson", modified: "2026-01-07"},
-					{name: "California_Morchella_snyderi.ndjson", modified: "2026-01-07"}
-				],
-				"Gray Morel (Morchella tomentosa)": [
-					{name: "Washington_Morchella_tomentosa.ndjson", modified: "2026-01-07"},
-					{name: "Oregon_Morchella_tomentosa.ndjson", modified: "2026-01-07"},
-					{name: "California_Morchella_tomentosa.ndjson", modified: "2026-01-07"}
-				],
-				"Mountain Blond Morel (Morchella tridentina)": [
-					{name: "Washington_Morchella_tridentina.ndjson", modified: "2026-01-07"},
-					{name: "Oregon_Morchella_tridentina.ndjson", modified: "2026-01-07"},
-					{name: "California_Morchella_tridentina.ndjson", modified: "2026-01-07"}
-				],
+			"Morels": {
+					"American yellow morel (Morchella americana)": [
+							{name: "California_Morchella_americana.ndjson", modified: "2026-02-23"},
+							{name: "Oregon_Morchella_americana.ndjson", modified: "2026-02-23"},
+							{name: "Washington_Morchella_americana.ndjson", modified: "2026-02-23"}
+					],
+					"Black Morels (Distantes)": [
+							{name: "California_Distantes.ndjson", modified: "2026-02-23"},
+							{name: "Oregon_Distantes.ndjson", modified: "2026-02-23"},
+							{name: "Washington_Distantes.ndjson", modified: "2026-02-23"}
+					],
+					"Fire Morel (Morchella eximia)": [
+							{name: "California_Morchella_eximia.ndjson", modified: "2026-02-23"},
+							{name: "Oregon_Morchella_eximia.ndjson", modified: "2026-02-23"},
+							{name: "Washington_Morchella_eximia.ndjson", modified: "2026-02-23"}
+					],
+					"Gray Morel (Morchella tomentosa)": [
+							{name: "California_Morchella_tomentosa.ndjson", modified: "2026-02-23"},
+							{name: "Oregon_Morchella_tomentosa.ndjson", modified: "2026-02-23"},
+							{name: "Washington_Morchella_tomentosa.ndjson", modified: "2026-02-23"}
+					],
+					"Landscaping Black Morel (Morchella importuna)": [
+							{name: "California_Morchella_importuna.ndjson", modified: "2026-02-23"},
+							{name: "Oregon_Morchella_importuna.ndjson", modified: "2026-02-23"},
+							{name: "Washington_Morchella_importuna.ndjson", modified: "2026-02-23"}
+					],
+					"Morchella": [
+							{name: "California_Morchella.ndjson", modified: "2026-02-23"},
+							{name: "Oregon_Morchella.ndjson", modified: "2026-02-23"},
+							{name: "Washington_Morchella.ndjson", modified: "2026-02-23"}
+					],
+					"Morchella brunnea": [
+							{name: "California_Morchella_brunnea.ndjson", modified: "2026-02-23"},
+							{name: "Oregon_Morchella_brunnea.ndjson", modified: "2026-02-23"},
+							{name: "Washington_Morchella_brunnea.ndjson", modified: "2026-02-23"}
+					],
+					"Morchella exuberans": [
+							{name: "California_Morchella_exuberans.ndjson", modified: "2026-02-23"},
+							{name: "Oregon_Morchella_exuberans.ndjson", modified: "2026-02-23"},
+							{name: "Washington_Morchella_exuberans.ndjson", modified: "2026-02-23"}
+					],
+					"Morchella hotsonii": [
+							{name: "Oregon_Morchella_hotsonii.ndjson", modified: "2026-02-23"},
+							{name: "Washington_Morchella_hotsonii.ndjson", modified: "2026-02-23"}
+					],
+					"Morchella magnispora": [
+							{name: "California_Morchella_magnispora.ndjson", modified: "2026-02-23"}
+					],
+					"Morchella norvegiensis": [
+							{name: "California_Morchella_norvegiensis.ndjson", modified: "2026-02-23"},
+							{name: "Oregon_Morchella_norvegiensis.ndjson", modified: "2026-02-23"},
+							{name: "Washington_Morchella_norvegiensis.ndjson", modified: "2026-02-23"}
+					],
+					"Morchella populiphila": [
+							{name: "California_Morchella_populiphila.ndjson", modified: "2026-02-23"},
+							{name: "Oregon_Morchella_populiphila.ndjson", modified: "2026-02-23"},
+							{name: "Washington_Morchella_populiphila.ndjson", modified: "2026-02-23"}
+					],
+					"Morchella prava": [
+							{name: "Washington_Morchella_prava.ndjson", modified: "2026-02-23"}
+					],
+					"Morchella septimelata": [
+							{name: "California_Morchella_septimelata.ndjson", modified: "2026-02-23"},
+							{name: "Washington_Morchella_septimelata.ndjson", modified: "2026-02-23"}
+					],
+					"Morchella sextelata": [
+							{name: "California_Morchella_sextelata.ndjson", modified: "2026-02-23"},
+							{name: "Oregon_Morchella_sextelata.ndjson", modified: "2026-02-23"},
+							{name: "Washington_Morchella_sextelata.ndjson", modified: "2026-02-23"}
+					],
+					"Mountain Blond Morel (Morchella tridentina)": [
+							{name: "California_Morchella_tridentina.ndjson", modified: "2026-02-23"},
+							{name: "Oregon_Morchella_tridentina.ndjson", modified: "2026-02-23"},
+							{name: "Washington_Morchella_tridentina.ndjson", modified: "2026-02-23"}
+					],
+					"Natural Black Morel (Morchella snyderi)": [
+							{name: "California_Morchella_snyderi.ndjson", modified: "2026-02-23"},
+							{name: "Oregon_Morchella_snyderi.ndjson", modified: "2026-02-23"},
+							{name: "Washington_Morchella_snyderi.ndjson", modified: "2026-02-23"}
+					],
+					"Semifree Morel (Morchella semilibera)": [
+							{name: "California_Morchella_semilibera.ndjson", modified: "2026-02-23"}
+					],
+					"Woodchip Morel (Morchella rufobrunnea)": [
+							{name: "California_Morchella_rufobrunnea.ndjson", modified: "2026-02-23"},
+							{name: "Oregon_Morchella_rufobrunnea.ndjson", modified: "2026-02-23"},
+							{name: "Washington_Morchella_rufobrunnea.ndjson", modified: "2026-02-23"}
+					],
+					"Yellow Morel (Morchella esculenta)": [
+							{name: "Washington_Morchella_esculenta.ndjson", modified: "2026-02-23"}
+					],
+					"black morel (Morchella angusticeps)": [
+							{name: "California_Morchella_angusticeps.ndjson", modified: "2026-02-23"},
+							{name: "Oregon_Morchella_angusticeps.ndjson", modified: "2026-02-23"},
+							{name: "Washington_Morchella_angusticeps.ndjson", modified: "2026-02-23"}
+					],
 			}
 		};
         
@@ -4788,6 +4867,8 @@
         
         // Initialize charts
 		function initCharts() {
+			const toggleBtn = document.getElementById('toggle-legend-btn');
+
 			const mainCtx = document.getElementById('mainChart').getContext('2d');
 			const histogramCtx = document.getElementById('histogramChart').getContext('2d');
 			
@@ -4848,7 +4929,7 @@
 					plugins: {
 						legend: {
 							display: true,
-							position: 'top',
+							position: 'bottom',
 							align: 'center',
 							labels: {
 								boxWidth: 12,
@@ -4976,7 +5057,7 @@
 					plugins: {
 						legend: {
 							display: true,
-							position: 'top'
+							position: 'bottom'
 						},
 						tooltip: {
 							mode: 'index',
@@ -5024,6 +5105,30 @@
 						}
 					}
 				}
+			});
+
+			// Set up legend toggle button
+			toggleBtn.addEventListener('click', function() {
+				// Get current legend display state
+				const currentMainLegendState = mainChart.options.plugins.legend.display;
+				const currentHistogramLegendState = histogramChart.options.plugins.legend.display;
+				
+				// Toggle both legends to the same state (opposite of current)
+				const newState = !currentMainLegendState;
+				
+				// Update chart options
+				mainChart.options.plugins.legend.display = newState;
+				histogramChart.options.plugins.legend.display = newState;
+				
+				// Update button text
+				toggleBtn.textContent = newState ? 'Hide Legend' : 'Show Legend';
+				
+				// Update both charts
+				mainChart.update();
+				histogramChart.update();
+				
+				// Also update theme colors if needed
+				updateChartsForTheme();
 			});
 			
 			// Set up chart type change listener
