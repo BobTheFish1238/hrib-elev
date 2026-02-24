@@ -118,7 +118,8 @@
             text-align: center;
         }
         
-		#toggle-legend-btn {
+		#toggle-main-legend-btn,
+		#toggle-histogram-legend-btn {
 			margin: 5px auto 15px auto;
 			display: block;
 			padding: 8px 16px;
@@ -133,7 +134,8 @@
 			width: fit-content;
 		}
 
-		#toggle-legend-btn:hover {
+		#toggle-main-legend-btn:hover,
+		#toggle-histogram-legend-btn:hover{
 			background-color: var(--slider-bg);
 			transform: translateY(-2px);
 		}
@@ -1472,7 +1474,7 @@
 							</div>
 						</div>
 					</div>
-					<button id="toggle-legend-btn">Toggle Legend</button>
+					<button id="toggle-main-legend-btn">Hide Legend</button>
 					<div class="chart-wrapper">
 						<canvas id="mainChart"></canvas>
 					</div>
@@ -1497,7 +1499,7 @@
 							<input type="number" id="bin-offset" min="0" max="100" value="0" style="width: 100px;">
 						</div>
 					</div>
-					<button id="toggle-legend-btn">Toggle Legend</button>
+					<button id="toggle-histogram-legend-btn">Hide Legend</button>
 					<div class="chart-wrapper">
 						<canvas id="histogramChart"></canvas>
 					</div>
@@ -4867,7 +4869,8 @@
         
         // Initialize charts
 		function initCharts() {
-			const toggleBtn = document.getElementById('toggle-legend-btn');
+			const toggleMainLegendBtn = document.getElementById('toggle-main-legend-btn');
+			const toggleHistogramLegendBtn = document.getElementById('toggle-histogram-legend-btn');
 
 			const mainCtx = document.getElementById('mainChart').getContext('2d');
 			const histogramCtx = document.getElementById('histogramChart').getContext('2d');
@@ -5063,13 +5066,31 @@
 							mode: 'index',
 							intersect: false,
 							callbacks: {
+								title: function(context) {
+									// Always show the bin label (e.g., 500-900ft)
+									return context[0].label;
+								},
 								label: function(context) {
+
+									const legendVisible = context.chart.options.plugins.legend.display;
+
+									// If legend is hidden → ONLY show bin range
+									if (!legendVisible) {
+										return '';
+									}
+
+									// If legend is visible → show dataset + count + %
 									const label = context.dataset.label || '';
 									const value = context.parsed.y;
+
 									const total = context.chart.data.datasets
 										.map(ds => ds.data[context.dataIndex])
 										.reduce((a, b) => a + b, 0);
-									const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+
+									const percentage = total > 0 
+										? Math.round((value / total) * 100) 
+										: 0;
+
 									return `${label}: ${value} (${percentage}%)`;
 								}
 							}
@@ -5107,27 +5128,35 @@
 				}
 			});
 
-			// Set up legend toggle button
-			toggleBtn.addEventListener('click', function() {
-				// Get current legend display state
-				const currentMainLegendState = mainChart.options.plugins.legend.display;
-				const currentHistogramLegendState = histogramChart.options.plugins.legend.display;
-				
-				// Toggle both legends to the same state (opposite of current)
-				const newState = !currentMainLegendState;
-				
-				// Update chart options
+			// Set up main chart legend toggle button
+			toggleMainLegendBtn.addEventListener('click', function() {
+				// Toggle main chart legend
+				const newState = !mainChart.options.plugins.legend.display;
 				mainChart.options.plugins.legend.display = newState;
+				
+				// Update button text
+				this.textContent = newState ? 'Hide Legend' : 'Show Legend';
+				
+				// Update main chart
+				mainChart.update();
+				
+				// Update theme colors
+				updateChartsForTheme();
+			});
+
+			// Set up histogram legend toggle button
+			toggleHistogramLegendBtn.addEventListener('click', function() {
+				// Toggle histogram chart legend
+				const newState = !histogramChart.options.plugins.legend.display;
 				histogramChart.options.plugins.legend.display = newState;
 				
 				// Update button text
-				toggleBtn.textContent = newState ? 'Hide Legend' : 'Show Legend';
+				this.textContent = newState ? 'Hide Legend' : 'Show Legend';
 				
-				// Update both charts
-				mainChart.update();
+				// Update histogram chart - this will refresh the tooltips
 				histogramChart.update();
 				
-				// Also update theme colors if needed
+				// Update theme colors
 				updateChartsForTheme();
 			});
 			
@@ -5633,13 +5662,31 @@
 			if (dimension !== 'month') {
 				histogramChart.options.scales.x.ticks = {};
 				histogramChart.options.plugins.tooltip.callbacks = {
+					title: function(context) {
+						return context[0].label; // always show bin range
+					},
 					label: function(context) {
+
+						const legendVisible =
+							context.chart.options.plugins.legend.display;
+
+						// If legend is OFF → show nothing under title
+						if (!legendVisible) {
+							return null;   // IMPORTANT: must be null, not ''
+						}
+
+						// If legend is ON → show dataset + count + %
 						const label = context.dataset.label || '';
 						const value = context.parsed.y;
+
 						const total = context.chart.data.datasets
 							.map(ds => ds.data[context.dataIndex])
 							.reduce((a, b) => a + b, 0);
-						const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+
+						const percentage = total > 0
+							? Math.round((value / total) * 100)
+							: 0;
+
 						return `${label}: ${value} (${percentage}%)`;
 					}
 				};
@@ -5796,21 +5843,36 @@
 				
 				// Customize tooltip to show week number
 				histogramChart.options.plugins.tooltip.callbacks = {
-					...histogramChart.options.plugins.tooltip.callbacks,
 					title: function(context) {
-						// Get the index of the hovered bar (accounting for offset)
 						const index = context[0].dataIndex + startIndex;
 						const monthIndex = Math.floor(index / 5);
 						const weekNumber = (index % 5) + 1;
+
 						return `${monthNames[monthIndex]} - Week ${weekNumber}`;
 					},
+
 					label: function(context) {
+
+						const legendVisible =
+							context.chart.options.plugins.legend.display;
+
+						// If legend is OFF → only show the title (week)
+						if (!legendVisible) {
+							return null;   // removes dataset rows completely
+						}
+
+						// If legend is ON → show dataset + count + %
 						const label = context.dataset.label || '';
 						const value = context.parsed.y;
+
 						const total = context.chart.data.datasets
 							.map(ds => ds.data[context.dataIndex])
 							.reduce((a, b) => a + b, 0);
-						const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+
+						const percentage = total > 0
+							? Math.round((value / total) * 100)
+							: 0;
+
 						return `${label}: ${value} (${percentage}%)`;
 					}
 				};
