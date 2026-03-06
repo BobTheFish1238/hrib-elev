@@ -93,10 +93,6 @@
             max-width: 100%;
 			min-height: 500px;
         }
-        
-        .graph-container:hover {
-            transform: translateY(-5px);
-        }
 
         .graph-container:has(#data-table) {
             max-height: none;
@@ -117,31 +113,9 @@
             font-size: 1.4rem;
             text-align: center;
         }
-        
-		#toggle-main-legend-btn,
-		#toggle-histogram-legend-btn {
-			margin: 5px auto 15px auto;
-			display: block;
-			padding: 8px 16px;
-			background-color: var(--card-bg);
-			color: var(--text-color);
-			border: 1px solid var(--border-color);
-			border-radius: 4px;
-			cursor: pointer;
-			font-size: 14px;
-			font-weight: 600;
-			transition: all 0.3s ease;
-			width: fit-content;
-		}
 
-		#toggle-main-legend-btn:hover,
-		#toggle-histogram-legend-btn:hover{
-			background-color: var(--slider-bg);
-			transform: translateY(-2px);
-		}
-
-		.chart-wrapper canvas#mainChart,
-		.chart-wrapper canvas#histogramChart {
+		.graph-container:not(.fullscreen-chart) .chart-wrapper canvas#mainChart,
+		.graph-container:not(.fullscreen-chart) .chart-wrapper canvas#histogramChart {
 			position: relative;
 			min-height: 500px;
 			width: 100%;
@@ -322,7 +296,6 @@
             color: #8B4513;
             margin-bottom: 15px;
             font-size: 1.4rem;
-            border-bottom: 2px solid #8B4513;
         }
         
         .info-content {
@@ -511,7 +484,7 @@
             padding: 10px;
             background-color: #fff;
             transition: max-height 0.3s ease;
-            max-height: 1000px;
+            max-height: none;
             overflow: hidden;
         }
         
@@ -1317,6 +1290,138 @@
 				transform-origin: top right;
 			}
 		}
+
+		.legend-container {
+			background-color: var(--card-bg);
+			border-radius: 8px;
+			transition: all 0.3s ease;
+		}
+
+		.legend-item {
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			padding: 4px 8px;
+			border-radius: 4px;
+			background-color: var(--card-bg);
+			border: 1px solid var(--border-color);
+			cursor: pointer;
+			transition: all 0.2s ease;
+			min-width: 140px;
+			font-size: 12px;
+		}
+
+		.legend-item:hover {
+			transform: translateY(-1px);
+			box-shadow: 0 2px 4px var(--shadow-color);
+			background-color: var(--slider-bg);
+		}
+
+		.legend-item.disabled {
+			opacity: 0.5;
+			background-color: var(--slider-bg);
+			text-decoration: line-through;
+		}
+
+		.legend-color {
+			width: 12px;
+			height: 12px;
+			border-radius: 50%;
+			border: 1px solid var(--border-color);
+			flex-shrink: 0;
+		}
+
+		.legend-label {
+			flex: 1;
+			color: var(--text-color);
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			font-size: 11px;
+		}
+
+		.legend-count {
+			font-size: 10px;
+			padding: 1px 4px;
+			border-radius: 8px;
+			background-color: var(--slider-bg);
+			color: var(--text-color);
+			white-space: nowrap;
+		}
+
+		.legend-checkbox {
+			width: 12px;
+			height: 12px;
+			cursor: pointer;
+			accent-color: #8B4513;
+			flex-shrink: 0;
+		}
+
+		.legend-control {
+			background-color: var(--card-bg);
+			border: 1px solid var(--header-color);
+			color: var(--header-color);
+			border-radius: 3px;
+		}
+
+		.legend-control:hover {
+			background-color: var(--header-color);
+			color: white;
+		}
+
+		/* Fullscreen chart styles */
+		.graph-container.fullscreen-chart {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100vw;
+			height: 100vh;
+			z-index: 10000;
+			margin: 0;
+			padding: 20px;
+			border-radius: 0;
+			overflow-y: auto;
+			background-color: var(--card-bg);
+		}
+
+		.graph-container.fullscreen-chart .chart-wrapper {
+			height: calc(100vh - 150px);
+			margin-bottom: 20px;
+		}
+
+		.graph-container.fullscreen-chart #mainChart,
+		.graph-container.fullscreen-chart #histogramChart {
+			height: 100% !important;
+			width: 100% !important;
+		}
+
+		.graph-container.fullscreen-chart .fullscreen-chart-btn i {
+			transform: rotate(180deg);
+		}
+
+		.fullscreen-chart-overlay {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background-color: rgba(0, 0, 0, 0.5);
+			z-index: 9999;
+			display: none;
+		}
+
+		.fullscreen-chart-overlay.active {
+			display: block;
+		}
+
+		/* Ensure chart controls are accessible in fullscreen */
+		.graph-container.fullscreen-chart .chart-controls,
+		.graph-container.fullscreen-chart .histogram-controls,
+		.graph-container.fullscreen-chart .legend-container {
+			max-width: 1200px;
+			margin-left: auto;
+			margin-right: auto;
+		}
     </style>
 </head>
 <body>
@@ -1392,9 +1497,36 @@
 							<option value="0_to_100cm">0-100 cm</option>
 						</select>
 					</div>
+					
+					<!-- Coordinate precision control -->
+					<div class="setting-row">
+						<div class="setting-label">Coordinate Precision (meters):</div>
+						<input type="number" id="positional-accuracy" value="300" min="0" max="50000" step="100">
+						<span style="color: #888; font-size: 12px; margin-left: 5px; white-space: nowrap;">(0 = no filter)</span>
+					</div>
+					
+					<!-- Quality grade filter checkboxes -->
+					<div class="setting-row" style="flex-wrap: wrap;">
+						<div class="setting-label" style="min-width: 150px;">Quality Grades:</div>
+						<div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+							<label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+								<input type="checkbox" id="quality-casual" value="casual" checked>
+								<span style="color: #ff6b6b;">Casual</span>
+							</label>
+							<label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+								<input type="checkbox" id="quality-needs-id" value="needs_id" checked>
+								<span style="color: #ffa500;">Needs ID</span>
+								<!-- <span style="font-size: 11px; color: #888;">(includes NA)</span> -->
+							</label>
+							<label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+								<input type="checkbox" id="quality-research" value="research" checked>
+								<span style="color: #2ecc71;">Research</span>
+							</label>
+						</div>
+					</div>
 				</div>
 				
-				<button id="apply-settings" style="width: 100%;">Apply Settings</button>
+				<button id="apply-settings" style="width: 100%; margin-top: 15px;">Apply Settings</button>
 			</div>
 			</div>
 			
@@ -1444,9 +1576,15 @@
             </div>
             
 			<div class="content-container">
+				<!-- Main Chart Container -->
 				<div class="graph-container">
 					<div class="chart-header">
-						<h3 class="graph-title">Data Visualization</h3>
+						<div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+							<h3 class="graph-title" style="margin: 0;">Data Visualization</h3>
+							<button class="fullscreen-chart-btn" data-chart="main" title="Fullscreen chart" style="background: none; border: none; color: #8B4513; font-size: 1.2rem; cursor: pointer; padding: 5px;">
+								<i class="fas fa-expand"></i>
+							</button>
+						</div>
 						<div class="chart-controls">
 							<div class="axis-selectors">
 								<div class="axis-selector">
@@ -1474,15 +1612,33 @@
 							</div>
 						</div>
 					</div>
-					<button id="toggle-main-legend-btn">Hide Legend</button>
 					<div class="chart-wrapper">
 						<canvas id="mainChart"></canvas>
 					</div>
+					<!-- Main Chart Legend Inside Container -->
+					<div class="legend-container" style="margin-top: 15px; padding: 10px; border-top: 1px solid var(--border-color);">
+						<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+							<h4 style="color: var(--header-color); margin: 0; font-size: 14px;">Dataset Visibility</h4>
+							<div style="display: flex; gap: 5px;">
+								<button class="control-btn legend-control" id="show-main-datasets" style="padding: 3px 8px; font-size: 11px;">Show All</button>
+								<button class="control-btn legend-control" id="hide-main-datasets" style="padding: 3px 8px; font-size: 11px;">Hide All</button>
+							</div>
+						</div>
+						<div id="main-chart-legend-items" style="display: flex; flex-wrap: wrap; gap: 10px; max-height: 120px; overflow-y: auto; padding: 5px;">
+							<!-- Main chart legend items will be populated here -->
+						</div>
+					</div>
 				</div>
 				
+				<!-- Histogram Container -->
 				<div class="graph-container">
 					<div class="chart-header">
-						<h3 class="graph-title">Distribution Histogram</h3>
+						<div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+							<h3 class="graph-title" style="margin: 0;">Distribution Histogram</h3>
+							<button class="fullscreen-chart-btn" data-chart="histogram" title="Fullscreen chart" style="background: none; border: none; color: #8B4513; font-size: 1.2rem; cursor: pointer; padding: 5px;">
+								<i class="fas fa-expand"></i>
+							</button>
+						</div>
 						<div class="histogram-controls">
 							<select id="histogram-dimension">
 								<option value="elevationFt">Elevation (ft)</option>
@@ -1499,25 +1655,38 @@
 							<input type="number" id="bin-offset" min="0" max="100" value="0" style="width: 100px;">
 						</div>
 					</div>
-					<button id="toggle-histogram-legend-btn">Hide Legend</button>
 					<div class="chart-wrapper">
 						<canvas id="histogramChart"></canvas>
 					</div>
+					<!-- Histogram Legend Inside Container -->
+					<div class="legend-container" style="margin-top: 15px; padding: 10px; border-top: 1px solid var(--border-color);">
+						<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+							<h4 style="color: var(--header-color); margin: 0; font-size: 14px;">Dataset Visibility</h4>
+							<div style="display: flex; gap: 5px;">
+								<button class="control-btn legend-control" id="show-histogram-datasets" style="padding: 3px 8px; font-size: 11px;">Show All</button>
+								<button class="control-btn legend-control" id="hide-histogram-datasets" style="padding: 3px 8px; font-size: 11px;">Hide All</button>
+							</div>
+						</div>
+						<div id="histogram-legend-items" style="display: flex; flex-wrap: wrap; gap: 10px; max-height: 120px; overflow-y: auto; padding: 5px;">
+							<!-- Histogram legend items will be populated here -->
+						</div>
+					</div>
 				</div>
-			</div>
             
-            <div class="info-panel" id="info-panel">
-                <h3 class="info-title">Observation Details</h3>
+			<div class="info-panel" id="info-panel" style="grid-column: 1 / -1; width: 100%; margin-top: 25px;">
+				<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+					<h3 class="info-title" style="margin: 0;">Observation Details</h3>
+				</div>
 				<div class="soil-temp-chart-container" style="margin-top: 20px; display: none;" id="soil-temp-chart-container">
 					<h4 style="color: #8B4513; margin-bottom: 15px;">Soil Temperature & Moisture Trend</h4>
 					<div class="chart-wrapper" style="height: 200px;">
 						<canvas id="soil-temp-chart"></canvas>
 					</div>
 				</div>
-                <div class="info-content" id="info-content">
-                    <!-- Details will be populated here when a point is clicked -->
-                </div>
-            </div>
+				<div class="info-content" id="info-content">
+					<!-- Details will be populated here when a point is clicked -->
+				</div>
+			</div>
 			<div class="graph-container" style="grid-column: 1 / -1; width: 100%; margin-top: 25px;">
 				<h3 class="graph-title">Data Table</h3>
 				<div id="data-table-container" style="overflow-x: auto;">
@@ -1546,7 +1715,6 @@
 		<p>Github: <a href="https://github.com/BobTheFish1238/hrib-elev" target="_blank" class="link">hrib-elev</a> </p>
         <p>(Observations data is updated periodically)</p>
         <p>Data Sources: iNaturalist observations & Open-Meteo Weather API</p>
-        <p>Note: The Open-Meteo API provides soil temperature data with a spatial resolution of 9 km for recent years (IFS model) or 0.25° (~25 km) for historical data (ERA5 model).</p>
     </footer>
 
     <script>
@@ -1665,7 +1833,14 @@
 		let highlightPointSize = 5;
 		let pointSize = 2;
 
-		let positionalAccuracy = 1000;
+		// Quality grade filter settings
+		let qualityGrades = {
+			casual: true,
+			needs_id: true,
+			research: true
+		};
+
+		let positionalAccuracy = 300;
 
 		// Available tile layers
 		const tileLayers = {
@@ -1988,6 +2163,85 @@
 			dark: ['osm_darkgray', 'osm_darkest', 'watercolor_darkgray', 'eox_blackmarble', 'osm_medgray', 'osm_medgray2'],
 			light: ['osm_std', 'osm_lightgray', 'watercolor', 'eox_terrain_light']
 		};
+
+		// Chart fullscreen functionality
+		function toggleChartFullscreen(chartType) {
+			let chartContainer;
+			
+			if (chartType === 'main') {
+				chartContainer = document.querySelector('.graph-container:has(#mainChart)');
+			} else if (chartType === 'histogram') {
+				chartContainer = document.querySelector('.graph-container:has(#histogramChart)');
+			}
+			
+			if (!chartContainer) return;
+			
+			if (!chartContainer.classList.contains('fullscreen-chart')) {
+				// Enter fullscreen
+				chartContainer.classList.add('fullscreen-chart');
+				
+				// Change icon to compress
+				const btn = chartContainer.querySelector('.fullscreen-chart-btn i');
+				btn.className = 'fas fa-compress';
+				
+				// Update charts to ensure proper sizing
+				setTimeout(() => {
+					if (chartType === 'main' && mainChart) {
+						mainChart.resize();
+					} else if (chartType === 'histogram' && histogramChart) {
+						histogramChart.resize();
+					}
+				}, 100);
+				
+				// Prevent body scrolling
+				document.body.style.overflow = 'hidden';
+			} else {
+				// Exit fullscreen
+				chartContainer.classList.remove('fullscreen-chart');
+				
+				// Change icon back to expand
+				const btn = chartContainer.querySelector('.fullscreen-chart-btn i');
+				btn.className = 'fas fa-expand';
+				
+				// Update charts
+				setTimeout(() => {
+					if (chartType === 'main' && mainChart) {
+						mainChart.resize();
+					} else if (chartType === 'histogram' && histogramChart) {
+						histogramChart.resize();
+					}
+				}, 100);
+				
+				// Restore body scrolling
+				document.body.style.overflow = '';
+			}
+		}
+
+		// Add ESC key to exit fullscreen
+		document.addEventListener('keydown', function(e) {
+			if (e.key === 'Escape') {
+				const fullscreenCharts = document.querySelectorAll('.graph-container.fullscreen-chart');
+				fullscreenCharts.forEach(container => {
+					container.classList.remove('fullscreen-chart');
+					
+					// Change icon back to expand
+					const btn = container.querySelector('.fullscreen-chart-btn i');
+					if (btn) {
+						btn.className = 'fas fa-expand';
+					}
+					
+					// Update the appropriate chart
+					if (container.querySelector('#mainChart') && mainChart) {
+						setTimeout(() => mainChart.resize(), 100);
+					} else if (container.querySelector('#histogramChart') && histogramChart) {
+						setTimeout(() => histogramChart.resize(), 100);
+					}
+				});
+				
+				// Restore body scrolling
+				document.body.style.overflow = '';
+			}
+		});
 
 		function clearUserPoints() {
 			userData = [];
@@ -3521,6 +3775,14 @@
 				
 				// Store the data
 				activeDatasets[fileId].data = data;
+
+				// Initialize visibility for this dataset in both charts
+				if (mainChartVisibility[fileId] === undefined) {
+					mainChartVisibility[fileId] = true;
+				}
+				if (histogramVisibility[fileId] === undefined) {
+					histogramVisibility[fileId] = true;
+				}
 				
 				// Check if folder color should be applied
 				const fileData = activeDatasets[fileId];
@@ -3554,10 +3816,8 @@
 					}
 				}
 				
-				// Count only valid points (positional_accuracy < positionalAccuracy)
-				const validPointsCount = data.filter(record => {
-					return record.positional_accuracy < positionalAccuracy;
-				}).length;
+				// Count valid points with current filters
+				const validPointsCount = countValidPointsInDataset(fileId);
 				
 				// Update count display with filtered count
 				const fileElement = document.querySelector(`.ndjson-file[data-file-id="${fileId}"]`);
@@ -3570,6 +3830,9 @@
 
 				// Update folder file counts
 				updateFolderFileCounts();
+
+				// Update legend items
+				updateLegendItems();
 				
 			} catch (error) {
 				console.error(`Error loading NDJSON file ${filePath}:`, error);
@@ -3599,6 +3862,18 @@
 						// FILTER: Skip records with positional_accuracy > positionalAccuracy
 						if (record.positional_accuracy > positionalAccuracy) {
 							return; // Skip this record
+						}
+						
+						// FILTER: Quality grade filter
+						let qualityGrade = record.quality_grade;
+						// Treat null/undefined/NA as 'needs_id'
+						if (!qualityGrade || qualityGrade === 'NA') {
+							qualityGrade = 'needs_id';
+						}
+						
+						// Check if this quality grade is enabled
+						if (!qualityGrades[qualityGrade]) {
+							return; // Skip if quality grade not selected
 						}
 						
 						// Calculate averages based on settings
@@ -3631,7 +3906,7 @@
 							observationUrl: record.observation_url,
 							date: record.date_used,
 							coordinates: record.coordinates,
-							elevationFt: record.aws_elevation_ft || record.elevation_ft, // Use aws_elevation_ft if available
+							elevationFt: record.aws_elevation_ft || record.elevation_ft,
 							soilTemp: avgTemp,
 							soilMoisture: avgMoisture,
 							month: month,
@@ -3641,8 +3916,9 @@
 							yearMonth: date.getFullYear() + '-' + String(month).padStart(2, '0'),
 							latitude: parseFloat(record.coordinates.split(',')[0]),
 							longitude: parseFloat(record.coordinates.split(',')[1]),
-							slopeDeg: record.slope_deg, // Add slope degree
-							slopeAspectDeg: record.slope_aspect_deg, // Add slope aspect
+							slopeDeg: record.slope_deg,
+							slopeAspectDeg: record.slope_aspect_deg,
+							qualityGrade: qualityGrade, // Store quality grade for reference
 							rawData: record
 						};
 						
@@ -3655,15 +3931,67 @@
 			// Combine with user data
 			allData = [...originalData, ...userData];
 		}
+
+		// Count valid points in a dataset based on current filters
+		function countValidPointsInDataset(fileId) {
+			const fileData = activeDatasets[fileId];
+			if (!fileData || !fileData.data) return 0;
+			
+			return fileData.data.filter(record => {
+				// Positional accuracy filter
+				if (record.positional_accuracy > positionalAccuracy) {
+					return false;
+				}
+				
+				// Quality grade filter
+				let qualityGrade = record.quality_grade;
+				if (!qualityGrade || qualityGrade === 'NA') {
+					qualityGrade = 'needs_id';
+				}
+				
+				return qualityGrades[qualityGrade] === true;
+			}).length;
+		}
         
+		// Update file counts based on current filters
+		function updateAllFileCounts() {
+			Object.keys(activeDatasets).forEach(fileId => {
+				const validPointsCount = countValidPointsInDataset(fileId);
+				
+				// Update count display
+				const fileElement = document.querySelector(`.ndjson-file[data-file-id="${fileId}"]`);
+				if (fileElement) {
+					const countElement = fileElement.querySelector('.file-count');
+					if (countElement) {
+						countElement.textContent = validPointsCount;
+					}
+				}
+			});
+			
+			updateFolderFileCounts();
+		}
+
         // Update all charts and map with current data
 		function updateDataDisplay(updateVisualsOnlyFlag = false) {
 			clearTimeout(updateTimeout);
 			updateTimeout = setTimeout(() => {
 				if (!updateVisualsOnlyFlag) {
-				// Only process data if needed (when loading new files or changing settings)
+					// Only process data if needed (when loading new files or changing settings)
 					processNdjsonData();
-					populateDataTable(); // Only needed when data changes
+					populateDataTable(); // This will now use the current sort settings
+					// Initialize visibility for new datasets in both charts
+					Object.keys(activeDatasets).forEach(id => {
+						if (activeDatasets[id].active) {
+							if (mainChartVisibility[id] === undefined) {
+								mainChartVisibility[id] = true;
+							}
+							if (histogramVisibility[id] === undefined) {
+								histogramVisibility[id] = true;
+							}
+						}
+					});
+					
+					updateLegendItems();
 					updateCharts(); // Full chart update with new data
 					updateHistogram(); // Update histogram with new data
 					// Create map points with fresh data
@@ -4682,6 +5010,9 @@
 			// Plot user-added points
 			if (userData.length > 0) {
 				userData.forEach(point => {
+					// Get current slope range
+					const currentSlopeRange = currentView === 'slope' ? slopeRange : [0, 90];
+					
 					// Filter based on ranges
 					const inElevationRange = point.elevationFt >= elevationRange[0] && 
 										  point.elevationFt <= elevationRange[1];
@@ -4691,7 +5022,35 @@
 					const inMoistureRange = point.soilMoisture !== null && 
 										 point.soilMoisture >= moistureRange[0] && 
 										 point.soilMoisture <= moistureRange[1];
-					let inMonthRange = true; // Default to true for non-month views
+					
+					// Slope filter - only apply if we're in slope view and point has slope data
+					let inSlopeRange = true;
+					if (currentView === 'slope') {
+						inSlopeRange = point.slopeDeg !== null && point.slopeDeg !== undefined &&
+									 point.slopeDeg >= currentSlopeRange[0] && 
+									 point.slopeDeg <= currentSlopeRange[1];
+					}
+					
+					// Aspect filter - only apply if we're in aspect view and point has aspect data
+					let inAspectRange = true;
+					if (currentView === 'aspect') {
+						const aspect = point.slopeAspectDeg;
+						if (aspect !== null && aspect !== undefined) {
+							const [start, end] = aspectRange;
+							
+							// Handle the wrap-around case
+							if (end >= start) {
+								inAspectRange = aspect >= start && aspect <= end;
+							} else {
+								inAspectRange = aspect >= start || aspect <= end;
+							}
+						} else {
+							inAspectRange = false; // No aspect data when in aspect view
+						}
+					}
+					
+					// Month filter
+					let inMonthRange = true;
 					if (currentView === 'month') {
 						inMonthRange = isPointInDayRange(point, monthRange[0], monthRange[1]);
 					}
@@ -4707,7 +5066,7 @@
 						if (isHighlighted) {
 							// Highlighted user point
 							const marker = L.circleMarker([point.latitude, point.longitude], {
-								radius: highlightPointSize, // Use highlight point size
+								radius: highlightPointSize,
 								color: userPointColor,
 								fillColor: userPointColor,
 								fillOpacity: 0.9,
@@ -4727,7 +5086,7 @@
 						} else {
 							// Regular user point
 							const marker = L.circleMarker([point.latitude, point.longitude], {
-								radius: userPointSize, // Use user point size
+								radius: userPointSize,
 								color: userPointColor,
 								fillColor: userPointColor,
 								fillOpacity: 0.8,
@@ -4866,12 +5225,311 @@
                 map.invalidateSize();
             }
         });
+
+		// Dataset visibility tracking (separate for each chart)
+		let mainChartVisibility = {};
+		let histogramVisibility = {};
+
+		function updateLegendItems() {
+			updateMainChartLegend();
+			updateHistogramLegend();
+		}
+
+		function updateMainChartLegend() {
+			const legendContainer = document.getElementById('main-chart-legend-items');
+			if (!legendContainer) return;
+			
+			legendContainer.innerHTML = '';
+			
+			// Get all active NDJSON datasets
+			const activeDatasetIds = Object.keys(activeDatasets).filter(id => activeDatasets[id].active);
+			
+			// Add NDJSON datasets
+			activeDatasetIds.forEach(id => {
+				const dataset = activeDatasets[id];
+				const isVisible = mainChartVisibility[id] !== false; // Default to true
+				
+				addMainChartLegendItem(
+					legendContainer,
+					id,
+					dataset.fileName,
+					dataset.color,
+					dataset.data.filter(record => record.positional_accuracy < positionalAccuracy).length,
+					isVisible
+				);
+			});
+			
+			// Add user data if exists
+			if (userData.length > 0) {
+				const isVisible = mainChartVisibility['user_data'] !== false;
+				addMainChartLegendItem(
+					legendContainer,
+					'user_data',
+					'Your Added Point',
+					userPointColor,
+					userData.length,
+					isVisible
+				);
+			}
+		}
+
+		function updateHistogramLegend() {
+			const legendContainer = document.getElementById('histogram-legend-items');
+			if (!legendContainer) return;
+			
+			legendContainer.innerHTML = '';
+			
+			// Get all active NDJSON datasets
+			const activeDatasetIds = Object.keys(activeDatasets).filter(id => activeDatasets[id].active);
+			
+			// Add NDJSON datasets
+			activeDatasetIds.forEach(id => {
+				const dataset = activeDatasets[id];
+				const isVisible = histogramVisibility[id] !== false; // Default to true
+				
+				addHistogramLegendItem(
+					legendContainer,
+					id,
+					dataset.fileName,
+					dataset.color,
+					dataset.data.filter(record => record.positional_accuracy < positionalAccuracy).length,
+					isVisible
+				);
+			});
+			
+			// Add user data if exists
+			if (userData.length > 0) {
+				const isVisible = histogramVisibility['user_data'] !== false;
+				addHistogramLegendItem(
+					legendContainer,
+					'user_data',
+					'Your Added Point',
+					userPointColor,
+					userData.length,
+					isVisible
+				);
+			}
+		}
+
+		function addMainChartLegendItem(container, id, label, color, count, isVisible) {
+			const item = document.createElement('div');
+			item.className = `legend-item ${!isVisible ? 'disabled' : ''}`;
+			item.dataset.datasetId = id;
+			
+			item.innerHTML = `
+				<input type="checkbox" class="legend-checkbox" ${isVisible ? 'checked' : ''} data-dataset-id="${id}">
+				<div class="legend-color" style="background-color: ${color};"></div>
+				<div class="legend-label" title="${label}">${label}</div>
+				<div class="legend-count">${count}</div>
+			`;
+			
+			// Toggle on click (anywhere on the item)
+			item.addEventListener('click', (e) => {
+				// Don't toggle if clicking the checkbox (let checkbox handle it)
+				if (e.target.classList.contains('legend-checkbox')) return;
+				
+				const checkbox = item.querySelector('.legend-checkbox');
+				checkbox.checked = !checkbox.checked;
+				toggleMainChartDataset(id, checkbox.checked);
+				item.classList.toggle('disabled', !checkbox.checked);
+			});
+			
+			// Handle checkbox change
+			const checkbox = item.querySelector('.legend-checkbox');
+			checkbox.addEventListener('change', (e) => {
+				e.stopPropagation();
+				toggleMainChartDataset(id, checkbox.checked);
+				item.classList.toggle('disabled', !checkbox.checked);
+			});
+			
+			container.appendChild(item);
+		}
+
+		function addHistogramLegendItem(container, id, label, color, count, isVisible) {
+			const item = document.createElement('div');
+			item.className = `legend-item ${!isVisible ? 'disabled' : ''}`;
+			item.dataset.datasetId = id;
+			
+			item.innerHTML = `
+				<input type="checkbox" class="legend-checkbox" ${isVisible ? 'checked' : ''} data-dataset-id="${id}">
+				<div class="legend-color" style="background-color: ${color};"></div>
+				<div class="legend-label" title="${label}">${label}</div>
+				<div class="legend-count">${count}</div>
+			`;
+			
+			// Toggle on click (anywhere on the item)
+			item.addEventListener('click', (e) => {
+				// Don't toggle if clicking the checkbox (let checkbox handle it)
+				if (e.target.classList.contains('legend-checkbox')) return;
+				
+				const checkbox = item.querySelector('.legend-checkbox');
+				checkbox.checked = !checkbox.checked;
+				toggleHistogramDataset(id, checkbox.checked);
+				item.classList.toggle('disabled', !checkbox.checked);
+			});
+			
+			// Handle checkbox change
+			const checkbox = item.querySelector('.legend-checkbox');
+			checkbox.addEventListener('change', (e) => {
+				e.stopPropagation();
+				toggleHistogramDataset(id, checkbox.checked);
+				item.classList.toggle('disabled', !checkbox.checked);
+			});
+			
+			container.appendChild(item);
+		}
+
+		function toggleMainChartDataset(datasetId, isVisible) {
+			mainChartVisibility[datasetId] = isVisible;
+			updateMainChartVisibility();
+		}
+
+		function toggleHistogramDataset(datasetId, isVisible) {
+			histogramVisibility[datasetId] = isVisible;
+			updateHistogramVisibility();
+		}
+
+		function updateMainChartVisibility() {
+			if (!mainChart || !mainChart.data || !mainChart.data.datasets) return;
+			
+			mainChart.data.datasets.forEach(dataset => {
+				// Skip highlighted dataset
+				if (dataset.datasetId === 'highlighted_point') return;
+				
+				// Determine if this dataset should be visible
+				let shouldBeVisible = true;
+				
+				if (dataset.datasetId === 'user_data') {
+					shouldBeVisible = mainChartVisibility['user_data'] !== false;
+				} else if (dataset.data && dataset.data.length > 0) {
+					const firstPoint = dataset.data[0];
+					if (firstPoint && firstPoint.datasetId) {
+						shouldBeVisible = mainChartVisibility[firstPoint.datasetId] !== false;
+					}
+				}
+				
+				// Toggle visibility
+				dataset.hidden = !shouldBeVisible;
+			});
+			
+			mainChart.update();
+		}
+
+		function updateHistogramVisibility() {
+			if (!histogramChart || !histogramChart.data || !histogramChart.data.datasets) return;
+			
+			histogramChart.data.datasets.forEach(dataset => {
+				// Find corresponding NDJSON dataset
+				const datasetId = Object.keys(activeDatasets).find(id => 
+					activeDatasets[id].fileName === dataset.label
+				);
+				
+				if (datasetId) {
+					dataset.hidden = histogramVisibility[datasetId] === false;
+				} else if (dataset.label === 'Your Added Point') {
+					dataset.hidden = histogramVisibility['user_data'] === false;
+				}
+			});
+			
+			histogramChart.update();
+		}
+
+		// Global legend controls for main chart
+		function toggleMainChartDatasets() {
+			const allVisible = Object.values(mainChartVisibility).every(v => v !== false);
+			const newState = !allVisible;
+			
+			Object.keys(mainChartVisibility).forEach(id => {
+				mainChartVisibility[id] = newState;
+			});
+			
+			// Update checkboxes
+			document.querySelectorAll('#main-chart-legend-items .legend-checkbox').forEach(cb => {
+				cb.checked = newState;
+				const item = cb.closest('.legend-item');
+				if (item) item.classList.toggle('disabled', !newState);
+			});
+			
+			updateMainChartVisibility();
+		}
+
+		function showMainChartDatasets() {
+			Object.keys(mainChartVisibility).forEach(id => {
+				mainChartVisibility[id] = true;
+			});
+			
+			document.querySelectorAll('#main-chart-legend-items .legend-checkbox').forEach(cb => {
+				cb.checked = true;
+				const item = cb.closest('.legend-item');
+				if (item) item.classList.remove('disabled');
+			});
+			
+			updateMainChartVisibility();
+		}
+
+		function hideMainChartDatasets() {
+			Object.keys(mainChartVisibility).forEach(id => {
+				mainChartVisibility[id] = false;
+			});
+			
+			document.querySelectorAll('#main-chart-legend-items .legend-checkbox').forEach(cb => {
+				cb.checked = false;
+				const item = cb.closest('.legend-item');
+				if (item) item.classList.add('disabled');
+			});
+			
+			updateMainChartVisibility();
+		}
+
+		// Global legend controls for histogram
+		function toggleHistogramDatasets() {
+			const allVisible = Object.values(histogramVisibility).every(v => v !== false);
+			const newState = !allVisible;
+			
+			Object.keys(histogramVisibility).forEach(id => {
+				histogramVisibility[id] = newState;
+			});
+			
+			// Update checkboxes
+			document.querySelectorAll('#histogram-legend-items .legend-checkbox').forEach(cb => {
+				cb.checked = newState;
+				const item = cb.closest('.legend-item');
+				if (item) item.classList.toggle('disabled', !newState);
+			});
+			
+			updateHistogramVisibility();
+		}
+
+		function showHistogramDatasets() {
+			Object.keys(histogramVisibility).forEach(id => {
+				histogramVisibility[id] = true;
+			});
+			
+			document.querySelectorAll('#histogram-legend-items .legend-checkbox').forEach(cb => {
+				cb.checked = true;
+				const item = cb.closest('.legend-item');
+				if (item) item.classList.remove('disabled');
+			});
+			
+			updateHistogramVisibility();
+		}
+
+		function hideHistogramDatasets() {
+			Object.keys(histogramVisibility).forEach(id => {
+				histogramVisibility[id] = false;
+			});
+			
+			document.querySelectorAll('#histogram-legend-items .legend-checkbox').forEach(cb => {
+				cb.checked = false;
+				const item = cb.closest('.legend-item');
+				if (item) item.classList.add('disabled');
+			});
+			
+			updateHistogramVisibility();
+		}
         
         // Initialize charts
 		function initCharts() {
-			const toggleMainLegendBtn = document.getElementById('toggle-main-legend-btn');
-			const toggleHistogramLegendBtn = document.getElementById('toggle-histogram-legend-btn');
-
 			const mainCtx = document.getElementById('mainChart').getContext('2d');
 			const histogramCtx = document.getElementById('histogramChart').getContext('2d');
 			
@@ -4931,7 +5589,7 @@
 					},
 					plugins: {
 						legend: {
-							display: true,
+							display: false,
 							position: 'bottom',
 							align: 'center',
 							labels: {
@@ -5059,7 +5717,7 @@
 					},
 					plugins: {
 						legend: {
-							display: true,
+							display: false,
 							position: 'bottom'
 						},
 						tooltip: {
@@ -5127,38 +5785,6 @@
 					}
 				}
 			});
-
-			// Set up main chart legend toggle button
-			toggleMainLegendBtn.addEventListener('click', function() {
-				// Toggle main chart legend
-				const newState = !mainChart.options.plugins.legend.display;
-				mainChart.options.plugins.legend.display = newState;
-				
-				// Update button text
-				this.textContent = newState ? 'Hide Legend' : 'Show Legend';
-				
-				// Update main chart
-				mainChart.update();
-				
-				// Update theme colors
-				updateChartsForTheme();
-			});
-
-			// Set up histogram legend toggle button
-			toggleHistogramLegendBtn.addEventListener('click', function() {
-				// Toggle histogram chart legend
-				const newState = !histogramChart.options.plugins.legend.display;
-				histogramChart.options.plugins.legend.display = newState;
-				
-				// Update button text
-				this.textContent = newState ? 'Hide Legend' : 'Show Legend';
-				
-				// Update histogram chart - this will refresh the tooltips
-				histogramChart.update();
-				
-				// Update theme colors
-				updateChartsForTheme();
-			});
 			
 			// Set up chart type change listener
 			document.getElementById('x-axis').addEventListener('change', updateMainChart);
@@ -5171,6 +5797,8 @@
 			
 			// Set initial state
 			setDefaultAxes();
+
+			initSortableTable();
 		}
 
 		function switchToMapViewFromHistogram(dimension, label) {
@@ -6161,26 +6789,67 @@
 			updateChartData(xProp, yProp);
 			updateHistogram();
 		}
-        
-        // Populate data table
-        function populateDataTable() {
-            const tableBody = document.getElementById('table-body');
-            tableBody.innerHTML = '';
-            
-            allData.forEach(point => {
-                const row = document.createElement('tr');
-                row.style.borderBottom = '1px solid #eee';
-                row.style.cursor = 'pointer';
-                
-                row.onclick = function() {
-                    showPointInfo(point);
-                };
-                
-                // Highlight user-added data
-                if (userData.includes(point)) {
-                    row.style.backgroundColor = '#FFF5F5';
-                }
-                
+				
+		let currentSortColumn = 'date';
+		let currentSortDirection = 'asc';
+
+		function sortData(column, data) {
+			console.log('Sorting data by:', column, 'direction:', currentSortDirection);
+			
+			return [...data].sort((a, b) => {
+				let aVal = a[column];
+				let bVal = b[column];
+				
+				// Handle null/undefined values
+				if (aVal === null || aVal === undefined) aVal = '';
+				if (bVal === null || bVal === undefined) bVal = '';
+				
+				// Special handling for dates
+				if (column === 'date') {
+					aVal = new Date(aVal).getTime();
+					bVal = new Date(bVal).getTime();
+				}
+				
+				// Handle numeric values
+				if (typeof aVal === 'number' && typeof bVal === 'number') {
+					const result = currentSortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+					console.log(`Comparing ${aVal} vs ${bVal}: ${result}`);
+					return result;
+				}
+				
+				// Handle string values
+				const aStr = String(aVal).toLowerCase();
+				const bStr = String(bVal).toLowerCase();
+				
+				if (currentSortDirection === 'asc') {
+					return aStr.localeCompare(bStr);
+				} else {
+					return bStr.localeCompare(aStr);
+				}
+			});
+		}
+
+		function populateDataTable() {
+			const tableBody = document.getElementById('table-body');
+			tableBody.innerHTML = '';
+			
+			// Sort the data
+			const sortedData = sortData(currentSortColumn, allData);
+			
+			sortedData.forEach(point => {
+				const row = document.createElement('tr');
+				row.style.borderBottom = '1px solid #eee';
+				row.style.cursor = 'pointer';
+				
+				row.onclick = function() {
+					showPointInfo(point);
+				};
+				
+				// Highlight user-added data
+				if (userData.includes(point)) {
+					row.style.backgroundColor = '#FFF5F5';
+				}
+				
 				row.innerHTML = `
 					<td style="padding: 10px; text-align: center;">${point.datasetName || 'User Data'}</td>
 					<td style="padding: 10px; text-align: center;">${point.date}</td>
@@ -6190,10 +6859,75 @@
 					<td style="padding: 10px; text-align: center;">${point.slopeDeg ? point.slopeDeg.toFixed(1) : 'N/A'}</td>
 					<td style="padding: 10px; text-align: center;">${point.slopeAspectDeg ? point.slopeAspectDeg.toFixed(1) : 'N/A'}</td>
 				`;
-                
-                tableBody.appendChild(row);
-            });
-        }
+				
+				tableBody.appendChild(row);
+			});
+			
+			// Update header arrows to show current sort
+			updateSortArrows();
+		}
+
+		function updateSortArrows() {
+			const headers = document.querySelectorAll('#data-table th');
+			headers.forEach(header => {
+				const headerText = header.textContent.toLowerCase();
+				
+				// Map header text to column names
+				let column = '';
+				if (headerText.includes('dataset')) column = 'datasetName';
+				else if (headerText.includes('date')) column = 'date';
+				else if (headerText.includes('elevation')) column = 'elevationFt';
+				else if (headerText.includes('soil temp')) column = 'soilTemp';
+				else if (headerText.includes('soil moisture')) column = 'soilMoisture';
+				else if (headerText.includes('slope')) column = 'slopeDeg';
+				else if (headerText.includes('aspect')) column = 'slopeAspectDeg';
+				
+				// Remove existing arrows
+				header.innerHTML = header.innerHTML.replace(/ [↑↓]$/, '');
+				
+				// Add arrow if this is the current sort column
+				if (column === currentSortColumn) {
+					header.innerHTML += currentSortDirection === 'asc' ? ' ↑' : ' ↓';
+				}
+			});
+		}
+
+		function initSortableTable() {
+			const headers = document.querySelectorAll('#data-table th');
+			headers.forEach(header => {
+				header.style.cursor = 'pointer';
+				header.addEventListener('click', function() {
+					const headerText = this.textContent.toLowerCase();
+					
+					// Map header text to column names
+					let column = '';
+					if (headerText.includes('dataset')) column = 'datasetName';
+					else if (headerText.includes('date')) column = 'date';
+					else if (headerText.includes('elevation')) column = 'elevationFt';
+					else if (headerText.includes('soil temp')) column = 'soilTemp';
+					else if (headerText.includes('soil moisture')) column = 'soilMoisture';
+					else if (headerText.includes('slope')) column = 'slopeDeg';
+					else if (headerText.includes('aspect')) column = 'slopeAspectDeg';
+					
+					if (!column) return;
+					
+					console.log('Sorting by:', column, 'Current direction:', currentSortDirection);
+					
+					// Toggle sort direction if same column, otherwise set to ascending
+					if (currentSortColumn === column) {
+						currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+						console.log('Toggling direction to:', currentSortDirection);
+					} else {
+						currentSortColumn = column;
+						currentSortDirection = 'asc';
+						console.log('New column, setting to asc');
+					}
+					
+					// Repopulate table with sorted data
+					populateDataTable();
+				});
+			});
+		}
         
         // Show point information in the info panel
 		async function showPointInfo(point) {
@@ -6855,15 +7589,18 @@
 					month: observationDate.getMonth() + 1,
 					monthName: observationDate.toLocaleString('default', { month: 'short' }),
 					monthDay: dayOfMonth,
-					monthFraction: monthFraction, // Now correct: 12.xx for December, not 11.xx
+					monthFraction: monthFraction,
 					yearMonth: observationDate.getFullYear() + '-' + 
 								String(observationDate.getMonth() + 1).padStart(2, '0'),
 					latitude: latitude,
 					longitude: longitude,
+					// Add slope properties with default values
+					slopeDeg: null,  // User points don't have slope data
+					slopeAspectDeg: null,  // User points don't have aspect data
 					openMeteoApiUrl: apiUrl,
 					openMeteoDocsUrl: docsUrl,
 					depthAverages: depthAverages,
-					isForecastData: isForecastAPI // Add flag for reference
+					isForecastData: isForecastAPI
 				};
 				
 				// Clear previous user data and add new point
@@ -7213,16 +7950,67 @@
 					averageDays = parseInt(document.getElementById('average-days').value);
 					tempDepth = document.getElementById('temp-depth').value;
 					moistureDepth = document.getElementById('moisture-depth').value;
+					
+					// Update positional accuracy
+					positionalAccuracy = parseInt(document.getElementById('positional-accuracy').value) || 1000;
+					
+					// Update quality grade filters
+					qualityGrades = {
+						casual: document.getElementById('quality-casual').checked,
+						needs_id: document.getElementById('quality-needs-id').checked,
+						research: document.getElementById('quality-research').checked
+					};
+					
+					// Update file counts to reflect new filters
+					updateAllFileCounts();
+					
+					// Update the display
 					updateDataDisplay(false); // false = full reprocessing needed
 
-				// If there's a highlighted point, refresh its info with new settings
-				if (highlightedPoint) {
-					showPointInfo(highlightedPoint);
-				} else if (userPoint) {
-					showPointInfo(userPoint);
-					removeHighlights();
-				}
+					// If there's a highlighted point, refresh its info with new settings
+					if (highlightedPoint) {
+						showPointInfo(highlightedPoint);
+					} else if (userPoint) {
+						showPointInfo(userPoint);
+						removeHighlights();
+					}
 				});
+
+				// Add scrollable input for positional accuracy
+				const accuracyInput = document.getElementById('positional-accuracy');
+				if (accuracyInput) {
+					makeInputScrollable(accuracyInput, 0, 50000, 100);
+				}
+
+				// Add fullscreen chart button listeners
+				document.querySelectorAll('.fullscreen-chart-btn').forEach(btn => {
+					btn.addEventListener('click', function(e) {
+						e.stopPropagation();
+						const chartType = this.dataset.chart;
+						toggleChartFullscreen(chartType);
+					});
+				});
+
+				// Handle window resize for fullscreen charts
+				window.addEventListener('resize', function() {
+					const mainFullscreen = document.querySelector('.graph-container.fullscreen-chart #mainChart');
+					const histFullscreen = document.querySelector('.graph-container.fullscreen-chart #histogramChart');
+					
+					if (mainFullscreen && mainChart) {
+						mainChart.resize();
+					}
+					if (histFullscreen && histogramChart) {
+						histogramChart.resize();
+					}
+				});
+
+				// Main chart legend controls
+				document.getElementById('show-main-datasets').addEventListener('click', showMainChartDatasets);
+				document.getElementById('hide-main-datasets').addEventListener('click', hideMainChartDatasets);
+
+				// Histogram legend controls
+				document.getElementById('show-histogram-datasets').addEventListener('click', showHistogramDatasets);
+				document.getElementById('hide-histogram-datasets').addEventListener('click', hideHistogramDatasets);
 			
 				// Initialize with default settings
 				setTimeout(() => {
