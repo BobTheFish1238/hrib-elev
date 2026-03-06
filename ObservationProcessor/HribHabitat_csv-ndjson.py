@@ -1,8 +1,8 @@
 # Go to 'https://www.inaturalist.org/observations/export'
 # Search the state and taxon
 # Set 'Geoprivacy' and 'Taxon Geoprivacy' to open
-# Disable all columns except url, created_at, observed_on, latitude, longitude, positional_accuracy, place_state_name, scientific_name, common_name, taxon_id
-# Eg. quality_grade=any&identifications=any&geoprivacy=open&taxon_geoprivacy=open&place_id=46&taxon_id=129328 Columns observed_on, created_at, url, latitude, longitude, positional_accuracy, place_state_name, scientific_name, common_name, taxon_id  
+# Disable all columns except url, created_at, observed_on, quality_grade, latitude, longitude, positional_accuracy, place_state_name, scientific_name, common_name, taxon_id
+# Eg. quality_grade=any&identifications=any&geoprivacy=open&taxon_geoprivacy=open&place_id=46&taxon_id=129328 Columns observed_on, created_at, url, quality_grade, latitude, longitude, positional_accuracy, place_state_name, scientific_name, common_name, taxon_id  
 # Export and extract the zip
 # Paste the extracted folder (eg. observations-665684) into the \Hrib-Habitat\ObservationProcessor\Observations\
 # Run this python script with 'python "C:\Users\bobth\Documents\Hrib-Habitat\ObservationProcessor\HribHabitat_csv-ndjson.py"' (make sure path uses your username)
@@ -349,11 +349,14 @@ for folder in os.listdir(ROOT_OBSERVATIONS):
                     aws_ft = round(grid[1][1] * METERS_TO_FEET)
                     slope, aspect = calculate_slope_aspect(grid)
 
+                    quality_grade = row.get("quality_grade", "").strip() or "NA"
+
                     positional_accuracy = row.get("positional_accuracy", "").strip()
                     positional_accuracy = int(positional_accuracy) if positional_accuracy.isdigit() else 0
 
                     record = {
                         "observation_url": observation_url,
+                        "quality_grade": quality_grade,
                         "date_used": date_str,
                         "coordinates": f"{lat}, {lon}",
                         "elevation_ft": elevation_ft,
