@@ -20,6 +20,11 @@
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+
+		html {
+		  -webkit-text-size-adjust: none;
+		  text-size-adjust: none;
+		}
         
         body {
             background-color: #f5f5f5;
@@ -72,16 +77,16 @@
         
         .content-container {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
             gap: 25px;
             margin-bottom: 30px;
         }
         
-        @media (max-width: 1200px) {
-            .content-container {
-                grid-template-columns: 1fr;
-            }
-        }
+		@media (max-width: 1200px) {
+			.graph-container {
+				min-width: 100%;
+			}
+		}
         
         .graph-container {
             background-color: #fff;
@@ -91,7 +96,6 @@
             transition: transform 0.3s ease;
             width: 100%;
             max-width: 100%;
-			min-height: 500px;
         }
 
         .graph-container:has(#data-table) {
@@ -1295,6 +1299,8 @@
 			background-color: var(--card-bg);
 			border-radius: 8px;
 			transition: all 0.3s ease;
+			max-height: 200px;
+			overflow-y: auto;
 		}
 
 		.legend-item {
@@ -1384,15 +1390,16 @@
 			background-color: var(--card-bg);
 		}
 
-		.graph-container.fullscreen-chart .chart-wrapper {
-			height: calc(100vh - 150px);
-			margin-bottom: 20px;
+		.chart-wrapper {
+			height: 500px;
 		}
 
-		.graph-container.fullscreen-chart #mainChart,
-		.graph-container.fullscreen-chart #histogramChart {
-			height: 100% !important;
-			width: 100% !important;
+		.graph-container.fullscreen-chart .chart-wrapper {
+			width: 100%;
+			max-width: 1200px;
+			margin: auto;
+			aspect-ratio: 16 / 9;
+			max-height: calc(100vh - 150px);
 		}
 
 		.graph-container.fullscreen-chart .fullscreen-chart-btn i {
@@ -1416,8 +1423,7 @@
 
 		/* Ensure chart controls are accessible in fullscreen */
 		.graph-container.fullscreen-chart .chart-controls,
-		.graph-container.fullscreen-chart .histogram-controls,
-		.graph-container.fullscreen-chart .legend-container {
+		.graph-container.fullscreen-chart .histogram-controls, {
 			max-width: 1200px;
 			margin-left: auto;
 			margin-right: auto;
@@ -1546,7 +1552,7 @@
 						<button id="clear-user-points" title="Clear user points" style="max-height: 30px; align-items: center;">🗑️</button>
 					</div>
 				</div>
-                <p style="font-size: 18px;">Enter coordinates manually or click on the map to select a location. The system will retrieve the soil and elevation data from the Open-Meteo Weather API.</p>
+                <p style="font-size: 0.9rem; margin-bottom: 5px;">Enter coordinates manually or click on the map to select a location. The system will retrieve the soil and elevation data from the Open-Meteo Weather API.</p>
                 
                 <div class="input-group">
                     <div class="input-field" style="flex: 1 1 200px;">
@@ -1578,7 +1584,7 @@
 			<div class="content-container">
 				<!-- Main Chart Container -->
 				<div class="graph-container">
-					<div class="chart-header">
+					<div class="chart-header" style="margin-bottom: 5px">
 						<div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
 							<h3 class="graph-title" style="margin: 0;">Data Visualization</h3>
 							<button class="fullscreen-chart-btn" data-chart="main" title="Fullscreen chart" style="background: none; border: none; color: #8B4513; font-size: 1.2rem; cursor: pointer; padding: 5px;">
@@ -1617,8 +1623,8 @@
 					</div>
 					<!-- Main Chart Legend Inside Container -->
 					<div class="legend-container" style="margin-top: 15px; padding: 10px; border-top: 1px solid var(--border-color);">
-						<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-							<h4 style="color: var(--header-color); margin: 0; font-size: 14px;">Dataset Visibility</h4>
+						<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 5px;">
+							<h4 style="color: var(--header-color); margin: 0; font-size: 14px;">Legend</h4>
 							<div style="display: flex; gap: 5px;">
 								<button class="control-btn legend-control" id="show-main-datasets" style="padding: 3px 8px; font-size: 11px;">Show All</button>
 								<button class="control-btn legend-control" id="hide-main-datasets" style="padding: 3px 8px; font-size: 11px;">Hide All</button>
@@ -1632,7 +1638,7 @@
 				
 				<!-- Histogram Container -->
 				<div class="graph-container">
-					<div class="chart-header">
+					<div class="chart-header" style="margin-bottom: 5px">
 						<div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
 							<h3 class="graph-title" style="margin: 0;">Distribution Histogram</h3>
 							<button class="fullscreen-chart-btn" data-chart="histogram" title="Fullscreen chart" style="background: none; border: none; color: #8B4513; font-size: 1.2rem; cursor: pointer; padding: 5px;">
@@ -1660,8 +1666,8 @@
 					</div>
 					<!-- Histogram Legend Inside Container -->
 					<div class="legend-container" style="margin-top: 15px; padding: 10px; border-top: 1px solid var(--border-color);">
-						<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-							<h4 style="color: var(--header-color); margin: 0; font-size: 14px;">Dataset Visibility</h4>
+						<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 5px;">
+							<h4 style="color: var(--header-color); margin: 0; font-size: 14px;">Legend</h4>
 							<div style="display: flex; gap: 5px;">
 								<button class="control-btn legend-control" id="show-histogram-datasets" style="padding: 3px 8px; font-size: 11px;">Show All</button>
 								<button class="control-btn legend-control" id="hide-histogram-datasets" style="padding: 3px 8px; font-size: 11px;">Hide All</button>
@@ -1711,7 +1717,7 @@
         </div>
     </div>
     
-    <footer>
+    <footer style="font-size: 0.8rem;">
 		<p>Github: <a href="https://github.com/BobTheFish1238/hrib-elev" target="_blank" class="link">hrib-elev</a> </p>
         <p>(Observations data is updated periodically)</p>
         <p>Data Sources: iNaturalist observations & Open-Meteo Weather API</p>
@@ -2198,12 +2204,17 @@
 			} else {
 				// Exit fullscreen
 				chartContainer.classList.remove('fullscreen-chart');
-				
-				// Change icon back to expand
+
+				// reset canvas height
+				const canvas = chartContainer.querySelector('canvas');
+				if (canvas) {
+					canvas.style.height = '';
+				}
+
+				// Change icon back
 				const btn = chartContainer.querySelector('.fullscreen-chart-btn i');
 				btn.className = 'fas fa-expand';
-				
-				// Update charts
+
 				setTimeout(() => {
 					if (chartType === 'main' && mainChart) {
 						mainChart.resize();
@@ -6842,7 +6853,17 @@
 				row.style.cursor = 'pointer';
 				
 				row.onclick = function() {
-					showPointInfo(point);
+					// Check if this is a user point
+					if (point.datasetId === 'user_data') {
+						// For user points, just show info without highlighting
+						removeHighlights(); // Clear any existing highlights
+						highlightedPoint = null; // Don't store as highlighted point
+						showPointInfo(point);
+					} else {
+						// For NDJSON points, highlight as normal
+						highlightPoint(point);
+						showPointInfo(point);
+					}
 				};
 				
 				// Highlight user-added data
