@@ -26,8 +26,8 @@ from tqdm import tqdm
 # ROOT PATHS
 # =====================================================
 
-ROOT_OBSERVATIONS = r"C:\Users\bobth\Documents\Hrib-Habitat\ObservationProcessorV2\Observations"
-NDJSON2_ROOT = r"C:\Users\bobth\Documents\Hrib-Habitat\ndjson2\Morels"
+ROOT_OBSERVATIONS = r"C:\Users\bobth\Documents\Hrib-Habitat\ObservationProcessor\Observations"
+NDJSON_ROOT = r"C:\Users\bobth\Documents\Hrib-Habitat\ndjson\Chanterelles"
 
 TIMEZONE = "America/Los_Angeles"
 API_DELAY = 0.1
@@ -59,14 +59,13 @@ SOIL_VARS = [
 
 def get_folder_name_from_scientific_name(scientific_name, common_name):
     """
-    Determine the folder name based on scientific name and common name.
-    This follows the pattern: "Common Name (Scientific Name)" or just "Scientific Name" if no common name
+    Determine folder name:
+    Common Name (Scientific Name)
+    or just Scientific Name if common name missing
     """
-    if common_name and common_name != "true morels" and common_name != "true morels" and common_name.strip():
+    if common_name and common_name.strip():
         return f"{common_name} ({scientific_name})"
-    else:
-        # Just use the scientific name without adding "(Genus)"
-        return scientific_name
+    return scientific_name
 
 def extract_ids_from_readme(readme_path):
     """Extract place_id and taxon_id from README.txt"""
@@ -83,24 +82,22 @@ def extract_ids_from_readme(readme_path):
 
 def get_species_folder_name_from_row(row):
     """
-    Get the species folder name from the CSV row data
+    Determine species/genus folder name from CSV row
     """
     scientific_name = row.get("scientific_name", "").strip()
     common_name = row.get("common_name", "").strip()
-    
-    # Handle empty or missing values
-    if not scientific_name or scientific_name == "Morchella":
-        # For genus-level observations, just use "Morchella"
-        return "Morchella"
-    
+
+    if not scientific_name:
+        return "Unknown"
+
     return get_folder_name_from_scientific_name(scientific_name, common_name)
 
-def find_existing_observations(ndjson2_root, place_state_name, species_folder, filename):
+def find_existing_observations(NDJSON_ROOT, place_state_name, species_folder, filename):
     """
     Check if an observation file already exists and return existing URLs
     """
     state_folder = place_state_name if place_state_name else "Unknown"
-    species_path = os.path.join(ndjson2_root, species_folder)
+    species_path = os.path.join(NDJSON_ROOT, species_folder)
     ndjson_path = os.path.join(species_path, filename)
     
     existing_urls = set()
@@ -132,7 +129,7 @@ def make_request_with_retry(url, max_retries=3, delay=2):
                 requests.exceptions.ConnectionError) as e:
             if attempt == max_retries - 1:  # Last attempt
                 raise e
-            print(f"    ⚠️ Request failed, retrying in {delay} seconds... (Attempt {attempt + 1}/{max_retries})")
+            print(f" Request failed, retrying in {delay} seconds... (Attempt {attempt + 1}/{max_retries})")
             time.sleep(delay)
     return None
 
@@ -236,13 +233,13 @@ for folder in os.listdir(ROOT_OBSERVATIONS):
     if not folder.startswith("observations-"):
         continue
 
-    print(f"\n📁 Processing {folder}")
+    print(f"\n Processing {folder}")
 
     readme = os.path.join(folder_path, "README.txt")
     csv_path = os.path.join(folder_path, folder)
 
     if not os.path.exists(readme) or not os.path.exists(csv_path):
-        print("⚠️ Missing README or CSV, skipping.")
+        print(" Missing README or CSV, skipping.")
         continue
 
     # Get place_id and taxon_id from README (for reference only now)
@@ -264,13 +261,9 @@ for folder in os.listdir(ROOT_OBSERVATIONS):
         scientific_name = row.get("scientific_name", "").strip()
         
         # Handle genus-level or missing scientific names
-        if scientific_name == "Morchella" or not scientific_name:
-            scientific_part = "Morchella"
-            common_part = "Genus"
-            filename = f"{place_state_name}_Morchella.ndjson"
+        if not scientific_name:
+            filename = f"{place_state_name}_Unknown.ndjson"
         else:
-            # Extract the species part for filename
-            species_part = scientific_name.split()[-1] if len(scientific_name.split()) > 1 else scientific_name
             filename = f"{place_state_name}_{scientific_name.replace(' ', '_')}.ndjson"
         
         # Create group key
@@ -293,10 +286,10 @@ for folder in os.listdir(ROOT_OBSERVATIONS):
         species_folder = group_info["species_folder"]
         filename = group_info["filename"]
         
-        print(f"\n  📍 Processing {place_state_name} - {species_folder}")
+        print(f"\n Processing {place_state_name} - {species_folder}")
         
         # Create target directory path
-        target_dir = os.path.join(NDJSON2_ROOT, species_folder)
+        target_dir = os.path.join(NDJSON_ROOT, species_folder)
         ensure_directory_exists(target_dir)
         
         # Check for existing observations
@@ -313,7 +306,7 @@ for folder in os.listdir(ROOT_OBSERVATIONS):
                     except:
                         continue
             
-            print(f"    📊 Found {len(existing_urls)} existing observations")
+            print(f" Found {len(existing_urls)} existing observations")
             
             # Open file in append mode
             fout = open(ndjson_path, "a", encoding="utf-8")
@@ -387,15 +380,15 @@ for folder in os.listdir(ROOT_OBSERVATIONS):
                     new_observations_count += 1
 
                 except Exception as e:
-                    tqdm.write(f"    ⚠️ Failed row: {e}")
+                    tqdm.write(f" Failed row: {e}")
 
                 time.sleep(API_DELAY)
                 pbar.update(1)
         
         fout.close()
         
-        print(f"    ✅ Added {new_observations_count} new observations, skipped {skipped_count} existing")
-        print(f"    📁 Saved to: {ndjson_path}")
+        print(f" Added {new_observations_count} new observations, skipped {skipped_count} existing")
+        print(f" Saved to: {ndjson_path}")
     
     # After processing all groups, move the original folder to a backup location
     backup_folder = r"C:\Users\bobth\Documents\Hrib-Habitat\ObservationProcessor\Processed"
@@ -404,6 +397,6 @@ for folder in os.listdir(ROOT_OBSERVATIONS):
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     backup_name = f"{folder}_processed_{timestamp}"
     shutil.move(folder_path, os.path.join(backup_folder, backup_name))
-    print(f"📦 Moved original folder to: {backup_folder}\\{backup_name}")
+    print(f" Moved original folder to: {backup_folder}\\{backup_name}")
 
-print("\n🎉 ALL OBSERVATIONS PROCESSED")
+print("\n ALL OBSERVATIONS PROCESSED")
