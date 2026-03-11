@@ -441,11 +441,6 @@
 			opacity: 0.6;
 		}
 
-		/* For scrollable number inputs specifically */
-		input[type="number"]:disabled {
-			-moz-appearance: textfield;
-		}
-
 		input[type="number"]:disabled::-webkit-inner-spin-button,
 		input[type="number"]:disabled::-webkit-outer-spin-button {
 			-webkit-appearance: none;
@@ -1423,7 +1418,7 @@
 
 		/* Ensure chart controls are accessible in fullscreen */
 		.graph-container.fullscreen-chart .chart-controls,
-		.graph-container.fullscreen-chart .histogram-controls, {
+		.graph-container.fullscreen-chart .histogram-controls {
 			max-width: 1200px;
 			margin-left: auto;
 			margin-right: auto;
@@ -2527,7 +2522,7 @@
         
         // NDJSON directory structure
 		const ndjsonStructure = {
-			"Boletus": {
+			"Boletes": {
 				"King Bolete (Boletus edulis)": [
 					{name: "Washington_Boletus_edulis.ndjson", modified: "2026-01-02"},
 					{name: "Oregon_Boletus_edulis.ndjson",  modified: "2026-01-02"},
@@ -2644,6 +2639,48 @@
 							{name: "California_Morchella_angusticeps.ndjson", modified: "2026-02-23"},
 							{name: "Oregon_Morchella_angusticeps.ndjson", modified: "2026-02-23"},
 							{name: "Washington_Morchella_angusticeps.ndjson", modified: "2026-02-23"}
+					],
+			},
+			"Chanterelles": {
+					"California Golden Chanterelle (Cantharellus californicus)": [
+							{name: "California_Cantharellus_californicus.ndjson", modified: "2026-03-10"}
+					],
+					"Cantharellus cascadensis": [
+							{name: "California_Cantharellus_cascadensis.ndjson", modified: "2026-03-10"},
+							{name: "Oregon_Cantharellus_cascadensis.ndjson", modified: "2026-03-10"},
+							{name: "Washington_Cantharellus_cascadensis.ndjson", modified: "2026-03-10"}
+					],
+					"Golden Chanterelle (Cantharellus cibarius)": [
+							{name: "California_Cantharellus_cibarius.ndjson", modified: "2026-03-10"},
+							{name: "Oregon_Cantharellus_cibarius.ndjson", modified: "2026-03-10"},
+							{name: "Washington_Cantharellus_cibarius.ndjson", modified: "2026-03-10"}
+					],
+					"Pacific Golden Chanterelle (Cantharellus formosus)": [
+							{name: "California_Cantharellus_formosus.ndjson", modified: "2026-03-10"},
+							{name: "Oregon_Cantharellus_formosus.ndjson", modified: "2026-03-10"},
+							{name: "Washington_Cantharellus_formosus.ndjson", modified: "2026-03-10"}
+					],
+					"Rainbow Chanterelle (Cantharellus roseocanus)": [
+							{name: "California_Cantharellus_roseocanus.ndjson", modified: "2026-03-10"},
+							{name: "Oregon_Cantharellus_roseocanus.ndjson", modified: "2026-03-10"},
+							{name: "Washington_Cantharellus_roseocanus.ndjson", modified: "2026-03-10"}
+					],
+					"Red Chanterelle (Cantharellus cinnabarinus)": [
+							{name: "California_Cantharellus_cinnabarinus.ndjson", modified: "2026-03-10"}
+					],
+					"Smooth Chanterelle (Cantharellus lateritius)": [
+							{name: "California_Cantharellus_lateritius.ndjson", modified: "2026-03-10"},
+							{name: "Washington_Cantharellus_lateritius.ndjson", modified: "2026-03-10"}
+					],
+					"White Chanterelle (Cantharellus subalbidus)": [
+							{name: "California_Cantharellus_subalbidus.ndjson", modified: "2026-03-10"},
+							{name: "Oregon_Cantharellus_subalbidus.ndjson", modified: "2026-03-10"},
+							{name: "Washington_Cantharellus_subalbidus.ndjson", modified: "2026-03-10"}
+					],
+					"chanterelles (Cantharellus)": [
+							{name: "California_Cantharellus.ndjson", modified: "2026-03-10"},
+							{name: "Oregon_Cantharellus.ndjson", modified: "2026-03-10"},
+							{name: "Washington_Cantharellus.ndjson", modified: "2026-03-10"}
 					],
 			}
 		};
@@ -6805,7 +6842,7 @@
 		let currentSortDirection = 'asc';
 
 		function sortData(column, data) {
-			console.log('Sorting data by:', column, 'direction:', currentSortDirection);
+			//console.log('Sorting data by:', column, 'direction:', currentSortDirection);
 			
 			return [...data].sort((a, b) => {
 				let aVal = a[column];
@@ -6824,7 +6861,7 @@
 				// Handle numeric values
 				if (typeof aVal === 'number' && typeof bVal === 'number') {
 					const result = currentSortDirection === 'asc' ? aVal - bVal : bVal - aVal;
-					console.log(`Comparing ${aVal} vs ${bVal}: ${result}`);
+					//console.log(`Comparing ${aVal} vs ${bVal}: ${result}`);
 					return result;
 				}
 				
@@ -6932,16 +6969,16 @@
 					
 					if (!column) return;
 					
-					console.log('Sorting by:', column, 'Current direction:', currentSortDirection);
+					//console.log('Sorting by:', column, 'Current direction:', currentSortDirection);
 					
 					// Toggle sort direction if same column, otherwise set to ascending
 					if (currentSortColumn === column) {
 						currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
-						console.log('Toggling direction to:', currentSortDirection);
+						//console.log('Toggling direction to:', currentSortDirection);
 					} else {
 						currentSortColumn = column;
 						currentSortDirection = 'asc';
-						console.log('New column, setting to asc');
+						//console.log('New column, setting to asc');
 					}
 					
 					// Repopulate table with sorted data
