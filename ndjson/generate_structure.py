@@ -1,9 +1,9 @@
 import os
 
-base_path = r"C:\Users\bobth\Documents\Hrib-Habitat\ndjson\Hedgehog Mushrooms"
-modified_date = "2026-03-13"
+base_path = r"C:\Users\bobth\Documents\Hrib-Habitat\ndjson\Lobster Mushrooms"
+modified_date = "2026-03-15"
 
-print('\t\t\t"Hedgehog Mushrooms": {')
+print('\t\t\t"Lobster Mushrooms": {')
 
 for folder in sorted(os.listdir(base_path)):
     folder_path = os.path.join(base_path, folder)
