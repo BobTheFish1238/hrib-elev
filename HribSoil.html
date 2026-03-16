@@ -1,0 +1,826 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>Open-Meteo Mapbox Layer - Soil Data Explorer</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.17.0/dist/maplibre-gl.css" />
+		<script src="https://unpkg.com/maplibre-gl@5.17.0/dist/maplibre-gl.js"></script>
+		<script src="https://unpkg.com/@openmeteo/mapbox-layer@0.0.15/dist/index.js"></script>
+		<script>
+			if (location.hostname === 'localhost' || location.href.startsWith('file://')) {
+				document.write('<script src="../../../dist/index.js"><\/script>');
+			}
+		</script>
+		<style>
+			html, body, #map { margin: 0; padding: 0; height: 100%; }
+
+			#controls {
+				position: absolute;
+				top: 12px;
+				left: 12px;
+				z-index: 10;
+				background: rgba(255,255,255,0.96);
+				border-radius: 10px;
+				padding: 14px 18px;
+				box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+				font-family: sans-serif;
+				font-size: 14px;
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+				min-width: 240px;
+				max-height: calc(100vh - 40px);
+				overflow-y: auto;
+			}
+
+			#controls h3 {
+				margin: 0 0 2px 0;
+				font-size: 13px;
+				font-weight: 700;
+				color: #333;
+				letter-spacing: 0.03em;
+				text-transform: uppercase;
+			}
+
+			.section-label {
+				font-size: 11px;
+				font-weight: 700;
+				color: #888;
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+				margin-bottom: -4px;
+			}
+
+			.toggle-group {
+				display: flex;
+				border-radius: 7px;
+				overflow: hidden;
+				border: 1px solid #ccc;
+				width: fit-content;
+			}
+
+			.toggle-group button {
+				padding: 5px 13px;
+				border: none;
+				background: #f0f0f0;
+				cursor: pointer;
+				font-size: 13px;
+				font-weight: 600;
+				color: #555;
+				transition: background 0.15s, color 0.15s;
+				white-space: nowrap;
+			}
+
+			.toggle-group button.active { background: #2563eb; color: #fff; }
+			.toggle-group button:not(:last-child) { border-right: 1px solid #ccc; }
+
+			.depth-group { display: flex; flex-direction: column; gap: 4px; }
+
+			.depth-group button {
+				padding: 5px 10px;
+				border: 1px solid #ccc;
+				border-radius: 6px;
+				background: #f0f0f0;
+				cursor: pointer;
+				font-size: 12px;
+				font-weight: 600;
+				color: #555;
+				text-align: left;
+				transition: background 0.15s, color 0.15s;
+			}
+
+			.depth-group button.active {
+				background: #2563eb;
+				color: #fff;
+				border-color: #2563eb;
+			}
+
+			.control-row {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+
+			.control-row label { color: #555; min-width: 36px; }
+
+			.control-row input[type="number"] {
+				width: 72px;
+				padding: 4px 6px;
+				border: 1px solid #ccc;
+				border-radius: 6px;
+				font-size: 14px;
+				cursor: ns-resize;
+			}
+
+			.control-row input[type="number"]:focus {
+				outline: 2px solid #2563eb44;
+				border-color: #2563eb;
+			}
+
+			.checkbox-label {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				color: #555;
+				cursor: pointer;
+				user-select: none;
+			}
+
+			#apply-btn {
+				width: 100%;
+				padding: 7px 0;
+				border: none;
+				border-radius: 7px;
+				font-size: 13px;
+				font-weight: 600;
+				cursor: pointer;
+				background: #2563eb;
+				color: #fff;
+				transition: background 0.15s;
+			}
+
+			#apply-btn:hover { background: #1d4ed8; }
+
+			.divider { border: none; border-top: 1px solid #e5e5e5; margin: 0; }
+
+			/* Color editor */
+			.color-editor-header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				cursor: pointer;
+				user-select: none;
+			}
+
+			.color-editor-header span {
+				font-size: 11px;
+				font-weight: 700;
+				color: #888;
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+			}
+
+			.color-editor-header .chevron {
+				font-size: 10px;
+				color: #aaa;
+				transition: transform 0.2s;
+			}
+
+			.color-editor-header.open .chevron { transform: rotate(180deg); }
+
+			.color-rows {
+				display: none;
+				flex-direction: column;
+				gap: 4px;
+				margin-top: 4px;
+			}
+
+			.color-rows.open { display: flex; }
+
+			.color-row {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				font-size: 12px;
+				color: #444;
+			}
+
+			.color-row input[type="color"] {
+				width: 32px;
+				height: 22px;
+				padding: 1px 2px;
+				border: 1px solid #ccc;
+				border-radius: 4px;
+				cursor: pointer;
+				background: none;
+			}
+
+			.color-row .bp-label {
+				min-width: 52px;
+				font-size: 11px;
+				color: #666;
+			}
+
+			.color-row input[type="range"] {
+				flex: 1;
+				accent-color: #2563eb;
+				max-width:100px;
+			}
+
+			.opacity-val {
+				font-size: 11px;
+				color: #888;
+				min-width: 28px;
+				text-align: right;
+			}
+
+			.reset-colors-btn {
+				font-size: 11px;
+				padding: 3px 8px;
+				border: 1px solid #ccc;
+				border-radius: 5px;
+				background: #f5f5f5;
+				cursor: pointer;
+				color: #555;
+				align-self: flex-end;
+				margin-top: 2px;
+			}
+
+			.reset-colors-btn:hover { background: #e8e8e8; }
+		</style>
+	</head>
+	<body>
+		<div id="map"></div>
+
+		<div id="controls">
+			<h3 style="display:flex; align-items:center; justify-content:space-between; margin:0">
+				Soil Data Explorer
+				<button id="minimize-btn" onclick="toggleMinimize()"
+					style="background:none; border:none; cursor:pointer; font-size:16px; color:#888; padding:0; line-height:1">
+					⌃
+				</button>
+			</h3>
+
+			<div class="section-label">Mushroom Presets</div>
+			<select id="mushroom-preset" onchange="applyPreset(this.value)"
+				style="width:100%; padding:5px 6px; border:1px solid #ccc; border-radius:6px;
+					   font-size:13px; color:#444; background:#fafafa; cursor:pointer">
+				<option value="">— Select a preset —</option>
+				<option value="king_bolete">King Bolete</option>
+				<option value="spring_king_bolete">Spring King Bolete</option>
+				<option value="morels">Morels</option>
+				<option value="chanterelle">Chanterelle</option>
+				<option value="yellowfoot">Yellowfoot</option>
+				<option value="hedgehog">Hedgehog Mushroom</option>
+				<option value="lobster">Lobster Mushroom</option>
+			</select>
+			<hr class="divider" />
+
+			<!-- Layer toggles -->
+			<div class="section-label">Active Layers</div>
+			<div style="display:flex; flex-direction:column; gap:6px;">
+				<div style="display:flex; align-items:center; gap:6px;">
+					<label class="checkbox-label" style="min-width:130px; white-space: nowrap; flex-shrink:0;">
+						<input type="checkbox" id="layer-temp-check" checked onchange="onLayerCheckChange()" />
+						🌡 Soil Temperature
+					</label>
+					<input type="range" id="temp-master-opacity" min="0" max="1" step="0.05" value="0.75"
+						style="max-width:100px; accent-color:#2563eb"
+						oninput="setMasterOpacity('temp', this.value)" />
+					<span id="temp-opacity-val" style="font-size:11px; color:#888; min-width:28px; text-align:right">75%</span>
+				</div>
+				<div style="display:flex; align-items:center; gap:6px;">
+					<label class="checkbox-label" style="min-width:130px flex-shrink:0;">
+						<input type="checkbox" id="layer-moist-check" onchange="onLayerCheckChange()" />
+						💧 Soil Moisture
+					</label>
+					<input type="range" id="moist-master-opacity" min="0" max="1" step="0.05" value="0.75"
+						style="max-width:100px; accent-color:#2563eb"
+						oninput="setMasterOpacity('moist', this.value)" />
+					<span id="moist-opacity-val" style="font-size:11px; color:#888; min-width:28px; text-align:right">75%</span>
+				</div>
+			</div>
+
+			<hr class="divider" />
+
+			<!-- TEMPERATURE SECTION -->
+			<div id="temp-section">
+				<div class="section-label" style="margin-bottom:6px">🌡 Temperature</div>
+
+				<div class="section-label" style="font-size:10px; margin-bottom:2px">Depth</div>
+				<div class="depth-group" id="depth-group-temp">
+					<button class="active" data-depth="0_to_10cm"    onclick="setDepth('temp',this)">0 – 10 cm</button>
+					<button data-depth="10_to_40cm"   onclick="setDepth('temp',this)">10 – 40 cm</button>
+					<button data-depth="40_to_100cm"  onclick="setDepth('temp',this)">40 – 100 cm</button>
+					<button data-depth="100_to_200cm" onclick="setDepth('temp',this)">100 – 200 cm</button>
+				</div>
+
+				<div style="margin-top:8px">
+					<div class="section-label" style="font-size:10px; margin-bottom:4px">Range</div>
+					<div class="toggle-group" style="margin-bottom:8px">
+						<button id="btn-f" class="active" onclick="setUnit('F')">°F</button>
+						<button id="btn-c" onclick="setUnit('C')">°C</button>
+					</div>
+					<div class="control-row">
+						<label>Min</label>
+						<input type="number" id="input-min" value="41" step="1" />
+						<span id="unit-label-min">°F</span>
+					</div>
+					<div class="control-row" style="margin-top:6px">
+						<label>Max</label>
+						<input type="number" id="input-max" value="50" step="1" />
+						<span id="unit-label-max">°F</span>
+					</div>
+				</div>
+
+				<div class="control-row" style="margin-top:8px">
+					<label class="checkbox-label">
+						<input type="checkbox" id="contour-check-temp" checked onchange="syncContourCheck('temp')" />
+						Show contours
+					</label>
+				</div>
+
+				<!-- Temperature color editor -->
+				<div style="margin-top:8px">
+					<div class="color-editor-header" id="temp-color-header" onclick="toggleColorEditor('temp')">
+						<span>Colors</span>
+						<span class="chevron">▼</span>
+					</div>
+					<div class="color-rows" id="temp-color-rows"></div>
+				</div>
+			</div>
+
+			<hr class="divider" id="divider-moist" style="display:none" />
+
+			<!-- MOISTURE SECTION -->
+			<div id="moist-section" style="display:none">
+				<div class="section-label" style="margin-bottom:6px">💧 Moisture</div>
+
+				<div class="section-label" style="font-size:10px; margin-bottom:2px">Depth</div>
+				<div class="depth-group" id="depth-group-moist">
+					<button class="active" data-depth="0_to_10cm"    onclick="setDepth('moist',this)">0 – 10 cm</button>
+					<button data-depth="10_to_40cm"   onclick="setDepth('moist',this)">10 – 40 cm</button>
+					<button data-depth="40_to_100cm"  onclick="setDepth('moist',this)">40 – 100 cm</button>
+					<button data-depth="100_to_200cm" onclick="setDepth('moist',this)">100 – 200 cm</button>
+				</div>
+
+				<div style="margin-top:8px">
+					<div class="section-label" style="font-size:10px; margin-bottom:4px">Range (m³/m³)</div>
+					<div class="control-row">
+						<label>Min</label>
+						<input type="number" id="input-moist-min" value="0.2" step="0.01" min="0" max="0.8" />
+						<span>m³/m³</span>
+					</div>
+					<div class="control-row" style="margin-top:6px">
+						<label>Max</label>
+						<input type="number" id="input-moist-max" value="0.4" step="0.01" min="0" max="0.8" />
+						<span>m³/m³</span>
+					</div>
+				</div>
+
+				<div class="control-row" style="margin-top:8px">
+					<label class="checkbox-label">
+						<input type="checkbox" id="contour-check-moist" onchange="syncContourCheck('moist')" />
+						Show contours
+					</label>
+				</div>
+
+				<!-- Moisture color editor -->
+				<div style="margin-top:8px">
+					<div class="color-editor-header" id="moist-color-header" onclick="toggleColorEditor('moist')">
+						<span>Colors</span>
+						<span class="chevron">▼</span>
+					</div>
+					<div class="color-rows" id="moist-color-rows"></div>
+				</div>
+			</div>
+
+			<hr class="divider" />
+			<button id="apply-btn" onclick="applySettings()">Apply</button>
+		</div>
+
+		<script>
+			// ─── Default color definitions ────────────────────────────────────────────
+			const DEFAULT_TEMP_BREAKPOINTS  = [-30,-20,-10,-5,0,5,10,15,20,25,30,35,40,45,50];
+			const DEFAULT_TEMP_COLORS = [
+				[100,50,200],[75,0,130],[0,0,255],[0,100,255],[0,180,255],
+				[0,220,150],[0,200,0],[170,220,0],[255,220,0],[255,180,0],
+				[255,140,0],[255,80,0],[255,0,0],[180,0,0],[139,0,0],
+			];
+			const DEFAULT_MOIST_BREAKPOINTS = [0,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.5,0.6,0.7,0.8];
+			const DEFAULT_MOIST_COLORS = [
+				[255,255,200],[220,240,180],[170,220,160],[120,200,180],[80,180,210],
+				[50,150,220],[30,120,210],[20,100,200],[10,80,190],[5,60,170],
+				[0,40,150],[0,20,130],[0,10,100],[0,0,70],
+			];
+
+			// Mutable user color arrays (deep copy of defaults)
+			let userTempColors  = DEFAULT_TEMP_COLORS.map(c => [...c]);
+			let userMoistColors = DEFAULT_MOIST_COLORS.map(c => [...c]);
+			// Per-breakpoint opacity (default 0.75)
+			let userTempOpacity  = DEFAULT_TEMP_BREAKPOINTS.map(() => 0.75);
+			let userMoistOpacity = DEFAULT_MOIST_BREAKPOINTS.map(() => 0.75);
+
+			// ─── State ────────────────────────────────────────────────────────────────
+			let currentUnit    = 'F';
+			let tempDepth      = '0_to_10cm';
+			let moistDepth     = '0_to_10cm';
+			let tempActive     = true;
+			let moistActive    = false;
+			let tempContours   = true;
+			let moistContours  = false;
+			let rangeMinC      = 5;
+			let rangeMaxC      = 10;
+			let mapLoaded      = false;
+			let tempOpacity  = 0.75;
+			let moistOpacity = 0.75;
+
+			let minimized = false;
+			function toggleMinimize() {
+				minimized = !minimized;
+				const btn = document.getElementById('minimize-btn');
+				btn.style.transform  = minimized ? 'rotate(180deg)' : '';
+				btn.style.transition = 'transform 0.2s';
+
+				document.querySelectorAll('#controls > *:not(h3)').forEach(el => {
+					el.style.display = minimized ? 'none' : '';
+				});
+
+				// Re-apply visibility rules that onLayerCheckChange owns
+				if (!minimized) onLayerCheckChange();
+			}
+
+			const MUSHROOM_PRESETS = {
+				king_bolete:        { tempF: [48, 60], moist: [0.21, 0.42] },
+				spring_king_bolete: { tempF: [47, 59], moist: [0.28, 0.40] },
+				morels:             { tempF: [44, 58], moist: [0.30, 0.42] },
+				chanterelle:        { tempF: [44, 62], moist: [0.15, 0.42] },
+				yellowfoot:         { tempF: [41, 52], moist: [0.30, 0.44] },
+				hedgehog:           { tempF: [43, 52], moist: [0.35, 0.43] },
+				lobster:            { tempF: [43, 66], moist: [0.16, 0.42] },
+			};
+
+			function applyPreset(key) {
+				if (!key) return;
+				const preset = MUSHROOM_PRESETS[key];
+
+				// Enable both layers
+				document.getElementById('layer-temp-check').checked  = true;
+				document.getElementById('layer-moist-check').checked = true;
+				tempActive  = true;
+				moistActive = true;
+				onLayerCheckChange();
+
+				// Set temperature range — respect current unit
+				const [minF, maxF] = preset.tempF;
+				if (currentUnit === 'F') {
+					document.getElementById('input-min').value = minF;
+					document.getElementById('input-max').value = maxF;
+				} else {
+					document.getElementById('input-min').value = round1(toC(minF));
+					document.getElementById('input-max').value = round1(toC(maxF));
+				}
+
+				// Set moisture range
+				document.getElementById('input-moist-min').value = preset.moist[0];
+				document.getElementById('input-moist-max').value = preset.moist[1];
+
+				// Auto-apply
+				applySettings();
+
+				// Reset dropdown back to placeholder after applying
+				document.getElementById('mushroom-preset').value = '';
+			}
+
+			// ─── Helpers ──────────────────────────────────────────────────────────────
+			const toC    = f => (f - 32) * 5 / 9;
+			const toF    = c => c * 9 / 5 + 32;
+			const round1 = v => Math.round(v * 10) / 10;
+			const round3 = v => Math.round(v * 1000) / 1000;
+
+			const rgbToHex = (r,g,b) => '#' + [r,g,b].map(v =>
+				v.toString(16).padStart(2,'0')).join('');
+			const hexToRgb = hex => [
+				parseInt(hex.slice(1,3),16),
+				parseInt(hex.slice(3,5),16),
+				parseInt(hex.slice(5,7),16)
+			];
+
+			// ─── Layer checkbox ───────────────────────────────────────────────────────
+			function onLayerCheckChange() {
+				tempActive  = document.getElementById('layer-temp-check').checked;
+				moistActive = document.getElementById('layer-moist-check').checked;
+
+				document.getElementById('temp-section').style.display  = tempActive  ? '' : 'none';
+				document.getElementById('moist-section').style.display = moistActive ? '' : 'none';
+				document.getElementById('divider-moist').style.display = (tempActive && moistActive) ? '' : 'none';
+			}
+
+			function setMasterOpacity(type, value) {
+				const v = parseFloat(value);
+				document.getElementById(`${type}-opacity-val`).textContent = Math.round(v * 100) + '%';
+				if (type === 'temp') {
+					tempOpacity = v;
+					if (map.getLayer('omTempRasterLayer'))
+						map.setPaintProperty('omTempRasterLayer', 'raster-opacity', v);
+				} else {
+					moistOpacity = v;
+					if (map.getLayer('omMoistRasterLayer'))
+						map.setPaintProperty('omMoistRasterLayer', 'raster-opacity', v);
+				}
+			}
+
+			// ─── Unit toggle ──────────────────────────────────────────────────────────
+			function setUnit(unit) {
+				const minEl = document.getElementById('input-min');
+				const maxEl = document.getElementById('input-max');
+				if (unit === 'C' && currentUnit === 'F') {
+					minEl.value = round1(toC(parseFloat(minEl.value)));
+					maxEl.value = round1(toC(parseFloat(maxEl.value)));
+				} else if (unit === 'F' && currentUnit === 'C') {
+					minEl.value = round1(toF(parseFloat(minEl.value)));
+					maxEl.value = round1(toF(parseFloat(maxEl.value)));
+				}
+				currentUnit = unit;
+				document.getElementById('unit-label-min').textContent = `°${unit}`;
+				document.getElementById('unit-label-max').textContent = `°${unit}`;
+				document.getElementById('btn-c').classList.toggle('active', unit === 'C');
+				document.getElementById('btn-f').classList.toggle('active', unit === 'F');
+			}
+
+			// ─── Depth ────────────────────────────────────────────────────────────────
+			function setDepth(type, btn) {
+				const groupId = type === 'temp' ? 'depth-group-temp' : 'depth-group-moist';
+				document.querySelectorAll(`#${groupId} button`).forEach(b => b.classList.remove('active'));
+				btn.classList.add('active');
+				if (type === 'temp') tempDepth = btn.dataset.depth;
+				else moistDepth = btn.dataset.depth;
+			}
+
+			// ─── Contour checkboxes ───────────────────────────────────────────────────
+			function syncContourCheck(type) {
+				if (type === 'temp') {
+					tempContours = document.getElementById('contour-check-temp').checked;
+					['omTempVectorLayer','omTempVectorLabels'].forEach(id => {
+						if (map.getLayer(id))
+							map.setLayoutProperty(id, 'visibility', tempContours ? 'visible' : 'none');
+					});
+				} else {
+					moistContours = document.getElementById('contour-check-moist').checked;
+					['omMoistVectorLayer','omMoistVectorLabels'].forEach(id => {
+						if (map.getLayer(id))
+							map.setLayoutProperty(id, 'visibility', moistContours ? 'visible' : 'none');
+					});
+				}
+			}
+
+			// ─── Color editor ─────────────────────────────────────────────────────────
+			function toggleColorEditor(type) {
+				const header = document.getElementById(`${type}-color-header`);
+				const rows   = document.getElementById(`${type}-color-rows`);
+				header.classList.toggle('open');
+				rows.classList.toggle('open');
+			}
+
+			function buildColorEditor(type) {
+				const isTemp      = type === 'temp';
+				const breakpoints = isTemp ? DEFAULT_TEMP_BREAKPOINTS  : DEFAULT_MOIST_BREAKPOINTS;
+				const colors      = isTemp ? userTempColors            : userMoistColors;
+				const opacities   = isTemp ? userTempOpacity           : userMoistOpacity;
+				const unit        = isTemp ? '°C' : '';
+				const container   = document.getElementById(`${type}-color-rows`);
+				container.innerHTML = '';
+
+				breakpoints.forEach((bp, i) => {
+					const row = document.createElement('div');
+					row.className = 'color-row';
+
+					const label = document.createElement('span');
+					label.className = 'bp-label';
+					label.textContent = unit ? `${bp}${unit}` : bp.toFixed(2);
+
+					const picker = document.createElement('input');
+					picker.type  = 'color';
+					picker.value = rgbToHex(...colors[i]);
+					picker.addEventListener('input', e => {
+						const rgb = hexToRgb(e.target.value);
+						if (isTemp) userTempColors[i]  = rgb;
+						else        userMoistColors[i] = rgb;
+					});
+
+					const slider = document.createElement('input');
+					slider.type  = 'range';
+					slider.min   = 0; slider.max = 1; slider.step = 0.05;
+					slider.value = opacities[i];
+					const opVal  = document.createElement('span');
+					opVal.className = 'opacity-val';
+					opVal.textContent = Math.round(opacities[i] * 100) + '%';
+					slider.addEventListener('input', e => {
+						const v = parseFloat(e.target.value);
+						if (isTemp) userTempOpacity[i]  = v;
+						else        userMoistOpacity[i] = v;
+						opVal.textContent = Math.round(v * 100) + '%';
+					});
+
+					row.appendChild(label);
+					row.appendChild(picker);
+					row.appendChild(slider);
+					row.appendChild(opVal);
+					container.appendChild(row);
+				});
+
+				// Reset button
+				const resetBtn = document.createElement('button');
+				resetBtn.className   = 'reset-colors-btn';
+				resetBtn.textContent = '↺ Reset colors';
+				resetBtn.onclick = () => {
+					if (isTemp) {
+						userTempColors  = DEFAULT_TEMP_COLORS.map(c => [...c]);
+						userTempOpacity = DEFAULT_TEMP_BREAKPOINTS.map(() => 0.75);
+					} else {
+						userMoistColors  = DEFAULT_MOIST_COLORS.map(c => [...c]);
+						userMoistOpacity = DEFAULT_MOIST_BREAKPOINTS.map(() => 0.75);
+					}
+					buildColorEditor(type); // re-render
+				};
+				container.appendChild(resetBtn);
+			}
+
+			// ─── Color interpolation ──────────────────────────────────────────────────
+			function interpolateColor(colors, breakpoints, value) {
+				if (value <= breakpoints[0]) return colors[0];
+				if (value >= breakpoints[breakpoints.length - 1]) return colors[colors.length - 1];
+				for (let i = 0; i < breakpoints.length - 1; i++) {
+					if (value >= breakpoints[i] && value <= breakpoints[i + 1]) {
+						const t  = (value - breakpoints[i]) / (breakpoints[i + 1] - breakpoints[i]);
+						const c0 = colors[i], c1 = colors[i + 1];
+						return [
+							Math.round(c0[0] + t * (c1[0] - c0[0])),
+							Math.round(c0[1] + t * (c1[1] - c0[1])),
+							Math.round(c0[2] + t * (c1[2] - c0[2])),
+						];
+					}
+				}
+				return colors[colors.length - 1];
+			}
+
+			function interpolateOpacity(opacities, breakpoints, value) {
+				if (value <= breakpoints[0]) return opacities[0];
+				if (value >= breakpoints[breakpoints.length - 1]) return opacities[opacities.length - 1];
+				for (let i = 0; i < breakpoints.length - 1; i++) {
+					if (value >= breakpoints[i] && value <= breakpoints[i + 1]) {
+						const t = (value - breakpoints[i]) / (breakpoints[i + 1] - breakpoints[i]);
+						return opacities[i] + t * (opacities[i + 1] - opacities[i]);
+					}
+				}
+				return opacities[opacities.length - 1];
+			}
+
+			// ─── Build color scales ───────────────────────────────────────────────────
+			function buildTempColorScale(minC, maxC) {
+				const merged = new Set(DEFAULT_TEMP_BREAKPOINTS);
+				merged.add(minC); merged.add(maxC);
+				const breakpoints = Array.from(merged).sort((a,b) => a - b);
+				const colors = breakpoints.map(bp => {
+					const [r,g,b] = interpolateColor(userTempColors, DEFAULT_TEMP_BREAKPOINTS, bp);
+					const op      = interpolateOpacity(userTempOpacity, DEFAULT_TEMP_BREAKPOINTS, bp);
+					return [r, g, b, (bp < minC || bp > maxC) ? 0 : op];
+				});
+				return { type: 'breakpoint', unit: '°C', breakpoints, colors };
+			}
+
+			function buildMoistureColorScale(minV, maxV) {
+				const merged = new Set(DEFAULT_MOIST_BREAKPOINTS);
+				merged.add(minV); merged.add(maxV);
+				const breakpoints = Array.from(merged).sort((a,b) => a - b);
+				const colors = breakpoints.map(bp => {
+					const [r,g,b] = interpolateColor(userMoistColors, DEFAULT_MOIST_BREAKPOINTS, bp);
+					const op      = interpolateOpacity(userMoistOpacity, DEFAULT_MOIST_BREAKPOINTS, bp);
+					return [r, g, b, (bp < minV || bp > maxV) ? 0 : op];
+				});
+				return { type: 'breakpoint', unit: 'm³/m³', breakpoints, colors };
+			}
+
+			// ─── Scroll inputs ────────────────────────────────────────────────────────
+			function addScrollInput(id, step) {
+				const el = document.getElementById(id);
+				el.addEventListener('wheel', e => {
+					e.preventDefault();
+					const decimals = step < 0.1 ? 3 : 1;
+					el.value = parseFloat((parseFloat(el.value) + (e.deltaY < 0 ? step : -step)).toFixed(decimals));
+				}, { passive: false });
+			}
+			addScrollInput('input-min',       1);
+			addScrollInput('input-max',       1);
+			addScrollInput('input-moist-min', 0.01);
+			addScrollInput('input-moist-max', 0.01);
+
+			// ─── Read temp inputs as °C ───────────────────────────────────────────────
+			function getInputsAsC() {
+				let min = parseFloat(document.getElementById('input-min').value);
+				let max = parseFloat(document.getElementById('input-max').value);
+				if (currentUnit === 'F') { min = toC(min); max = toC(max); }
+				return { min: round1(min), max: round1(max) };
+			}
+
+			// ─── Register protocol ────────────────────────────────────────────────────
+			function registerProtocol(tempMinC, tempMaxC, moistMinV, moistMaxV) {
+				const options = OpenMeteoMapboxLayer.defaultOmProtocolSettings;
+				options.colorScales = {};
+				if (tempActive)  options.colorScales[`soil_temperature_${tempDepth}`]  = buildTempColorScale(tempMinC, tempMaxC);
+				if (moistActive) options.colorScales[`soil_moisture_${moistDepth}`]    = buildMoistureColorScale(moistMinV, moistMaxV);
+				maplibregl.addProtocol('om', (params, abortController) =>
+					OpenMeteoMapboxLayer.omProtocol(params, abortController, options)
+				);
+			}
+
+			// ─── Build URLs ───────────────────────────────────────────────────────────
+			function buildTempUrl(minC, maxC) {
+				return `https://map-tiles.open-meteo.com/data_spatial/ncep_nam_conus/latest.json`
+					+ `?time_step=current_time_1H&variable=soil_temperature_${tempDepth}&contours=true&intervals=${minC},${maxC}`;
+			}
+
+			function buildMoistUrl(minV, maxV) {
+				return `https://map-tiles.open-meteo.com/data_spatial/ncep_nam_conus/latest.json`
+					+ `?time_step=current_time_1H&variable=soil_moisture_${moistDepth}&contours=true&intervals=${minV},${maxV}`;
+			}
+
+			// ─── Layer management ─────────────────────────────────────────────────────
+			function removeLayers(prefix) {
+				[`${prefix}VectorLabels`,`${prefix}VectorLayer`,`${prefix}RasterLayer`].forEach(id => {
+					if (map.getLayer(id)) map.removeLayer(id);
+				});
+				[`${prefix}RasterSource`,`${prefix}VectorSource`].forEach(id => {
+					if (map.getSource(id)) map.removeSource(id);
+				});
+			}
+
+			function addTempLayers(omUrl) {
+				removeLayers('omTemp');
+				map.addSource('omTempRasterSource', { url: 'om://'+omUrl, type: 'raster', maxzoom: 12 });
+				map.addLayer({ id:'omTempRasterLayer', type:'raster', source:'omTempRasterSource',
+					paint: { 'raster-opacity': tempOpacity }}, 'waterway-tunnel');
+				map.addSource('omTempVectorSource', { url: 'om://'+omUrl, type: 'vector' });
+				map.addLayer({ id:'omTempVectorLayer', type:'line', source:'omTempVectorSource',
+					'source-layer':'contours',
+					layout:{ visibility: tempContours ? 'visible' : 'none' },
+					paint:{'line-color':'rgba(0,0,0,0.85)','line-width':1} }, 'place_label_other');
+				map.addLayer({ id:'omTempVectorLabels', type:'symbol', source:'omTempVectorSource',
+					'source-layer':'contours',
+					layout:{ visibility: tempContours ? 'visible' : 'none',
+						'symbol-placement':'line-center','symbol-spacing':1,
+						'text-font':['Noto Sans Regular'],'text-field':['to-string',['get','value']],
+						'text-padding':1,'text-offset':[0,-0.6] } }, 'place_label_other');
+			}
+
+			function addMoistLayers(omUrl) {
+				removeLayers('omMoist');
+				map.addSource('omMoistRasterSource', { url: 'om://'+omUrl, type: 'raster', maxzoom: 12 });
+				map.addLayer({ id:'omMoistRasterLayer', type:'raster', source:'omMoistRasterSource',
+					paint: { 'raster-opacity': moistOpacity }}, 'waterway-tunnel');
+				map.addSource('omMoistVectorSource', { url: 'om://'+omUrl, type: 'vector' });
+				map.addLayer({ id:'omMoistVectorLayer', type:'line', source:'omMoistVectorSource',
+					'source-layer':'contours',
+					layout:{ visibility: moistContours ? 'visible' : 'none' },
+					paint:{'line-color':'rgba(0,0,0,0.6)','line-width':1,'line-dasharray':[3,2]} }, 'place_label_other');
+				map.addLayer({ id:'omMoistVectorLabels', type:'symbol', source:'omMoistVectorSource',
+					'source-layer':'contours',
+					layout:{ visibility: moistContours ? 'visible' : 'none',
+						'symbol-placement':'line-center','symbol-spacing':1,
+						'text-font':['Noto Sans Regular'],'text-field':['to-string',['get','value']],
+						'text-padding':1,'text-offset':[0,-0.6] } }, 'place_label_other');
+			}
+
+			// ─── Apply ────────────────────────────────────────────────────────────────
+			function applySettings() {
+				if (!tempActive && !moistActive) { alert('Enable at least one layer.'); return; }
+
+				let tempMinC = rangeMinC, tempMaxC = rangeMaxC;
+				let moistMinV = 0.1, moistMaxV = 0.4;
+
+				if (tempActive) {
+					const vals = getInputsAsC();
+					if (vals.min >= vals.max) { alert('Temperature: Min must be less than Max.'); return; }
+					tempMinC = vals.min; tempMaxC = vals.max;
+					rangeMinC = tempMinC; rangeMaxC = tempMaxC;
+				}
+
+				if (moistActive) {
+					moistMinV = parseFloat(document.getElementById('input-moist-min').value);
+					moistMaxV = parseFloat(document.getElementById('input-moist-max').value);
+					if (moistMinV >= moistMaxV) { alert('Moisture: Min must be less than Max.'); return; }
+					moistMinV = round3(moistMinV); moistMaxV = round3(moistMaxV);
+				}
+
+				registerProtocol(tempMinC, tempMaxC, moistMinV, moistMaxV);
+
+				if (mapLoaded) {
+					if (tempActive)  addTempLayers(buildTempUrl(tempMinC, tempMaxC));
+					else             removeLayers('omTemp');
+					if (moistActive) addMoistLayers(buildMoistUrl(moistMinV, moistMaxV));
+					else             removeLayers('omMoist');
+				}
+			}
+
+			// ─── Init ─────────────────────────────────────────────────────────────────
+			buildColorEditor('temp');
+			buildColorEditor('moist');
+
+			registerProtocol(rangeMinC, rangeMaxC, 0.1, 0.4);
+
+			const map = new maplibregl.Map({
+				container: 'map',
+				style: 'https://map-assets.open-meteo.com/styles/minimal-planet-maps.json',
+				center: [-98.5, 39.5],
+				zoom: 3.5,
+				hash: true
+			});
+
+			map.on('load', () => {
+				mapLoaded = true;
+				addTempLayers(buildTempUrl(rangeMinC, rangeMaxC));
+			});
+		</script>
+	</body>
+</html>
