@@ -1,17 +1,12 @@
 <!doctype html>
 <html lang="en">
 	<head>
-		<title>Open-Meteo Mapbox Layer - Soil Data Explorer</title>
+		<title>Soil Data Explorer</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.17.0/dist/maplibre-gl.css" />
 		<script src="https://unpkg.com/maplibre-gl@5.17.0/dist/maplibre-gl.js"></script>
 		<script src="https://unpkg.com/@openmeteo/mapbox-layer@0.0.15/dist/index.js"></script>
-		<script>
-			if (location.hostname === 'localhost' || location.href.startsWith('file://')) {
-				document.write('<script src="../../../dist/index.js"><\/script>');
-			}
-		</script>
 		<style>
 			html, body, #map { margin: 0; padding: 0; height: 100%; }
 
@@ -235,7 +230,14 @@
 
 		<div id="controls">
 			<h3 style="display:flex; align-items:center; justify-content:space-between; margin:0">
-				Soil Data Explorer
+				<span>
+					Soil Data Explorer
+					<a href="https://maps.open-meteo.com/?domain=ncep_nam_conus&variable=soil_temperature_0_to_10cm"
+					   target="_blank"
+					   style="font-size:10px; margin-left:8px; color:#4aa3ff; text-decoration:none;">
+					   (Open-Meteo Map)
+					</a>
+				</span>
 				<button id="minimize-btn" onclick="toggleMinimize()"
 					style="background:none; border:none; cursor:pointer; font-size:16px; color:#888; padding:0; line-height:1">
 					⌃
@@ -429,6 +431,28 @@
 
 				// Re-apply visibility rules that onLayerCheckChange owns
 				if (!minimized) onLayerCheckChange();
+			}
+
+			function getInsertionLayer(preferLabel) {
+				const style = map.getStyle();
+				if (!style || !style.layers) return undefined;
+				const ids = style.layers.map(l => l.id);
+
+				if (preferLabel) {
+					// Try common label layer names across styles
+					const labelCandidates = [
+						'place_label_other', 'place-label', 'place_label',
+						'poi-label', 'road-label', 'waterway-label'
+					];
+					for (const c of labelCandidates) if (ids.includes(c)) return c;
+				} else {
+					// Try common waterway/tunnel layer names
+					const rasterCandidates = [
+						'waterway-tunnel', 'waterway', 'water', 'landuse', 'background'
+					];
+					for (const c of rasterCandidates) if (ids.includes(c)) return c;
+				}
+				return undefined; // falls back to top of stack
 			}
 
 			const MUSHROOM_PRESETS = {
@@ -740,36 +764,40 @@
 				removeLayers('omTemp');
 				map.addSource('omTempRasterSource', { url: 'om://'+omUrl, type: 'raster', maxzoom: 12 });
 				map.addLayer({ id:'omTempRasterLayer', type:'raster', source:'omTempRasterSource',
-					paint: { 'raster-opacity': tempOpacity }}, 'waterway-tunnel');
+					paint:{'raster-opacity': tempOpacity} }, getInsertionLayer(false));
 				map.addSource('omTempVectorSource', { url: 'om://'+omUrl, type: 'vector' });
 				map.addLayer({ id:'omTempVectorLayer', type:'line', source:'omTempVectorSource',
 					'source-layer':'contours',
 					layout:{ visibility: tempContours ? 'visible' : 'none' },
-					paint:{'line-color':'rgba(0,0,0,0.85)','line-width':1} }, 'place_label_other');
+					paint:{'line-color':'rgba(0,0,0,0.85)','line-width':1}
+				}, getInsertionLayer(true));
 				map.addLayer({ id:'omTempVectorLabels', type:'symbol', source:'omTempVectorSource',
 					'source-layer':'contours',
 					layout:{ visibility: tempContours ? 'visible' : 'none',
 						'symbol-placement':'line-center','symbol-spacing':1,
 						'text-font':['Noto Sans Regular'],'text-field':['to-string',['get','value']],
-						'text-padding':1,'text-offset':[0,-0.6] } }, 'place_label_other');
+						'text-padding':1,'text-offset':[0,-0.6] }
+				}, getInsertionLayer(true));
 			}
 
 			function addMoistLayers(omUrl) {
 				removeLayers('omMoist');
 				map.addSource('omMoistRasterSource', { url: 'om://'+omUrl, type: 'raster', maxzoom: 12 });
 				map.addLayer({ id:'omMoistRasterLayer', type:'raster', source:'omMoistRasterSource',
-					paint: { 'raster-opacity': moistOpacity }}, 'waterway-tunnel');
+					paint:{'raster-opacity': moistOpacity} }, getInsertionLayer(false));
 				map.addSource('omMoistVectorSource', { url: 'om://'+omUrl, type: 'vector' });
 				map.addLayer({ id:'omMoistVectorLayer', type:'line', source:'omMoistVectorSource',
 					'source-layer':'contours',
 					layout:{ visibility: moistContours ? 'visible' : 'none' },
-					paint:{'line-color':'rgba(0,0,0,0.6)','line-width':1,'line-dasharray':[3,2]} }, 'place_label_other');
+					paint:{'line-color':'rgba(0,0,0,0.6)','line-width':1,'line-dasharray':[3,2]}
+				}, getInsertionLayer(true));
 				map.addLayer({ id:'omMoistVectorLabels', type:'symbol', source:'omMoistVectorSource',
 					'source-layer':'contours',
 					layout:{ visibility: moistContours ? 'visible' : 'none',
 						'symbol-placement':'line-center','symbol-spacing':1,
 						'text-font':['Noto Sans Regular'],'text-field':['to-string',['get','value']],
-						'text-padding':1,'text-offset':[0,-0.6] } }, 'place_label_other');
+						'text-padding':1,'text-offset':[0,-0.6] }
+				}, getInsertionLayer(true));
 			}
 
 			// ─── Apply ────────────────────────────────────────────────────────────────
@@ -811,7 +839,7 @@
 
 			const map = new maplibregl.Map({
 				container: 'map',
-				style: 'https://map-assets.open-meteo.com/styles/minimal-planet-maps.json',
+				style: 'https://tiles.openfreemap.org/styles/liberty',
 				center: [-98.5, 39.5],
 				zoom: 3.5,
 				hash: true
