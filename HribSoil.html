@@ -11,243 +11,486 @@
 			html, body, #map { margin: 0; padding: 0; height: 100%; }
 
 			#controls {
+				position: absolute; top: 12px; left: 12px; z-index: 10;
+				background: rgba(255,255,255,0.96); border-radius: 10px;
+				padding: 14px 18px; box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+				font-family: sans-serif; font-size: 14px;
+				display: flex; flex-direction: column; gap: 10px;
+				min-width: 240px; max-height: calc(100vh - 40px); overflow-y: auto;
+			}
+			#controls h3 { margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #333; letter-spacing: 0.03em; text-transform: uppercase; }
+			.section-label { font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: -4px; }
+			.toggle-group { display: flex; border-radius: 7px; overflow: hidden; border: 1px solid #ccc; width: fit-content; }
+			.toggle-group button { padding: 5px 13px; border: none; background: #f0f0f0; cursor: pointer; font-size: 13px; font-weight: 600; color: #555; transition: background 0.15s, color 0.15s; white-space: nowrap; }
+			.toggle-group button.active { background: #2563eb; color: #fff; }
+			.toggle-group button:not(:last-child) { border-right: 1px solid #ccc; }
+			.depth-group { display: flex; flex-direction: column; gap: 4px; }
+			.depth-group button { padding: 5px 10px; border: 1px solid #ccc; border-radius: 6px; background: #f0f0f0; cursor: pointer; font-size: 12px; font-weight: 600; color: #555; text-align: left; transition: background 0.15s, color 0.15s; }
+			.depth-group button.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+			.control-row { display: flex; align-items: center; gap: 8px; }
+			.control-row label { color: #555; min-width: 36px; }
+			.control-row input[type="number"] { width: 72px; padding: 4px 6px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; cursor: ns-resize; }
+			.control-row input[type="number"]:focus { outline: 2px solid #2563eb44; border-color: #2563eb; }
+			.checkbox-label { display: flex; align-items: center; gap: 6px; color: #555; cursor: pointer; user-select: none; }
+			#apply-btn { width: 100%; padding: 7px 0; border: none; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; background: #2563eb; color: #fff; transition: background 0.15s; }
+			#apply-btn:hover { background: #1d4ed8; }
+			.divider { border: none; border-top: 1px solid #e5e5e5; margin: 0; }
+			.color-editor-header { display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
+			.color-editor-header span { font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.05em; }
+			.color-editor-header .chevron { font-size: 10px; color: #aaa; transition: transform 0.2s; }
+			.color-editor-header.open .chevron { transform: rotate(180deg); }
+			.color-rows { display: none; flex-direction: column; gap: 4px; margin-top: 4px; }
+			.color-rows.open { display: flex; }
+			.color-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #444; }
+			.color-row input[type="color"] { width: 32px; height: 22px; padding: 1px 2px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; background: none; }
+			.color-row .bp-label { min-width: 52px; font-size: 11px; color: #666; }
+			.color-row input[type="range"] { flex: 1; accent-color: #2563eb; max-width:100px; }
+			.opacity-val { font-size: 11px; color: #888; min-width: 28px; text-align: right; }
+			.reset-colors-btn { font-size: 11px; padding: 3px 8px; border: 1px solid #ccc; border-radius: 5px; background: #f5f5f5; cursor: pointer; color: #555; align-self: flex-end; margin-top: 2px; }
+			.reset-colors-btn:hover { background: #e8e8e8; }
+
+			/* ── Tree Panel ─────────────────────────────────────────────────────── */
+			#tree-panel {
+				position: absolute; top: 12px; right: 12px; z-index: 10;
+				background: rgba(255,255,255,0.96); border-radius: 10px;
+				padding: 14px 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+				font-family: sans-serif; font-size: 13px; width: 268px;
+				max-height: calc(100vh - 40px); display: flex; flex-direction: column; gap: 8px;
+			}
+			#tree-panel h3 { margin: 0; font-size: 13px; font-weight: 700; color: #333; letter-spacing: 0.03em; text-transform: uppercase; display: flex; align-items: center; justify-content: space-between; }
+			#tree-panel-body { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; flex: 1; min-height: 0; padding-right: 2px; }
+			.tree-search { width: 100%; box-sizing: border-box; padding: 5px 8px; border: 1px solid #ccc; border-radius: 6px; font-size: 12px; color: #444; background: #fafafa; }
+			.tree-search:focus { outline: 2px solid #2563eb44; border-color: #2563eb; }
+			.tree-list {
+				display: flex; flex-direction: column; gap: 4px;
+				overflow-y: auto; max-height: 260px; padding-right: 2px; flex-shrink: 0;
+			}
+			.species-group {}
+			.species-group-header {
+				display: flex; align-items: center; gap: 6px;
+				padding: 5px 7px; border-radius: 6px; cursor: pointer;
+				background: #f4f4f4; border: 1px solid #e0e0e0;
+				user-select: none; transition: background 0.12s;
+			}
+			.species-group-header:hover { background: #eaeaea; }
+			.species-group-header.has-active { background: #dbeafe; border-color: #93c5fd; }
+			.species-group-name { flex: 1; font-size: 12px; font-weight: 600; color: #222; }
+			.species-group-badge {
+				font-size: 10px; background: #2563eb; color: #fff;
+				border-radius: 10px; padding: 1px 6px; display: none;
+			}
+			.species-group-badge.visible { display: inline; }
+			.species-group-chevron { font-size: 9px; color: #aaa; transition: transform 0.18s; flex-shrink: 0; }
+			.species-group-chevron.open { transform: rotate(180deg); }
+			.species-years { display: none; flex-wrap: wrap; gap: 4px; padding: 6px 7px 4px 7px; }
+			.species-years.open { display: flex; }
+			.year-pill { padding: 3px 9px; border-radius: 12px; border: 1px solid #ccc; background: #f8f8f8; font-size: 11px; color: #444; cursor: pointer; transition: background 0.12s, border-color 0.12s, color 0.12s; user-select: none; }
+			.year-pill:hover { background: #e8f0ff; border-color: #93c5fd; }
+			.year-pill.active { background: #2563eb; border-color: #2563eb; color: #fff; font-weight: 600; }
+			#tree-selection-summary { display: none; flex-direction: column; gap: 4px; font-size: 11px; color: #444; background: #f0f7ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 6px 8px; max-height: 340px; overflow-y: auto; }
+			#tree-selection-summary.visible { display: flex; }
+			.summary-row { display: flex; align-items: center; justify-content: space-between; gap: 4px; flex-wrap: wrap; }
+			.summary-row-top { display: flex; align-items: center; gap: 4px; width: 100%; }
+			.summary-row-top span.sum-label { flex:1; font-weight: 600; }
+			.summary-ramp-preview { width: 44px; height: 10px; border-radius: 2px; border: 1px solid #ccc; flex-shrink: 0; }
+			.summary-gear { cursor: pointer; color: #888; font-size: 12px; flex-shrink: 0; padding: 0 1px; user-select: none; }
+			.summary-gear:hover { color: #2563eb; }
+			.summary-remove { cursor: pointer; color: #999; font-size: 12px; flex-shrink: 0; padding: 0 2px; }
+			.summary-remove:hover { color: #dc2626; }
+			/* Per-layer settings drawer */
+			.layer-settings-drawer { display: none; width: 100%; background: #fff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 7px 8px; box-sizing: border-box; flex-direction: column; gap: 5px; margin-top: 2px; }
+			.layer-settings-drawer.open { display: flex; }
+			.lsd-row { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #555; }
+			.lsd-row .lsd-label { min-width: 52px; font-weight: 600; flex-shrink: 0; }
+			.lsd-row input[type="range"] { flex: 1; accent-color: #16a34a; }
+			.lsd-row select { flex: 1; padding: 2px 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 11px; background: #fafafa; }
+			.lsd-row input[type="number"] { flex: 1; padding: 2px 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 11px; background: #fafafa; width: 100%; box-sizing: border-box; }
+			.lsd-ramp-list { display: flex; flex-direction: column; gap: 2px; max-height: 130px; overflow-y: auto; margin-top: 2px; }
+			.lsd-ramp-row { display: flex; align-items: center; gap: 5px; padding: 2px 4px; border-radius: 4px; cursor: pointer; border: 1px solid transparent; font-size: 10px; color: #444; }
+			.lsd-ramp-row:hover { background: #f4f4f4; }
+			.lsd-ramp-row.active { border-color: #2563eb; background: #eff6ff; }
+			.lsd-ramp-bar { width: 70px; height: 11px; border-radius: 2px; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.1); }
+			.lsd-flip-btn { font-size: 10px; padding: 2px 6px; border: 1px solid #ccc; border-radius: 4px; background: #f5f5f5; cursor: pointer; color: #555; }
+			.lsd-flip-btn:hover { background: #e8e8e8; }
+			.lsd-section-label { font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
+			.lsd-stretch-rows { display: flex; flex-direction: column; gap: 4px; }
+			.lsd-stats-grid { display: grid; grid-template-columns: auto 1fr; gap: 2px 5px; font-size: 10px; color: #555; align-items: center; }
+			.lsd-stats-grid label { font-weight: 600; white-space: nowrap; }
+			.lsd-stats-grid input { padding: 2px 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 10px; background: #fafafa; width: 100%; box-sizing: border-box; }
+
+			/* Collapsible header */
+			.collapsible-header { display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; padding: 3px 0; }
+			.collapsible-header .clabel { font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.05em; }
+			.collapsible-header .cchev { font-size: 9px; color: #aaa; transition: transform 0.18s; }
+			.collapsible-header.open .cchev { transform: rotate(180deg); }
+			.collapsible-body { display: none; flex-direction: column; gap: 6px; margin-top: 4px; }
+			.collapsible-body.open { display: flex; }
+
+			/* Render options */
+			.tree-render-row { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #555; }
+			.tree-render-row .rlabel { min-width: 64px; font-weight: 600; flex-shrink: 0; }
+			.tree-render-row select, .tree-render-row input[type="number"] { flex: 1; padding: 3px 5px; border: 1px solid #ccc; border-radius: 5px; font-size: 11px; background: #fafafa; color: #333; }
+			.tree-render-row input[type="range"] { flex: 1; accent-color: #16a34a; }
+			.tree-render-row input[type="checkbox"] { accent-color: #16a34a; cursor: pointer; }
+			.stats-grid { display: grid; grid-template-columns: auto 1fr; gap: 3px 6px; font-size: 11px; color: #555; align-items: center; }
+			.stats-grid label { font-weight: 600; white-space: nowrap; }
+			.stats-grid input[type="number"] { padding: 3px 5px; border: 1px solid #ccc; border-radius: 5px; font-size: 11px; background: #fafafa; width: 100%; box-sizing: border-box; }
+
+			/* ── Soil Value Popup (open-meteo style) ─────────────────────────── */
+			.soil-popup {
 				position: absolute;
-				top: 12px;
-				left: 12px;
-				z-index: 10;
-				background: rgba(255,255,255,0.96);
-				border-radius: 10px;
-				padding: 14px 18px;
-				box-shadow: 0 2px 12px rgba(0,0,0,0.18);
-				font-family: sans-serif;
-				font-size: 14px;
+				pointer-events: none;
+				z-index: 30;
+				transform: translateX(-50%) translateY(-100%);
+				display: inline-flex;
+				flex-direction: column;
+				align-items: center;
+			}
+			.soil-popup.draggable-mode {
+				pointer-events: auto;
+				cursor: grab;
+			}
+			.soil-popup.draggable-mode:active { cursor: grabbing; }
+			.popup-wrapper {
+				-webkit-backdrop-filter: blur(2px);
+				backdrop-filter: blur(2px);
+				background: #fffdf8cc;
+				border: 3px solid #646464;
+				border-radius: 4px;
+				min-width: 50px;
 				display: flex;
 				flex-direction: column;
-				gap: 10px;
-				min-width: 240px;
-				max-height: calc(100vh - 40px);
-				overflow-y: auto;
+				align-items: center;
 			}
-
-			#controls h3 {
-				margin: 0 0 2px 0;
+			.popup-content {
+				justify-content: center;
+				align-items: center;
+				gap: 2px;
+				min-height: 22px;
+				padding: .2rem .4rem;
+				font-weight: 700;
+				transition: all .15s;
+				display: flex;
+				font-family: sans-serif;
 				font-size: 13px;
-				font-weight: 700;
-				color: #333;
-				letter-spacing: 0.03em;
-				text-transform: uppercase;
+				white-space: nowrap;
+				color: #222;
 			}
-
-			.section-label {
-				font-size: 11px;
-				font-weight: 700;
-				color: #888;
-				text-transform: uppercase;
-				letter-spacing: 0.05em;
-				margin-bottom: -4px;
+			.popup-coords {
+				opacity: .72;
+				color: #444;
+				text-align: center;
+				font-size: 10px;
+				font-weight: 600;
+				white-space: nowrap;
+				font-family: sans-serif;
+				padding: 0 .4rem .2rem;
+				line-height: 1.3;
+				border-top: 1px solid rgba(100,100,100,0.15);
+				width: 100%;
+				box-sizing: border-box;
 			}
-
-			.toggle-group {
+			.popup-stem {
+				background: #646464;
+				width: 3px;
+				height: 16px;
+				flex-shrink: 0;
+				position: relative;
+				margin: 0 auto;
+			}
+			.popup-dot {
+				background: #646464;
+				border-radius: 50%;
+				width: 9px;
+				height: 9px;
+				position: absolute;
+				bottom: -4px;
+				left: 50%;
+				transform: translateX(-50%);
+			}
+			.popup-value-row {
+				display: flex;
+				align-items: center;
+				gap: 5px;
+			}
+			.popup-swatch {
+				width: 10px;
+				height: 10px;
+				border-radius: 2px;
+				border: 1px solid rgba(0,0,0,0.25);
+				flex-shrink: 0;
+			}
+			/* Popup settings in controls panel */
+			.popup-settings-section {
+				display: flex;
+				flex-direction: column;
+				gap: 5px;
+			}
+			.popup-mode-group {
 				display: flex;
 				border-radius: 7px;
 				overflow: hidden;
 				border: 1px solid #ccc;
 				width: fit-content;
 			}
-
-			.toggle-group button {
-				padding: 5px 13px;
+			.popup-mode-group button {
+				padding: 4px 10px;
 				border: none;
 				background: #f0f0f0;
 				cursor: pointer;
-				font-size: 13px;
+				font-size: 12px;
 				font-weight: 600;
 				color: #555;
 				transition: background 0.15s, color 0.15s;
 				white-space: nowrap;
 			}
-
-			.toggle-group button.active { background: #2563eb; color: #fff; }
-			.toggle-group button:not(:last-child) { border-right: 1px solid #ccc; }
-
-			.depth-group { display: flex; flex-direction: column; gap: 4px; }
-
-			.depth-group button {
-				padding: 5px 10px;
-				border: 1px solid #ccc;
-				border-radius: 6px;
-				background: #f0f0f0;
-				cursor: pointer;
-				font-size: 12px;
-				font-weight: 600;
-				color: #555;
-				text-align: left;
-				transition: background 0.15s, color 0.15s;
+			.popup-mode-group button:not(:last-child) { border-right: 1px solid #ccc; }
+			.popup-mode-group button.active { background: #2563eb; color: #fff; }
+			@media (max-width: 768px) {
+				.popup-mode-group button { font-size: 11px; padding: 4px 7px; }
 			}
 
-			.depth-group button.active {
-				background: #2563eb;
-				color: #fff;
-				border-color: #2563eb;
+			/* Ramp picker */
+			#ramp-preview-strip { width: 60px; height: 12px; border-radius: 3px; border: 1px solid #ccc; flex-shrink: 0; }
+			.ramp-flip-btn { width: 100%; padding: 4px 0; font-size: 11px; border: 1px solid #ccc; border-radius: 5px; background: #f5f5f5; cursor: pointer; color: #555; transition: background 0.12s; }
+			.ramp-flip-btn:hover { background: #e8e8e8; }
+			/* Horizontal ramp rows */
+			.ramp-list { display: flex; flex-direction: column; gap: 2px; }
+			.ramp-row {
+				display: flex; align-items: center; gap: 7px;
+				padding: 3px 5px; border-radius: 5px; cursor: pointer;
+				border: 1px solid transparent; transition: border-color 0.12s, background 0.12s;
 			}
-
-			.control-row {
-				display: flex;
-				align-items: center;
-				gap: 8px;
+			.ramp-row:hover { background: #f4f4f4; }
+			.ramp-row.active { border-color: #2563eb; background: #eff6ff; }
+			.ramp-bar {
+				width: 100px; height: 14px; border-radius: 3px; flex-shrink: 0;
+				border: 1px solid rgba(0,0,0,0.1);
 			}
+			.ramp-label { font-size: 11px; color: #444; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-			.control-row label { color: #555; min-width: 36px; }
-
-			.control-row input[type="number"] {
-				width: 72px;
-				padding: 4px 6px;
-				border: 1px solid #ccc;
-				border-radius: 6px;
-				font-size: 14px;
-				cursor: ns-resize;
+			/* Opacity + clear */
+			.tree-opacity-row { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #555; }
+			.tree-opacity-row input[type="range"] { flex: 1; accent-color: #16a34a; }
+			.tree-none-btn { width: 100%; padding: 5px 0; font-size: 12px; border: 1px solid #ccc; border-radius: 6px; background: #f5f5f5; cursor: pointer; color: #666; transition: background 0.12s; }
+			.tree-none-btn:hover { background: #fee2e2; border-color: #fca5a5; color: #dc2626; }
+			#tree-status { font-size: 11px; color: #888; text-align: center; padding: 6px 0; }
+			/* Layer limit badge */
+			#tree-layer-limit { font-size: 11px; font-weight: 600; color: #92400e; background: #fef3c7; border: 1px solid #fcd34d; border-radius: 5px; padding: 4px 8px; text-align: center; display: none; }
+			#tree-layer-limit.visible { display: block; }
+			/* ── Basemap floating button + popup ─────────────────────────── */
+			#bm-fab {
+				position: absolute; bottom: 28px; left: 12px; z-index: 20;
+				width: 44px; height: 44px; border-radius: 50%;
+				background: rgba(255,255,255,0.97); border: 2px solid #ddd;
+				box-shadow: 0 2px 10px rgba(0,0,0,0.22);
+				cursor: pointer; display: flex; align-items: center; justify-content: center;
+				font-size: 20px; transition: box-shadow 0.15s, border-color 0.15s;
+				font-family: sans-serif;
 			}
-
-			.control-row input[type="number"]:focus {
-				outline: 2px solid #2563eb44;
-				border-color: #2563eb;
+			#bm-fab:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.28); border-color: #2563eb; }
+			#bm-fab.open { border-color: #2563eb; background: #eff6ff; }
+			#bm-popup {
+				position: absolute; bottom: 80px; left: 12px; z-index: 20;
+				background: rgba(255,255,255,0.98); border-radius: 12px;
+				box-shadow: 0 4px 20px rgba(0,0,0,0.22); padding: 12px;
+				font-family: sans-serif; width: 284px;
+				display: none; flex-direction: column; gap: 6px;
+				max-height: 500px;
+				overflow-y: auto;
 			}
-
-			.checkbox-label {
-				display: flex;
-				align-items: center;
-				gap: 6px;
-				color: #555;
-				cursor: pointer;
-				user-select: none;
+			#bm-popup.open { display: flex; }
+			.bm-popup-title {
+				font-size: 11px; font-weight: 700; color: #666;
+				text-transform: uppercase; letter-spacing: 0.05em;
 			}
-
-			#apply-btn {
-				width: 100%;
-				padding: 7px 0;
-				border: none;
-				border-radius: 7px;
-				font-size: 13px;
-				font-weight: 600;
-				cursor: pointer;
-				background: #2563eb;
-				color: #fff;
-				transition: background 0.15s;
+			.bm-section-label {
+				font-size: 10px; font-weight: 700; color: #aaa;
+				text-transform: uppercase; letter-spacing: 0.05em; margin: 4px 0 2px;
 			}
-
-			#apply-btn:hover { background: #1d4ed8; }
-
-			.divider { border: none; border-top: 1px solid #e5e5e5; margin: 0; }
-
-			/* Color editor */
-			.color-editor-header {
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
-				cursor: pointer;
-				user-select: none;
+			.bm-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+			.bm-btn {
+				display: flex; flex-direction: column; align-items: center; gap: 3px;
+				cursor: pointer; border: 2px solid transparent; border-radius: 8px;
+				padding: 4px 3px; background: none; transition: border-color 0.15s, background 0.15s;
 			}
-
-			.color-editor-header span {
-				font-size: 11px;
-				font-weight: 700;
-				color: #888;
-				text-transform: uppercase;
-				letter-spacing: 0.05em;
+			.bm-btn:hover { background: #f0f4ff; }
+			.bm-btn.active { border-color: #2563eb; background: #dbeafe; box-shadow: 0 0 0 2px #93c5fd inset; }
+			.bm-btn.active .bm-label { color: #1d4ed8; font-weight: 700; }
+			.bm-thumb {
+				width: 54px; height: 36px; border-radius: 5px; border: 1px solid rgba(0,0,0,0.12);
+				background-size: cover; background-position: center; flex-shrink: 0;
 			}
-
-			.color-editor-header .chevron {
-				font-size: 10px;
-				color: #aaa;
-				transition: transform 0.2s;
+			.bm-label { font-size: 9px; font-weight: 600; color: #444; text-align: center; line-height: 1.2; word-break: break-word; }
+			/* Raster overlay rows — single-select radio style */
+			.bm-overlay-row {
+				display: flex; align-items: center; gap: 8px;
+				padding: 5px 8px; border-radius: 7px; cursor: pointer;
+				border: 1.5px solid #e8e8e8; margin-bottom: 3px;
+				transition: background 0.12s, border-color 0.12s;
+				background: #fafafa;
 			}
-
-			.color-editor-header.open .chevron { transform: rotate(180deg); }
-
-			.color-rows {
-				display: none;
-				flex-direction: column;
-				gap: 4px;
-				margin-top: 4px;
+			.bm-overlay-row:hover { background: #f0f4ff; border-color: #bfdbfe; }
+			.bm-overlay-row.active {
+				background: #dbeafe; border-color: #2563eb; border-width: 2px;
 			}
-
-			.color-rows.open { display: flex; }
-
-			.color-row {
-				display: flex;
-				align-items: center;
-				gap: 6px;
-				font-size: 12px;
-				color: #444;
+			.bm-overlay-swatch { width: 34px; height: 20px; border-radius: 3px; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.1); }
+			.bm-overlay-name { font-size: 11px; color: #444; flex: 1; font-weight: 500; }
+			.bm-overlay-row.active .bm-overlay-name { color: #1d4ed8; font-weight: 700; }
+			.bm-overlay-radio {
+				width: 14px; height: 14px; border-radius: 50%; border: 2px solid #ccc;
+				flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+				transition: border-color 0.12s;
 			}
-
-			.color-row input[type="color"] {
-				width: 32px;
-				height: 22px;
-				padding: 1px 2px;
-				border: 1px solid #ccc;
-				border-radius: 4px;
-				cursor: pointer;
-				background: none;
+			.bm-overlay-row.active .bm-overlay-radio { border-color: #2563eb; background: #2563eb; }
+			.bm-overlay-radio::after {
+				content: ''; width: 6px; height: 6px; border-radius: 50%;
+				background: white; display: none;
 			}
-
-			.color-row .bp-label {
-				min-width: 52px;
-				font-size: 11px;
-				color: #666;
-			}
-
-			.color-row input[type="range"] {
-				flex: 1;
-				accent-color: #2563eb;
-				max-width:100px;
-			}
-
-			.opacity-val {
-				font-size: 11px;
-				color: #888;
-				min-width: 28px;
-				text-align: right;
-			}
-
-			.reset-colors-btn {
-				font-size: 11px;
-				padding: 3px 8px;
-				border: 1px solid #ccc;
-				border-radius: 5px;
-				background: #f5f5f5;
-				cursor: pointer;
-				color: #555;
-				align-self: flex-end;
-				margin-top: 2px;
-			}
-
-			.reset-colors-btn:hover { background: #e8e8e8; }
+			.bm-overlay-row.active .bm-overlay-radio::after { display: block; }
+			.bm-divider { border: none; border-top: 1px solid #eee; margin: 6px 0; }
 		</style>
 	</head>
 	<body>
 		<div id="map"></div>
 
+		<!-- Basemap FAB button -->
+		<button id="bm-fab" onclick="toggleBmPopup()" title="Map layers">🗺</button>
+
+		<!-- Basemap popup panel -->
+		<div id="bm-popup">
+			<div class="bm-popup-title" style="margin-bottom:4px">🗺 Map Style</div>
+
+			<!-- Overlay Layers become the basemap options -->
+			<div class="bm-section-label">Watercolor</div>
+			<div class="bm-overlay-row" id="bmo-watercolor" onclick="setBasemapOverlay('watercolor')">
+				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#f5deb3,#d2b48c,#b0c4de)"></div>
+				<span class="bm-overlay-name">Stamen Watercolor</span><div class="bm-overlay-radio"></div>
+			</div>
+			<div class="bm-overlay-row" id="bmo-watercolor_muted" onclick="setBasemapOverlay('watercolor_muted')">
+				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#ddd,#c8c8c8,#b8b8b8)"></div>
+				<span class="bm-overlay-name">Watercolor Muted</span><div class="bm-overlay-radio"></div>
+			</div>
+			<div class="bm-overlay-row" id="bmo-watercolor_gray" onclick="setBasemapOverlay('watercolor_gray')">
+				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#e0e0e0,#b0b0b0,#888)"></div>
+				<span class="bm-overlay-name">Watercolor Gray</span><div class="bm-overlay-radio"></div>
+			</div>
+			<div class="bm-overlay-row" id="bmo-watercolor_darkgray" onclick="setBasemapOverlay('watercolor_darkgray')">
+				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#555,#333,#222)"></div>
+				<span class="bm-overlay-name">Watercolor Dark Gray</span><div class="bm-overlay-radio"></div>
+			</div>
+
+			<div class="bm-section-label">OpenStreetMap</div>
+			<div class="bm-overlay-row" id="bmo-osm_std" onclick="setBasemapOverlay('osm_std')">
+				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#f2f2f0,#b5d0d0,#f8f4f0)"></div>
+				<span class="bm-overlay-name">OSM Standard</span><div class="bm-overlay-radio"></div>
+			</div>
+			<div class="bm-overlay-row" id="bmo-osm_de" onclick="setBasemapOverlay('osm_de')">
+				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#eef0e8,#c8d0b8,#f0ece4)"></div>
+				<span class="bm-overlay-name">OSM DE</span><div class="bm-overlay-radio"></div>
+			</div>
+			<div class="bm-overlay-row" id="bmo-osm_fr" onclick="setBasemapOverlay('osm_fr')">
+				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#f0ece4,#c0c8b0,#e8e4dc)"></div>
+				<span class="bm-overlay-name">OSM FR</span><div class="bm-overlay-radio"></div>
+			</div>
+			<div class="bm-overlay-row" id="bmo-osm_hot" onclick="setBasemapOverlay('osm_hot')">
+				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#fef0dc,#e8c8a0,#f8e8d0)"></div>
+				<span class="bm-overlay-name">OSM HOT</span><div class="bm-overlay-radio"></div>
+			</div>
+			<div class="bm-overlay-row" id="bmo-osm_lightgray" onclick="setBasemapOverlay('osm_lightgray')">
+				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#f0f0f0,#d8d8d8,#f8f8f8)"></div>
+				<span class="bm-overlay-name">OSM Light Gray</span><div class="bm-overlay-radio"></div>
+			</div>
+			<div class="bm-overlay-row" id="bmo-osm_medgray" onclick="setBasemapOverlay('osm_medgray')">
+				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#888,#666,#999)"></div>
+				<span class="bm-overlay-name">OSM Medium Gray</span><div class="bm-overlay-radio"></div>
+			</div>
+			<div class="bm-overlay-row" id="bmo-osm_medgray2" onclick="setBasemapOverlay('osm_medgray2')">
+				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#777,#555,#888)"></div>
+				<span class="bm-overlay-name">OSM Medium Gray 2</span><div class="bm-overlay-radio"></div>
+			</div>
+			<div class="bm-overlay-row" id="bmo-osm_darkgray" onclick="setBasemapOverlay('osm_darkgray')">
+				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#333,#222,#444)"></div>
+				<span class="bm-overlay-name">OSM Dark Gray</span><div class="bm-overlay-radio"></div>
+			</div>
+			<div class="bm-overlay-row" id="bmo-osm_darkest" onclick="setBasemapOverlay('osm_darkest')">
+				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#1a1a1a,#111,#222)"></div>
+				<span class="bm-overlay-name">OSM Darkest</span><div class="bm-overlay-radio"></div>
+			</div>
+
+			<div class="bm-section-label">Topographic</div>
+			<div class="bm-overlay-row" id="bmo-otm" onclick="setBasemapOverlay('otm')">
+				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#e8e0c8,#c8d8b0,#b0c890)"></div>
+				<span class="bm-overlay-name">OpenTopoMap</span><div class="bm-overlay-radio"></div>
+			</div>
+			<div class="bm-overlay-row" id="bmo-otm_muted" onclick="setBasemapOverlay('otm_muted')">
+				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#d8d0b8,#b8c8a0,#a0b880)"></div>
+				<span class="bm-overlay-name">OpenTopoMap Muted</span><div class="bm-overlay-radio"></div>
+			</div>
+			<div class="bm-overlay-row" id="bmo-eox_terrain" onclick="setBasemapOverlay('eox_terrain')">
+				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#d4c8a8,#a8c890,#8898c0)"></div>
+				<span class="bm-overlay-name">EOX Terrain</span><div class="bm-overlay-radio"></div>
+			</div>
+			<div class="bm-overlay-row" id="bmo-eox_terrain_light" onclick="setBasemapOverlay('eox_terrain_light')">
+				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#ece8d8,#c8d8b8,#a8c0d8)"></div>
+				<span class="bm-overlay-name">EOX Terrain Light</span><div class="bm-overlay-radio"></div>
+			</div>
+			<div class="bm-overlay-row" id="bmo-usgs_topo" onclick="setBasemapOverlay('usgs_topo')">
+				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#f0ece0,#d0e0c0,#c8d8e8)"></div>
+				<span class="bm-overlay-name">USGS Topo</span><div class="bm-overlay-radio"></div>
+			</div>
+			<div class="bm-overlay-row" id="bmo-usgs_hillshade" onclick="setBasemapOverlay('usgs_hillshade')">
+				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#f0f0f0,#a0a0a0,#404040)"></div>
+				<span class="bm-overlay-name">USGS Hillshade</span><div class="bm-overlay-radio"></div>
+			</div>
+			<div class="bm-overlay-row" id="bmo-usgs_aspect" onclick="setBasemapOverlay('usgs_aspect')">
+				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#4040c0,#40c040,#c04040)"></div>
+				<span class="bm-overlay-name">USGS Aspect Map</span><div class="bm-overlay-radio"></div>
+			</div>
+			<div class="bm-overlay-row" id="bmo-usgs_slope" onclick="setBasemapOverlay('usgs_slope')">
+				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#e8f0e0,#c0d890,#405830)"></div>
+				<span class="bm-overlay-name">USGS Slope Map</span><div class="bm-overlay-radio"></div>
+			</div>
+
+			<div class="bm-section-label">Satellite &amp; Imagery</div>
+			<div class="bm-overlay-row" id="bmo-eox_blackmarble" onclick="setBasemapOverlay('eox_blackmarble')">
+				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#080818,#101828,#0c1020)"></div>
+				<span class="bm-overlay-name">EOX Black Marble</span><div class="bm-overlay-radio"></div>
+			</div>
+			<div class="bm-overlay-row" id="bmo-eox_bluemarble" onclick="setBasemapOverlay('eox_bluemarble')">
+				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#2860a0,#60a840,#80c8e8)"></div>
+				<span class="bm-overlay-name">EOX Blue Marble</span><div class="bm-overlay-radio"></div>
+			</div>
+			<div class="bm-overlay-row" id="bmo-sentinel_2024" onclick="setBasemapOverlay('sentinel_2024')">
+				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#508830,#88a848,#a0c0d8)"></div>
+				<span class="bm-overlay-name">Sentinel-2 2024</span><div class="bm-overlay-radio"></div>
+			</div>
+			<div class="bm-overlay-row" id="bmo-usgs_img" onclick="setBasemapOverlay('usgs_img')">
+				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#384828,#507038,#708858)"></div>
+				<span class="bm-overlay-name">USGS Imagery</span><div class="bm-overlay-radio"></div>
+			</div>
+			<div class="bm-overlay-row" id="bmo-usgs_imgtopo" onclick="setBasemapOverlay('usgs_imgtopo')">
+				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#405030,#607040,#a0b090)"></div>
+				<span class="bm-overlay-name">USGS Imagery+Topo</span><div class="bm-overlay-radio"></div>
+			</div>
+		</div>
+
+
+		<!-- Left: Soil Controls -->
 		<div id="controls">
-			<h3 style="display:flex; align-items:center; justify-content:space-between; margin:0">
+			<h3 style="display:flex;align-items:center;justify-content:space-between;margin:0">
 				<span>
 					Soil Data Explorer
 					<a href="https://maps.open-meteo.com/?domain=ncep_nam_conus&variable=soil_temperature_0_to_10cm"
-					   target="_blank"
-					   style="font-size:10px; margin-left:8px; color:#4aa3ff; text-decoration:none;">
-					   (Open-Meteo Map)
-					</a>
+					   target="_blank" style="font-size:10px;margin-left:8px;margin-right:8px;color:#4aa3ff;text-decoration:none">(Open-Meteo Map)</a>
 				</span>
 				<button id="minimize-btn" onclick="toggleMinimize()"
-					style="background:none; border:none; cursor:pointer; font-size:16px; color:#888; padding:0; line-height:1">
-					⌃
-				</button>
+					style="background:none;border:none;cursor:pointer;font-size:16px;color:#888;padding:0;line-height:1">⌃</button>
 			</h3>
 
 			<div class="section-label">Mushroom Presets</div>
 			<select id="mushroom-preset" onchange="applyPreset(this.value)"
-				style="width:100%; padding:5px 6px; border:1px solid #ccc; border-radius:6px;
-					   font-size:13px; color:#444; background:#fafafa; cursor:pointer">
+				style="width:100%;padding:5px 6px;border:1px solid #ccc;border-radius:6px;font-size:13px;color:#444;background:#fafafa;cursor:pointer">
 				<option value="">— Select a preset —</option>
 				<option value="king_bolete">King Bolete</option>
 				<option value="spring_king_bolete">Spring King Bolete</option>
@@ -259,75 +502,59 @@
 			</select>
 			<hr class="divider" />
 
-			<!-- Layer toggles -->
 			<div class="section-label">Active Layers</div>
-			<div style="display:flex; flex-direction:column; gap:6px;">
-				<div style="display:flex; align-items:center; gap:6px;">
-					<label class="checkbox-label" style="min-width:130px; white-space: nowrap; flex-shrink:0;">
+			<div style="display:flex;flex-direction:column;gap:6px">
+				<div style="display:flex;align-items:center;gap:6px">
+					<label class="checkbox-label" style="min-width:130px;white-space:nowrap;flex-shrink:0">
 						<input type="checkbox" id="layer-temp-check" checked onchange="onLayerCheckChange()" />
 						🌡 Soil Temperature
 					</label>
 					<input type="range" id="temp-master-opacity" min="0" max="1" step="0.05" value="0.75"
-						style="max-width:100px; accent-color:#2563eb"
-						oninput="setMasterOpacity('temp', this.value)" />
-					<span id="temp-opacity-val" style="font-size:11px; color:#888; min-width:28px; text-align:right">75%</span>
+						style="max-width:100px;accent-color:#2563eb" oninput="setMasterOpacity('temp',this.value)" />
+					<span id="temp-opacity-val" style="font-size:11px;color:#888;min-width:28px;text-align:right">75%</span>
 				</div>
-				<div style="display:flex; align-items:center; gap:6px;">
-					<label class="checkbox-label" style="min-width:130px flex-shrink:0;">
+				<div style="display:flex;align-items:center;gap:6px">
+					<label class="checkbox-label" style="min-width:130px;white-space:nowrap;flex-shrink:0">
 						<input type="checkbox" id="layer-moist-check" onchange="onLayerCheckChange()" />
 						💧 Soil Moisture
 					</label>
 					<input type="range" id="moist-master-opacity" min="0" max="1" step="0.05" value="0.75"
-						style="max-width:100px; accent-color:#2563eb"
-						oninput="setMasterOpacity('moist', this.value)" />
-					<span id="moist-opacity-val" style="font-size:11px; color:#888; min-width:28px; text-align:right">75%</span>
+						style="max-width:100px;accent-color:#2563eb" oninput="setMasterOpacity('moist',this.value)" />
+					<span id="moist-opacity-val" style="font-size:11px;color:#888;min-width:28px;text-align:right">75%</span>
 				</div>
 			</div>
-
 			<hr class="divider" />
 
-			<!-- TEMPERATURE SECTION -->
 			<div id="temp-section">
 				<div class="section-label" style="margin-bottom:6px">🌡 Temperature</div>
-
-				<div class="section-label" style="font-size:10px; margin-bottom:2px">Depth</div>
+				<div class="section-label" style="font-size:10px;margin-bottom:2px">Depth</div>
 				<div class="depth-group" id="depth-group-temp">
 					<button class="active" data-depth="0_to_10cm"    onclick="setDepth('temp',this)">0 – 10 cm</button>
 					<button data-depth="10_to_40cm"   onclick="setDepth('temp',this)">10 – 40 cm</button>
 					<button data-depth="40_to_100cm"  onclick="setDepth('temp',this)">40 – 100 cm</button>
 					<button data-depth="100_to_200cm" onclick="setDepth('temp',this)">100 – 200 cm</button>
 				</div>
-
 				<div style="margin-top:8px">
-					<div class="section-label" style="font-size:10px; margin-bottom:4px">Range</div>
+					<div class="section-label" style="font-size:10px;margin-bottom:4px">Range</div>
 					<div class="toggle-group" style="margin-bottom:8px">
 						<button id="btn-f" class="active" onclick="setUnit('F')">°F</button>
 						<button id="btn-c" onclick="setUnit('C')">°C</button>
 					</div>
 					<div class="control-row">
-						<label>Min</label>
-						<input type="number" id="input-min" value="41" step="1" />
-						<span id="unit-label-min">°F</span>
+						<label>Min</label><input type="number" id="input-min" value="41" step="1" /><span id="unit-label-min">°F</span>
 					</div>
 					<div class="control-row" style="margin-top:6px">
-						<label>Max</label>
-						<input type="number" id="input-max" value="50" step="1" />
-						<span id="unit-label-max">°F</span>
+						<label>Max</label><input type="number" id="input-max" value="50" step="1" /><span id="unit-label-max">°F</span>
 					</div>
 				</div>
-
 				<div class="control-row" style="margin-top:8px">
 					<label class="checkbox-label">
-						<input type="checkbox" id="contour-check-temp" checked onchange="syncContourCheck('temp')" />
-						Show contours
+						<input type="checkbox" id="contour-check-temp" checked onchange="syncContourCheck('temp')" />Show contours
 					</label>
 				</div>
-
-				<!-- Temperature color editor -->
 				<div style="margin-top:8px">
 					<div class="color-editor-header" id="temp-color-header" onclick="toggleColorEditor('temp')">
-						<span>Colors</span>
-						<span class="chevron">▼</span>
+						<span>Colors</span><span class="chevron">▼</span>
 					</div>
 					<div class="color-rows" id="temp-color-rows"></div>
 				</div>
@@ -335,46 +562,46 @@
 
 			<hr class="divider" id="divider-moist" style="display:none" />
 
-			<!-- MOISTURE SECTION -->
 			<div id="moist-section" style="display:none">
 				<div class="section-label" style="margin-bottom:6px">💧 Moisture</div>
-
-				<div class="section-label" style="font-size:10px; margin-bottom:2px">Depth</div>
+				<div class="section-label" style="font-size:10px;margin-bottom:2px">Depth</div>
 				<div class="depth-group" id="depth-group-moist">
 					<button class="active" data-depth="0_to_10cm"    onclick="setDepth('moist',this)">0 – 10 cm</button>
 					<button data-depth="10_to_40cm"   onclick="setDepth('moist',this)">10 – 40 cm</button>
 					<button data-depth="40_to_100cm"  onclick="setDepth('moist',this)">40 – 100 cm</button>
 					<button data-depth="100_to_200cm" onclick="setDepth('moist',this)">100 – 200 cm</button>
 				</div>
-
 				<div style="margin-top:8px">
-					<div class="section-label" style="font-size:10px; margin-bottom:4px">Range (m³/m³)</div>
+					<div class="section-label" style="font-size:10px;margin-bottom:4px">Range (m³/m³)</div>
 					<div class="control-row">
-						<label>Min</label>
-						<input type="number" id="input-moist-min" value="0.2" step="0.01" min="0" max="0.8" />
-						<span>m³/m³</span>
+						<label>Min</label><input type="number" id="input-moist-min" value="0.2" step="0.01" min="0" max="0.8" /><span>m³/m³</span>
 					</div>
 					<div class="control-row" style="margin-top:6px">
-						<label>Max</label>
-						<input type="number" id="input-moist-max" value="0.4" step="0.01" min="0" max="0.8" />
-						<span>m³/m³</span>
+						<label>Max</label><input type="number" id="input-moist-max" value="0.4" step="0.01" min="0" max="0.8" /><span>m³/m³</span>
 					</div>
 				</div>
-
 				<div class="control-row" style="margin-top:8px">
 					<label class="checkbox-label">
-						<input type="checkbox" id="contour-check-moist" onchange="syncContourCheck('moist')" />
-						Show contours
+						<input type="checkbox" id="contour-check-moist" onchange="syncContourCheck('moist')" />Show contours
 					</label>
 				</div>
-
-				<!-- Moisture color editor -->
 				<div style="margin-top:8px">
 					<div class="color-editor-header" id="moist-color-header" onclick="toggleColorEditor('moist')">
-						<span>Colors</span>
-						<span class="chevron">▼</span>
+						<span>Colors</span><span class="chevron">▼</span>
 					</div>
 					<div class="color-rows" id="moist-color-rows"></div>
+				</div>
+			</div>
+
+			<hr class="divider" />
+
+			<!-- Popup Settings -->
+			<div class="popup-settings-section">
+				<div class="section-label">🔍 Popup</div>
+				<div class="popup-mode-group">
+					<button id="popup-mode-off"      onclick="setPopupMode('off')"      class="active">Off</button>
+					<button id="popup-mode-follow"   onclick="setPopupMode('follow')">Follows mouse</button>
+					<button id="popup-mode-draggable" onclick="setPopupMode('draggable')">Draggable</button>
 				</div>
 			</div>
 
@@ -382,473 +609,1378 @@
 			<button id="apply-btn" onclick="applySettings()">Apply</button>
 		</div>
 
+		<!-- Right: Tree Species Panel -->
+		<div id="tree-panel">
+			<h3>
+				🌲 Tree Species
+				<button id="tree-minimize-btn" onclick="toggleTreePanel()"
+					style="background:none;border:none;cursor:pointer;font-size:16px;color:#888;padding:0;line-height:1">⌃</button>
+			</h3>
+			<div id="tree-panel-body">
+				<div class="section-label" style="font-size:10px;margin:0">USFS Basal Area · Species + Year · <strong>max 3 active</strong></div>
+
+				<input type="text" class="tree-search" id="tree-search" placeholder="Search species…" oninput="filterTreeList()" />
+
+				<div id="tree-layer-limit">⚠ Max 3 layers reached — remove one to add another</div>
+
+				<div id="tree-status">Loading species list…</div>
+				<div class="tree-list" id="tree-list" style="display:none"></div>
+
+				<div id="tree-selection-summary"></div>
+
+				<button class="tree-none-btn" id="tree-none-btn" style="display:none" onclick="clearAllTreeLayers()">✕ Clear all selections</button>
+				<div id="ramp-list-loading" style="display:none;font-size:11px;color:#888;text-align:center;padding:4px 0">Loading ramps…</div>
+			</div>
+		</div>
+
 		<script>
-			// ─── Default color definitions ────────────────────────────────────────────
-			const DEFAULT_TEMP_BREAKPOINTS  = [-30,-20,-10,-5,0,5,10,15,20,25,30,35,40,45,50];
-			const DEFAULT_TEMP_COLORS = [
-				[100,50,200],[75,0,130],[0,0,255],[0,100,255],[0,180,255],
-				[0,220,150],[0,200,0],[170,220,0],[255,220,0],[255,180,0],
-				[255,140,0],[255,80,0],[255,0,0],[180,0,0],[139,0,0],
-			];
-			const DEFAULT_MOIST_BREAKPOINTS = [0,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.5,0.6,0.7,0.8];
-			const DEFAULT_MOIST_COLORS = [
-				[255,255,200],[220,240,180],[170,220,160],[120,200,180],[80,180,210],
-				[50,150,220],[30,120,210],[20,100,200],[10,80,190],[5,60,170],
-				[0,40,150],[0,20,130],[0,10,100],[0,0,70],
-			];
+		// ─── Soil: color defaults ─────────────────────────────────────────────────
+		const DEFAULT_TEMP_BREAKPOINTS  = [-30,-20,-10,-5,0,5,10,15,20,25,30,35,40,45,50];
+		const DEFAULT_TEMP_COLORS = [
+			[100,50,200],[75,0,130],[0,0,255],[0,100,255],[0,180,255],
+			[0,220,150],[0,200,0],[170,220,0],[255,220,0],[255,180,0],
+			[255,140,0],[255,80,0],[255,0,0],[180,0,0],[139,0,0],
+		];
+		const DEFAULT_MOIST_BREAKPOINTS = [0,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.5,0.6,0.7,0.8];
+		const DEFAULT_MOIST_COLORS = [
+			[255,255,200],[220,240,180],[170,220,160],[120,200,180],[80,180,210],
+			[50,150,220],[30,120,210],[20,100,200],[10,80,190],[5,60,170],
+			[0,40,150],[0,20,130],[0,10,100],[0,0,70],
+		];
+		let userTempColors   = DEFAULT_TEMP_COLORS.map(c=>[...c]);
+		let userMoistColors  = DEFAULT_MOIST_COLORS.map(c=>[...c]);
+		let userTempOpacity  = DEFAULT_TEMP_BREAKPOINTS.map(()=>0.75);
+		let userMoistOpacity = DEFAULT_MOIST_BREAKPOINTS.map(()=>0.75);
 
-			// Mutable user color arrays (deep copy of defaults)
-			let userTempColors  = DEFAULT_TEMP_COLORS.map(c => [...c]);
-			let userMoistColors = DEFAULT_MOIST_COLORS.map(c => [...c]);
-			// Per-breakpoint opacity (default 0.75)
-			let userTempOpacity  = DEFAULT_TEMP_BREAKPOINTS.map(() => 0.75);
-			let userMoistOpacity = DEFAULT_MOIST_BREAKPOINTS.map(() => 0.75);
+		// ─── Soil: state ──────────────────────────────────────────────────────────
+		let currentUnit='F', tempDepth='0_to_10cm', moistDepth='0_to_10cm';
+		let tempActive=true, moistActive=false, tempContours=true, moistContours=false;
+		let rangeMinC=5, rangeMaxC=10, mapLoaded=false, tempOpacity=0.75, moistOpacity=0.75;
 
-			// ─── State ────────────────────────────────────────────────────────────────
-			let currentUnit    = 'F';
-			let tempDepth      = '0_to_10cm';
-			let moistDepth     = '0_to_10cm';
-			let tempActive     = true;
-			let moistActive    = false;
-			let tempContours   = true;
-			let moistContours  = false;
-			let rangeMinC      = 5;
-			let rangeMaxC      = 10;
-			let mapLoaded      = false;
-			let tempOpacity  = 0.75;
-			let moistOpacity = 0.75;
+		let minimized=false;
+		function toggleMinimize(){
+			minimized=!minimized;
+			const btn=document.getElementById('minimize-btn');
+			btn.style.transform=minimized?'rotate(180deg)':'';
+			btn.style.transition='transform 0.2s';
+			document.querySelectorAll('#controls > *:not(h3)').forEach(el=>{el.style.display=minimized?'none':'';});
+			if(!minimized) onLayerCheckChange();
+		}
 
-			let minimized = false;
-			function toggleMinimize() {
-				minimized = !minimized;
-				const btn = document.getElementById('minimize-btn');
-				btn.style.transform  = minimized ? 'rotate(180deg)' : '';
-				btn.style.transition = 'transform 0.2s';
-
-				document.querySelectorAll('#controls > *:not(h3)').forEach(el => {
-					el.style.display = minimized ? 'none' : '';
-				});
-
-				// Re-apply visibility rules that onLayerCheckChange owns
-				if (!minimized) onLayerCheckChange();
-			}
-
-			function getInsertionLayer(preferLabel) {
-				const style = map.getStyle();
-				if (!style || !style.layers) return undefined;
-				const ids = style.layers.map(l => l.id);
-
-				if (preferLabel) {
-					// Try common label layer names across styles
-					const labelCandidates = [
-						'place_label_other', 'place-label', 'place_label',
-						'poi-label', 'road-label', 'waterway-label'
-					];
-					for (const c of labelCandidates) if (ids.includes(c)) return c;
-				} else {
-					// Try common waterway/tunnel layer names
-					const rasterCandidates = [
-						'waterway-tunnel', 'waterway', 'water', 'landuse', 'background'
-					];
-					for (const c of rasterCandidates) if (ids.includes(c)) return c;
+		function setBasemapOverlay(key) {
+			// Deactivate current basemap (if any)
+			if (activeBasemap) {
+				const prev = document.getElementById('bmo-' + activeBasemap);
+				if (prev) prev.classList.remove('active');
+				
+				// If there was a previous overlay basemap, remove it
+				if (activeBasemap.startsWith('osm_') || activeBasemap.startsWith('watercolor') || 
+					activeBasemap.startsWith('otm') || activeBasemap.startsWith('eox_') || 
+					activeBasemap.startsWith('usgs_') || activeBasemap.startsWith('sentinel_')) {
+					removeRasterOverlayFromMap(activeBasemap);
 				}
-				return undefined; // falls back to top of stack
+				
+				const wasActive = activeBasemap === key;
+				if (wasActive) {
+					activeBasemap = null;
+					return;
+				}
 			}
+			
+			// Set new basemap
+			activeBasemap = key;
+			const row = document.getElementById('bmo-' + key);
+			if (row) row.classList.add('active');
+			
+			// Add as raster overlay to the map
+			addRasterOverlayToMap(key);
+			
+			// Update any active soil/tree layers to appear above the new basemap
+			if (tempActive) refreshSliceLayers('temp');
+			if (moistActive) refreshSliceLayers('moist');
+			refreshAllTreeLayers();
+		}
 
-			const MUSHROOM_PRESETS = {
-				king_bolete:        { tempF: [48, 60], moist: [0.21, 0.42] },
-				spring_king_bolete: { tempF: [47, 59], moist: [0.28, 0.40] },
-				morels:             { tempF: [44, 58], moist: [0.30, 0.42] },
-				chanterelle:        { tempF: [44, 62], moist: [0.15, 0.42] },
-				yellowfoot:         { tempF: [41, 52], moist: [0.30, 0.44] },
-				hedgehog:           { tempF: [43, 52], moist: [0.35, 0.43] },
-				lobster:            { tempF: [43, 66], moist: [0.16, 0.42] },
+		function getInsertionLayer(preferLabel){
+			const style=map.getStyle();
+			if(!style||!style.layers) return undefined;
+			const ids=style.layers.map(l=>l.id);
+			if(preferLabel){
+				// Vector labels always go on top of everything
+				for(const c of ['place_label_other','place-label','place_label','poi-label','road-label','waterway-label']) if(ids.includes(c)) return c;
+			} else {
+				// Soil/tree rasters must render ABOVE the active raster overlay.
+				// Insert directly above the overlay layer in the draw order.
+				if(typeof activeRasterOverlay !== 'undefined' && activeRasterOverlay){
+					const olvId = rasterOverlayLyrId(activeRasterOverlay);
+					const idx = ids.indexOf(olvId);
+					if(idx >= 0 && idx < ids.length - 1) return ids[idx + 1];
+					if(idx === ids.length - 1) return undefined; // overlay is topmost
+				}
+				// No overlay — insert before the first label layer
+				for(const c of ['place_label_other','place-label','place_label','poi-label','road-label','waterway-label']) if(ids.includes(c)) return c;
+			}
+			return undefined;
+		}
+
+		const MUSHROOM_PRESETS={
+			king_bolete:{tempF:[48,60],moist:[0.21,0.42]},spring_king_bolete:{tempF:[47,59],moist:[0.28,0.40]},
+			morels:{tempF:[44,58],moist:[0.30,0.42]},chanterelle:{tempF:[44,62],moist:[0.15,0.42]},
+			yellowfoot:{tempF:[41,52],moist:[0.30,0.44]},hedgehog:{tempF:[43,52],moist:[0.35,0.43]},
+			lobster:{tempF:[43,66],moist:[0.16,0.42]},
+		};
+		function applyPreset(key){
+			if(!key) return;
+			const p=MUSHROOM_PRESETS[key];
+			document.getElementById('layer-temp-check').checked=true;
+			document.getElementById('layer-moist-check').checked=true;
+			tempActive=true; moistActive=true; onLayerCheckChange();
+			const[minF,maxF]=p.tempF;
+			document.getElementById('input-min').value=currentUnit==='F'?minF:round1(toC(minF));
+			document.getElementById('input-max').value=currentUnit==='F'?maxF:round1(toC(maxF));
+			document.getElementById('input-moist-min').value=p.moist[0];
+			document.getElementById('input-moist-max').value=p.moist[1];
+			applySettings();
+			document.getElementById('mushroom-preset').value='';
+		}
+
+		const toC=f=>(f-32)*5/9, toF=c=>c*9/5+32;
+		const round1=v=>Math.round(v*10)/10, round3=v=>Math.round(v*1000)/1000;
+		const rgbToHex=(r,g,b)=>'#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+		const hexToRgb=hex=>[parseInt(hex.slice(1,3),16),parseInt(hex.slice(3,5),16),parseInt(hex.slice(5,7),16)];
+
+		function onLayerCheckChange(){
+			tempActive=document.getElementById('layer-temp-check').checked;
+			moistActive=document.getElementById('layer-moist-check').checked;
+			document.getElementById('temp-section').style.display=tempActive?'':'none';
+			document.getElementById('moist-section').style.display=moistActive?'':'none';
+			document.getElementById('divider-moist').style.display=(tempActive&&moistActive)?'':'none';
+			if(mapLoaded){
+				if(!tempActive) removeLayers('omTemp');
+				else { registerProtocol(rangeMinC,rangeMaxC,parseFloat(document.getElementById('input-moist-min').value),parseFloat(document.getElementById('input-moist-max').value)); addTempLayers(buildTempUrl(rangeMinC,rangeMaxC)); }
+				if(!moistActive) removeLayers('omMoist');
+				else { const minV=parseFloat(document.getElementById('input-moist-min').value),maxV=parseFloat(document.getElementById('input-moist-max').value); registerProtocol(rangeMinC,rangeMaxC,minV,maxV); addMoistLayers(buildMoistUrl(minV,maxV)); }
+			}
+		}
+
+		function setMasterOpacity(type,value){
+			const v=parseFloat(value);
+			document.getElementById(`${type}-opacity-val`).textContent=Math.round(v*100)+'%';
+			if(type==='temp'){tempOpacity=v;if(map.getLayer('omTempRasterLayer'))map.setPaintProperty('omTempRasterLayer','raster-opacity',v);}
+			else{moistOpacity=v;if(map.getLayer('omMoistRasterLayer'))map.setPaintProperty('omMoistRasterLayer','raster-opacity',v);}
+		}
+
+		function setUnit(unit){
+			const minEl=document.getElementById('input-min'),maxEl=document.getElementById('input-max');
+			if(unit==='C'&&currentUnit==='F'){minEl.value=round1(toC(parseFloat(minEl.value)));maxEl.value=round1(toC(parseFloat(maxEl.value)));}
+			else if(unit==='F'&&currentUnit==='C'){minEl.value=round1(toF(parseFloat(minEl.value)));maxEl.value=round1(toF(parseFloat(maxEl.value)));}
+			currentUnit=unit;
+			document.getElementById('unit-label-min').textContent=`°${unit}`;document.getElementById('unit-label-max').textContent=`°${unit}`;
+			document.getElementById('btn-c').classList.toggle('active',unit==='C');document.getElementById('btn-f').classList.toggle('active',unit==='F');
+		}
+
+		function setDepth(type,btn){
+			const gid=type==='temp'?'depth-group-temp':'depth-group-moist';
+			document.querySelectorAll(`#${gid} button`).forEach(b=>b.classList.remove('active'));
+			btn.classList.add('active');
+			if(type==='temp') tempDepth=btn.dataset.depth; else moistDepth=btn.dataset.depth;
+		}
+
+		function syncContourCheck(type){
+			if(type==='temp'){
+				tempContours=document.getElementById('contour-check-temp').checked;
+				['omTempVectorLayer','omTempVectorLabels'].forEach(id=>{if(map.getLayer(id))map.setLayoutProperty(id,'visibility',tempContours?'visible':'none');});
+			} else {
+				moistContours=document.getElementById('contour-check-moist').checked;
+				['omMoistVectorLayer','omMoistVectorLabels'].forEach(id=>{if(map.getLayer(id))map.setLayoutProperty(id,'visibility',moistContours?'visible':'none');});
+			}
+		}
+
+		function toggleColorEditor(type){
+			document.getElementById(`${type}-color-header`).classList.toggle('open');
+			document.getElementById(`${type}-color-rows`).classList.toggle('open');
+		}
+
+		function buildColorEditor(type){
+			const isTemp=type==='temp';
+			const bps=isTemp?DEFAULT_TEMP_BREAKPOINTS:DEFAULT_MOIST_BREAKPOINTS;
+			const colors=isTemp?userTempColors:userMoistColors;
+			const ops=isTemp?userTempOpacity:userMoistOpacity;
+			const unit=isTemp?'°C':'';
+			const container=document.getElementById(`${type}-color-rows`);
+			container.innerHTML='';
+			bps.forEach((bp,i)=>{
+				const row=document.createElement('div'); row.className='color-row';
+				const lbl=document.createElement('span'); lbl.className='bp-label'; lbl.textContent=unit?`${bp}${unit}`:bp.toFixed(2);
+				const picker=document.createElement('input'); picker.type='color'; picker.value=rgbToHex(...colors[i]);
+				picker.addEventListener('input',e=>{const rgb=hexToRgb(e.target.value);if(isTemp)userTempColors[i]=rgb;else userMoistColors[i]=rgb;});
+				const slider=document.createElement('input'); slider.type='range'; slider.min=0;slider.max=1;slider.step=0.05;slider.value=ops[i];
+				const opVal=document.createElement('span'); opVal.className='opacity-val'; opVal.textContent=Math.round(ops[i]*100)+'%';
+				slider.addEventListener('input',e=>{const v=parseFloat(e.target.value);if(isTemp)userTempOpacity[i]=v;else userMoistOpacity[i]=v;opVal.textContent=Math.round(v*100)+'%';});
+				row.appendChild(lbl);row.appendChild(picker);row.appendChild(slider);row.appendChild(opVal);
+				container.appendChild(row);
+			});
+			const resetBtn=document.createElement('button'); resetBtn.className='reset-colors-btn'; resetBtn.textContent='↺ Reset colors';
+			resetBtn.onclick=()=>{
+				if(isTemp){userTempColors=DEFAULT_TEMP_COLORS.map(c=>[...c]);userTempOpacity=DEFAULT_TEMP_BREAKPOINTS.map(()=>0.75);}
+				else{userMoistColors=DEFAULT_MOIST_COLORS.map(c=>[...c]);userMoistOpacity=DEFAULT_MOIST_BREAKPOINTS.map(()=>0.75);}
+				buildColorEditor(type);
 			};
+			container.appendChild(resetBtn);
+		}
 
-			function applyPreset(key) {
-				if (!key) return;
-				const preset = MUSHROOM_PRESETS[key];
-
-				// Enable both layers
-				document.getElementById('layer-temp-check').checked  = true;
-				document.getElementById('layer-moist-check').checked = true;
-				tempActive  = true;
-				moistActive = true;
-				onLayerCheckChange();
-
-				// Set temperature range — respect current unit
-				const [minF, maxF] = preset.tempF;
-				if (currentUnit === 'F') {
-					document.getElementById('input-min').value = minF;
-					document.getElementById('input-max').value = maxF;
-				} else {
-					document.getElementById('input-min').value = round1(toC(minF));
-					document.getElementById('input-max').value = round1(toC(maxF));
-				}
-
-				// Set moisture range
-				document.getElementById('input-moist-min').value = preset.moist[0];
-				document.getElementById('input-moist-max').value = preset.moist[1];
-
-				// Auto-apply
-				applySettings();
-
-				// Reset dropdown back to placeholder after applying
-				document.getElementById('mushroom-preset').value = '';
-			}
-
-			// ─── Helpers ──────────────────────────────────────────────────────────────
-			const toC    = f => (f - 32) * 5 / 9;
-			const toF    = c => c * 9 / 5 + 32;
-			const round1 = v => Math.round(v * 10) / 10;
-			const round3 = v => Math.round(v * 1000) / 1000;
-
-			const rgbToHex = (r,g,b) => '#' + [r,g,b].map(v =>
-				v.toString(16).padStart(2,'0')).join('');
-			const hexToRgb = hex => [
-				parseInt(hex.slice(1,3),16),
-				parseInt(hex.slice(3,5),16),
-				parseInt(hex.slice(5,7),16)
-			];
-
-			// ─── Layer checkbox ───────────────────────────────────────────────────────
-			function onLayerCheckChange() {
-				tempActive  = document.getElementById('layer-temp-check').checked;
-				moistActive = document.getElementById('layer-moist-check').checked;
-
-				document.getElementById('temp-section').style.display  = tempActive  ? '' : 'none';
-				document.getElementById('moist-section').style.display = moistActive ? '' : 'none';
-				document.getElementById('divider-moist').style.display = (tempActive && moistActive) ? '' : 'none';
-			}
-
-			function setMasterOpacity(type, value) {
-				const v = parseFloat(value);
-				document.getElementById(`${type}-opacity-val`).textContent = Math.round(v * 100) + '%';
-				if (type === 'temp') {
-					tempOpacity = v;
-					if (map.getLayer('omTempRasterLayer'))
-						map.setPaintProperty('omTempRasterLayer', 'raster-opacity', v);
-				} else {
-					moistOpacity = v;
-					if (map.getLayer('omMoistRasterLayer'))
-						map.setPaintProperty('omMoistRasterLayer', 'raster-opacity', v);
+		function interpolateColor(colors,bps,value){
+			if(value<=bps[0]) return colors[0];
+			if(value>=bps[bps.length-1]) return colors[colors.length-1];
+			for(let i=0;i<bps.length-1;i++){
+				if(value>=bps[i]&&value<=bps[i+1]){
+					const t=(value-bps[i])/(bps[i+1]-bps[i]),c0=colors[i],c1=colors[i+1];
+					return[Math.round(c0[0]+t*(c1[0]-c0[0])),Math.round(c0[1]+t*(c1[1]-c0[1])),Math.round(c0[2]+t*(c1[2]-c0[2]))];
 				}
 			}
+			return colors[colors.length-1];
+		}
+		function interpolateOpacity(ops,bps,value){
+			if(value<=bps[0]) return ops[0];
+			if(value>=bps[bps.length-1]) return ops[ops.length-1];
+			for(let i=0;i<bps.length-1;i++){if(value>=bps[i]&&value<=bps[i+1]){const t=(value-bps[i])/(bps[i+1]-bps[i]);return ops[i]+t*(ops[i+1]-ops[i]);}}
+			return ops[ops.length-1];
+		}
 
-			// ─── Unit toggle ──────────────────────────────────────────────────────────
-			function setUnit(unit) {
-				const minEl = document.getElementById('input-min');
-				const maxEl = document.getElementById('input-max');
-				if (unit === 'C' && currentUnit === 'F') {
-					minEl.value = round1(toC(parseFloat(minEl.value)));
-					maxEl.value = round1(toC(parseFloat(maxEl.value)));
-				} else if (unit === 'F' && currentUnit === 'C') {
-					minEl.value = round1(toF(parseFloat(minEl.value)));
-					maxEl.value = round1(toF(parseFloat(maxEl.value)));
-				}
-				currentUnit = unit;
-				document.getElementById('unit-label-min').textContent = `°${unit}`;
-				document.getElementById('unit-label-max').textContent = `°${unit}`;
-				document.getElementById('btn-c').classList.toggle('active', unit === 'C');
-				document.getElementById('btn-f').classList.toggle('active', unit === 'F');
+		function buildTempColorScale(minC,maxC){
+			const merged=new Set(DEFAULT_TEMP_BREAKPOINTS); merged.add(minC);merged.add(maxC);
+			const bps=Array.from(merged).sort((a,b)=>a-b);
+			const colors=bps.map(bp=>{const[r,g,b]=interpolateColor(userTempColors,DEFAULT_TEMP_BREAKPOINTS,bp);const op=interpolateOpacity(userTempOpacity,DEFAULT_TEMP_BREAKPOINTS,bp);return[r,g,b,(bp<minC||bp>maxC)?0:op];});
+			return{type:'breakpoint',unit:'°C',breakpoints:bps,colors};
+		}
+		function buildMoistureColorScale(minV,maxV){
+			const merged=new Set(DEFAULT_MOIST_BREAKPOINTS); merged.add(minV);merged.add(maxV);
+			const bps=Array.from(merged).sort((a,b)=>a-b);
+			const colors=bps.map(bp=>{const[r,g,b]=interpolateColor(userMoistColors,DEFAULT_MOIST_BREAKPOINTS,bp);const op=interpolateOpacity(userMoistOpacity,DEFAULT_MOIST_BREAKPOINTS,bp);return[r,g,b,(bp<minV||bp>maxV)?0:op];});
+			return{type:'breakpoint',unit:'m³/m³',breakpoints:bps,colors};
+		}
+
+		function addScrollInput(id,step){
+			const el=document.getElementById(id);
+			el.addEventListener('wheel',e=>{e.preventDefault();const d=step<0.1?3:1;el.value=parseFloat((parseFloat(el.value)+(e.deltaY<0?step:-step)).toFixed(d));},{passive:false});
+		}
+		addScrollInput('input-min',1);addScrollInput('input-max',1);
+		addScrollInput('input-moist-min',0.01);addScrollInput('input-moist-max',0.01);
+
+		function getInputsAsC(){
+			let min=parseFloat(document.getElementById('input-min').value);
+			let max=parseFloat(document.getElementById('input-max').value);
+			if(currentUnit==='F'){min=toC(min);max=toC(max);}
+			return{min:round1(min),max:round1(max)};
+		}
+
+		function registerProtocol(tempMinC,tempMaxC,moistMinV,moistMaxV){
+			const options=OpenMeteoMapboxLayer.defaultOmProtocolSettings;
+			options.colorScales={};
+			if(tempActive)  options.colorScales[`soil_temperature_${tempDepth}`]=buildTempColorScale(tempMinC,tempMaxC);
+			if(moistActive) options.colorScales[`soil_moisture_${moistDepth}`]=buildMoistureColorScale(moistMinV,moistMaxV);
+			maplibregl.addProtocol('om',(params,abortController)=>OpenMeteoMapboxLayer.omProtocol(params,abortController,options));
+		}
+
+		const buildTempUrl=(minC,maxC)=>`https://map-tiles.open-meteo.com/data_spatial/ncep_nam_conus/latest.json?time_step=current_time_1H&variable=soil_temperature_${tempDepth}&contours=true&intervals=${minC},${maxC}`;
+		const buildMoistUrl=(minV,maxV)=>`https://map-tiles.open-meteo.com/data_spatial/ncep_nam_conus/latest.json?time_step=current_time_1H&variable=soil_moisture_${moistDepth}&contours=true&intervals=${minV},${maxV}`;
+
+		function removeLayers(prefix){
+			[`${prefix}VectorLabels`,`${prefix}VectorLayer`,`${prefix}RasterLayer`].forEach(id=>{if(map.getLayer(id))map.removeLayer(id);});
+			[`${prefix}RasterSource`,`${prefix}VectorSource`].forEach(id=>{if(map.getSource(id))map.removeSource(id);});
+		}
+		function addTempLayers(omUrl){
+			removeLayers('omTemp');
+			map.addSource('omTempRasterSource',{url:'om://'+omUrl,type:'raster',maxzoom:12});
+			map.addLayer({id:'omTempRasterLayer',type:'raster',source:'omTempRasterSource',paint:{'raster-opacity':tempOpacity}},getInsertionLayer(false));
+			map.addSource('omTempVectorSource',{url:'om://'+omUrl,type:'vector'});
+			map.addLayer({id:'omTempVectorLayer',type:'line',source:'omTempVectorSource','source-layer':'contours',layout:{visibility:tempContours?'visible':'none'},paint:{'line-color':'rgba(0,0,0,0.85)','line-width':1}},getInsertionLayer(true));
+			map.addLayer({id:'omTempVectorLabels',type:'symbol',source:'omTempVectorSource','source-layer':'contours',layout:{visibility:tempContours?'visible':'none','symbol-placement':'line-center','symbol-spacing':1,'text-font':['Noto Sans Regular'],'text-field':['to-string',['get','value']],'text-padding':1,'text-offset':[0,-0.6]}},getInsertionLayer(true));
+		}
+		function addMoistLayers(omUrl){
+			removeLayers('omMoist');
+			map.addSource('omMoistRasterSource',{url:'om://'+omUrl,type:'raster',maxzoom:12});
+			map.addLayer({id:'omMoistRasterLayer',type:'raster',source:'omMoistRasterSource',paint:{'raster-opacity':moistOpacity}},getInsertionLayer(false));
+			map.addSource('omMoistVectorSource',{url:'om://'+omUrl,type:'vector'});
+			map.addLayer({id:'omMoistVectorLayer',type:'line',source:'omMoistVectorSource','source-layer':'contours',layout:{visibility:moistContours?'visible':'none'},paint:{'line-color':'rgba(0,0,0,0.6)','line-width':1,'line-dasharray':[3,2]}},getInsertionLayer(true));
+			map.addLayer({id:'omMoistVectorLabels',type:'symbol',source:'omMoistVectorSource','source-layer':'contours',layout:{visibility:moistContours?'visible':'none','symbol-placement':'line-center','symbol-spacing':1,'text-font':['Noto Sans Regular'],'text-field':['to-string',['get','value']],'text-padding':1,'text-offset':[0,-0.6]}},getInsertionLayer(true));
+		}
+
+		function applySettings(){
+			let tempMinC=rangeMinC,tempMaxC=rangeMaxC,moistMinV=0.1,moistMaxV=0.4;
+			if(tempActive){
+				const v=getInputsAsC();
+				if(v.min>=v.max){alert('Temperature: Min must be less than Max.');return;}
+				tempMinC=v.min;tempMaxC=v.max;rangeMinC=tempMinC;rangeMaxC=tempMaxC;
 			}
-
-			// ─── Depth ────────────────────────────────────────────────────────────────
-			function setDepth(type, btn) {
-				const groupId = type === 'temp' ? 'depth-group-temp' : 'depth-group-moist';
-				document.querySelectorAll(`#${groupId} button`).forEach(b => b.classList.remove('active'));
-				btn.classList.add('active');
-				if (type === 'temp') tempDepth = btn.dataset.depth;
-				else moistDepth = btn.dataset.depth;
+			if(moistActive){
+				moistMinV=parseFloat(document.getElementById('input-moist-min').value);
+				moistMaxV=parseFloat(document.getElementById('input-moist-max').value);
+				if(moistMinV>=moistMaxV){alert('Moisture: Min must be less than Max.');return;}
+				moistMinV=round3(moistMinV);moistMaxV=round3(moistMaxV);
 			}
-
-			// ─── Contour checkboxes ───────────────────────────────────────────────────
-			function syncContourCheck(type) {
-				if (type === 'temp') {
-					tempContours = document.getElementById('contour-check-temp').checked;
-					['omTempVectorLayer','omTempVectorLabels'].forEach(id => {
-						if (map.getLayer(id))
-							map.setLayoutProperty(id, 'visibility', tempContours ? 'visible' : 'none');
-					});
-				} else {
-					moistContours = document.getElementById('contour-check-moist').checked;
-					['omMoistVectorLayer','omMoistVectorLabels'].forEach(id => {
-						if (map.getLayer(id))
-							map.setLayoutProperty(id, 'visibility', moistContours ? 'visible' : 'none');
-					});
-				}
+			if(tempActive||moistActive) registerProtocol(tempMinC,tempMaxC,moistMinV,moistMaxV);
+			if(mapLoaded){
+				if(tempActive)  addTempLayers(buildTempUrl(tempMinC,tempMaxC));
+				else            removeLayers('omTemp');
+				if(moistActive) addMoistLayers(buildMoistUrl(moistMinV,moistMaxV));
+				else            removeLayers('omMoist');
 			}
+		}
 
-			// ─── Color editor ─────────────────────────────────────────────────────────
-			function toggleColorEditor(type) {
-				const header = document.getElementById(`${type}-color-header`);
-				const rows   = document.getElementById(`${type}-color-rows`);
-				header.classList.toggle('open');
-				rows.classList.toggle('open');
+		buildColorEditor('temp');buildColorEditor('moist');
+		registerProtocol(rangeMinC,rangeMaxC,0.1,0.4);
+
+		// ── Basemap definitions ───────────────────────────────────────────────────
+		// ── GL Vector Basemaps ───────────────────────────────────────────────────
+		const BASEMAPS = {
+			'liberty':              'https://tiles.openfreemap.org/styles/liberty',
+			'positron':             'https://tiles.openfreemap.org/styles/positron',
+			'bright':               'https://tiles.openfreemap.org/styles/bright',
+			'voyager':              'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+			'dark-matter':          'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+			'dark-matter-nolabels': 'https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json',
+			'fiord':                'https://tiles.openfreemap.org/styles/fiord',
+			'alidade-dark':         'https://tiles.stadiamaps.com/styles/alidade_dark.json',
+			'topo':                 'https://demotiles.maplibre.org/style.json',
+			'stamen-terrain':       'https://tiles.stadiamaps.com/styles/stamen_terrain.json',
+			'outdoor':              'https://tiles.stadiamaps.com/styles/outdoors.json',
+			'stamen-toner':         'https://tiles.stadiamaps.com/styles/stamen_toner.json',
+		};
+		let activeBasemap = 'liberty';
+
+		// ── Raster Overlay Layers ─────────────────────────────────────────────────
+		// CSS filter strings applied per-tile via raster-color-saturation workaround.
+		// For MapLibre we use raster sources with raster-brightness/contrast paint props
+		// and handle grayscale via raster-saturation: -1.
+		const RASTER_OVERLAYS = {
+			watercolor: { 
+				url: 'https://watercolormaps.collection.cooperhewitt.org/tile/watercolor/{z}/{x}/{y}.jpg', 
+				maxzoom: 18, sat: 0, bright: 0, contrast: 0,
+				attribution: '© <a href="https://www.cooperhewitt.org" target="_blank">Cooper Hewitt</a>'
+			},
+			watercolor_muted: { 
+				url: 'https://watercolormaps.collection.cooperhewitt.org/tile/watercolor/{z}/{x}/{y}.jpg', 
+				maxzoom: 18, sat: -0.7, bright: 0, contrast: 0,
+				attribution: '© <a href="https://www.cooperhewitt.org" target="_blank">Cooper Hewitt</a>'
+			},
+			watercolor_gray: { 
+				url: 'https://watercolormaps.collection.cooperhewitt.org/tile/watercolor/{z}/{x}/{y}.jpg', 
+				maxzoom: 18, sat: -1, bright: 0, contrast: 0,
+				attribution: '© <a href="https://www.cooperhewitt.org" target="_blank">Cooper Hewitt</a>'
+			},
+			watercolor_darkgray: { 
+				url: 'https://watercolormaps.collection.cooperhewitt.org/tile/watercolor/{z}/{x}/{y}.jpg', 
+				maxzoom: 18, sat: -1, bright: -0.4, contrast: 0,
+				attribution: '© <a href="https://www.cooperhewitt.org" target="_blank">Cooper Hewitt</a>'
+			},
+			osm_std: { 
+				url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', maxzoom: 19, sat: 0, bright: 0, contrast: 0,
+				attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
+			},
+			osm_de: { 
+				url: 'https://tile.openstreetmap.de/{z}/{x}/{y}.png', maxzoom: 18, sat: 0, bright: 0, contrast: 0,
+				attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
+			},
+			osm_fr: { 
+				url: 'https://a.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', maxzoom: 20, sat: 0, bright: 0, contrast: 0,
+				attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
+			},
+			osm_hot: { 
+				url: 'https://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', maxzoom: 19, sat: 0, bright: 0, contrast: 0,
+				attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
+			},
+			osm_lightgray: { 
+				url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', maxzoom: 19, sat: -1, bright: 0, contrast: 0,
+				attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
+			},
+			osm_medgray: { 
+				url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', maxzoom: 19, sat: -1, bright: -0.3, contrast: 0.2,
+				attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
+			},
+			osm_medgray2: { 
+				url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', maxzoom: 19, sat: -1, bright: -0.3, contrast: 0.3,
+				attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
+			},
+			osm_darkgray: { 
+				url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', maxzoom: 19, sat: -1, bright: -0.5, contrast: 0.2,
+				attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
+			},
+			osm_darkest: { 
+				url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', maxzoom: 19, sat: -1, bright: -0.6, contrast: 0.4,
+				attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
+			},
+			otm: { 
+				url: 'https://a.tile.opentopomap.org/{z}/{x}/{y}.png', maxzoom: 17, sat: 0, bright: 0, contrast: 0,
+				attribution: '© <a href="https://www.opentopomap.org/copyright" target="_blank">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">CC-BY-SA</a>)'
+			},
+			otm_muted: { 
+				url: 'https://a.tile.opentopomap.org/{z}/{x}/{y}.png', maxzoom: 17, sat: -0.5, bright: 0, contrast: 0,
+				attribution: '© <a href="https://www.opentopomap.org/copyright" target="_blank">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank">CC-BY-SA</a>)'
+			},
+			eox_terrain: { 
+				url: 'https://tiles.maps.eox.at/wmts/1.0.0/terrain_3857/default/g/{z}/{y}/{x}.jpg', maxzoom: 17, sat: 0, bright: 0, contrast: 0,
+				attribution: '© <a href="https://eox.at" target="_blank">EOX</a>'
+			},
+			eox_terrain_light: { 
+				url: 'https://tiles.maps.eox.at/wmts/1.0.0/terrain-light_3857/default/g/{z}/{y}/{x}.jpg', maxzoom: 17, sat: 0, bright: 0, contrast: 0,
+				attribution: '© <a href="https://eox.at" target="_blank">EOX</a>'
+			},
+			usgs_topo: { 
+				url: 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}', maxzoom: 16, sat: 0, bright: 0, contrast: 0,
+				attribution: '© <a href="https://www.usgs.gov/" target="_blank">U.S. Geological Survey</a>'
+			},
+			usgs_hillshade: { 
+				url: 'https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?f=image&bboxSR=102100&imageSR=102100&size=256,256&bbox={bbox-epsg-3857}&renderingRule=%7B"rasterFunction":"Hillshade Gray"%7D', 
+				maxzoom: 16, sat: -1, bright: 0, contrast: 0, bbox: true,
+				attribution: '© <a href="https://www.usgs.gov/" target="_blank">U.S. Geological Survey</a>'
+			},
+			usgs_aspect: { 
+				url: 'https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?f=image&bboxSR=102100&imageSR=102100&size=256,256&bbox={bbox-epsg-3857}&renderingRule=%7B"rasterFunction":"Aspect Map"%7D',   
+				maxzoom: 16, sat: 0, bright: 0, contrast: 0, bbox: true,
+				attribution: '© <a href="https://www.usgs.gov/" target="_blank">U.S. Geological Survey</a>'
+			},
+			usgs_slope: { 
+				url: 'https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?f=image&bboxSR=102100&imageSR=102100&size=256,256&bbox={bbox-epsg-3857}&renderingRule=%7B"rasterFunction":"Slope Map"%7D',    
+				maxzoom: 16, sat: 0, bright: 0, contrast: 0, bbox: true,
+				attribution: '© <a href="https://www.usgs.gov/" target="_blank">U.S. Geological Survey</a>'
+			},
+			eox_blackmarble: { 
+				url: 'https://tiles.maps.eox.at/wmts/1.0.0/blackmarble_3857/default/g/{z}/{y}/{x}.jpg', maxzoom: 17, sat: 0, bright: 0, contrast: 0,
+				attribution: '© <a href="https://eox.at" target="_blank">EOX</a>'
+			},
+			eox_bluemarble: { 
+				url: 'https://tiles.maps.eox.at/wmts/1.0.0/bluemarble_3857/default/g/{z}/{y}/{x}.jpg', maxzoom: 17, sat: 0, bright: 0, contrast: 0,
+				attribution: '© <a href="https://eox.at" target="_blank">EOX</a>'
+			},
+			sentinel_2024: { 
+				url: 'https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2024_3857/default/g/{z}/{y}/{x}.jpg', maxzoom: 17, sat: 0, bright: 0, contrast: 0,
+				attribution: '© <a href="https://eox.at" target="_blank">EOX</a> | Contains modified Copernicus Sentinel data'
+			},
+			usgs_img: { 
+				url: 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}', maxzoom: 16, sat: 0, bright: 0, contrast: 0,
+				attribution: '© <a href="https://www.usgs.gov/" target="_blank">U.S. Geological Survey</a>'
+			},
+			usgs_imgtopo: { 
+				url: 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryTopo/MapServer/tile/{z}/{y}/{x}', maxzoom: 16, sat: 0, bright: 0, contrast: 0,
+				attribution: '© <a href="https://www.usgs.gov/" target="_blank">U.S. Geological Survey</a>'
+			},
+		};
+
+		function rasterOverlaySrcId(key) { return `rasterOverlay_src_${key}`; }
+		function rasterOverlayLyrId(key) { return `rasterOverlay_lyr_${key}`; }
+
+		// Insert raster overlay below soil/tree layers but above the GL base style
+		function getOverlayInsertionLayer() {
+			const style = map.getStyle();
+			if (!style || !style.layers) return undefined;
+			// Find the bottommost soil or tree layer and insert before it
+			for (const l of style.layers) {
+				if (l.id.startsWith('omTemp') || l.id.startsWith('omMoist') || l.id.startsWith('treeSlice_')) return l.id;
 			}
-
-			function buildColorEditor(type) {
-				const isTemp      = type === 'temp';
-				const breakpoints = isTemp ? DEFAULT_TEMP_BREAKPOINTS  : DEFAULT_MOIST_BREAKPOINTS;
-				const colors      = isTemp ? userTempColors            : userMoistColors;
-				const opacities   = isTemp ? userTempOpacity           : userMoistOpacity;
-				const unit        = isTemp ? '°C' : '';
-				const container   = document.getElementById(`${type}-color-rows`);
-				container.innerHTML = '';
-
-				breakpoints.forEach((bp, i) => {
-					const row = document.createElement('div');
-					row.className = 'color-row';
-
-					const label = document.createElement('span');
-					label.className = 'bp-label';
-					label.textContent = unit ? `${bp}${unit}` : bp.toFixed(2);
-
-					const picker = document.createElement('input');
-					picker.type  = 'color';
-					picker.value = rgbToHex(...colors[i]);
-					picker.addEventListener('input', e => {
-						const rgb = hexToRgb(e.target.value);
-						if (isTemp) userTempColors[i]  = rgb;
-						else        userMoistColors[i] = rgb;
-					});
-
-					const slider = document.createElement('input');
-					slider.type  = 'range';
-					slider.min   = 0; slider.max = 1; slider.step = 0.05;
-					slider.value = opacities[i];
-					const opVal  = document.createElement('span');
-					opVal.className = 'opacity-val';
-					opVal.textContent = Math.round(opacities[i] * 100) + '%';
-					slider.addEventListener('input', e => {
-						const v = parseFloat(e.target.value);
-						if (isTemp) userTempOpacity[i]  = v;
-						else        userMoistOpacity[i] = v;
-						opVal.textContent = Math.round(v * 100) + '%';
-					});
-
-					row.appendChild(label);
-					row.appendChild(picker);
-					row.appendChild(slider);
-					row.appendChild(opVal);
-					container.appendChild(row);
-				});
-
-				// Reset button
-				const resetBtn = document.createElement('button');
-				resetBtn.className   = 'reset-colors-btn';
-				resetBtn.textContent = '↺ Reset colors';
-				resetBtn.onclick = () => {
-					if (isTemp) {
-						userTempColors  = DEFAULT_TEMP_COLORS.map(c => [...c]);
-						userTempOpacity = DEFAULT_TEMP_BREAKPOINTS.map(() => 0.75);
-					} else {
-						userMoistColors  = DEFAULT_MOIST_COLORS.map(c => [...c]);
-						userMoistOpacity = DEFAULT_MOIST_BREAKPOINTS.map(() => 0.75);
-					}
-					buildColorEditor(type); // re-render
-				};
-				container.appendChild(resetBtn);
+			// No data layers yet — insert before the first label/symbol layer so
+			// the overlay sits above base tiles but below any future data layers
+			for (const l of style.layers) {
+				if (l.type === 'symbol') return l.id;
 			}
+			return undefined;
+		}
 
-			// ─── Color interpolation ──────────────────────────────────────────────────
-			function interpolateColor(colors, breakpoints, value) {
-				if (value <= breakpoints[0]) return colors[0];
-				if (value >= breakpoints[breakpoints.length - 1]) return colors[colors.length - 1];
-				for (let i = 0; i < breakpoints.length - 1; i++) {
-					if (value >= breakpoints[i] && value <= breakpoints[i + 1]) {
-						const t  = (value - breakpoints[i]) / (breakpoints[i + 1] - breakpoints[i]);
-						const c0 = colors[i], c1 = colors[i + 1];
-						return [
-							Math.round(c0[0] + t * (c1[0] - c0[0])),
-							Math.round(c0[1] + t * (c1[1] - c0[1])),
-							Math.round(c0[2] + t * (c1[2] - c0[2])),
-						];
-					}
-				}
-				return colors[colors.length - 1];
-			}
-
-			function interpolateOpacity(opacities, breakpoints, value) {
-				if (value <= breakpoints[0]) return opacities[0];
-				if (value >= breakpoints[breakpoints.length - 1]) return opacities[opacities.length - 1];
-				for (let i = 0; i < breakpoints.length - 1; i++) {
-					if (value >= breakpoints[i] && value <= breakpoints[i + 1]) {
-						const t = (value - breakpoints[i]) / (breakpoints[i + 1] - breakpoints[i]);
-						return opacities[i] + t * (opacities[i + 1] - opacities[i]);
-					}
-				}
-				return opacities[opacities.length - 1];
-			}
-
-			// ─── Build color scales ───────────────────────────────────────────────────
-			function buildTempColorScale(minC, maxC) {
-				const merged = new Set(DEFAULT_TEMP_BREAKPOINTS);
-				merged.add(minC); merged.add(maxC);
-				const breakpoints = Array.from(merged).sort((a,b) => a - b);
-				const colors = breakpoints.map(bp => {
-					const [r,g,b] = interpolateColor(userTempColors, DEFAULT_TEMP_BREAKPOINTS, bp);
-					const op      = interpolateOpacity(userTempOpacity, DEFAULT_TEMP_BREAKPOINTS, bp);
-					return [r, g, b, (bp < minC || bp > maxC) ? 0 : op];
-				});
-				return { type: 'breakpoint', unit: '°C', breakpoints, colors };
-			}
-
-			function buildMoistureColorScale(minV, maxV) {
-				const merged = new Set(DEFAULT_MOIST_BREAKPOINTS);
-				merged.add(minV); merged.add(maxV);
-				const breakpoints = Array.from(merged).sort((a,b) => a - b);
-				const colors = breakpoints.map(bp => {
-					const [r,g,b] = interpolateColor(userMoistColors, DEFAULT_MOIST_BREAKPOINTS, bp);
-					const op      = interpolateOpacity(userMoistOpacity, DEFAULT_MOIST_BREAKPOINTS, bp);
-					return [r, g, b, (bp < minV || bp > maxV) ? 0 : op];
-				});
-				return { type: 'breakpoint', unit: 'm³/m³', breakpoints, colors };
-			}
-
-			// ─── Scroll inputs ────────────────────────────────────────────────────────
-			function addScrollInput(id, step) {
-				const el = document.getElementById(id);
-				el.addEventListener('wheel', e => {
-					e.preventDefault();
-					const decimals = step < 0.1 ? 3 : 1;
-					el.value = parseFloat((parseFloat(el.value) + (e.deltaY < 0 ? step : -step)).toFixed(decimals));
-				}, { passive: false });
-			}
-			addScrollInput('input-min',       1);
-			addScrollInput('input-max',       1);
-			addScrollInput('input-moist-min', 0.01);
-			addScrollInput('input-moist-max', 0.01);
-
-			// ─── Read temp inputs as °C ───────────────────────────────────────────────
-			function getInputsAsC() {
-				let min = parseFloat(document.getElementById('input-min').value);
-				let max = parseFloat(document.getElementById('input-max').value);
-				if (currentUnit === 'F') { min = toC(min); max = toC(max); }
-				return { min: round1(min), max: round1(max) };
-			}
-
-			// ─── Register protocol ────────────────────────────────────────────────────
-			function registerProtocol(tempMinC, tempMaxC, moistMinV, moistMaxV) {
-				const options = OpenMeteoMapboxLayer.defaultOmProtocolSettings;
-				options.colorScales = {};
-				if (tempActive)  options.colorScales[`soil_temperature_${tempDepth}`]  = buildTempColorScale(tempMinC, tempMaxC);
-				if (moistActive) options.colorScales[`soil_moisture_${moistDepth}`]    = buildMoistureColorScale(moistMinV, moistMaxV);
-				maplibregl.addProtocol('om', (params, abortController) =>
-					OpenMeteoMapboxLayer.omProtocol(params, abortController, options)
-				);
-			}
-
-			// ─── Build URLs ───────────────────────────────────────────────────────────
-			function buildTempUrl(minC, maxC) {
-				return `https://map-tiles.open-meteo.com/data_spatial/ncep_nam_conus/latest.json`
-					+ `?time_step=current_time_1H&variable=soil_temperature_${tempDepth}&contours=true&intervals=${minC},${maxC}`;
-			}
-
-			function buildMoistUrl(minV, maxV) {
-				return `https://map-tiles.open-meteo.com/data_spatial/ncep_nam_conus/latest.json`
-					+ `?time_step=current_time_1H&variable=soil_moisture_${moistDepth}&contours=true&intervals=${minV},${maxV}`;
-			}
-
-			// ─── Layer management ─────────────────────────────────────────────────────
-			function removeLayers(prefix) {
-				[`${prefix}VectorLabels`,`${prefix}VectorLayer`,`${prefix}RasterLayer`].forEach(id => {
-					if (map.getLayer(id)) map.removeLayer(id);
-				});
-				[`${prefix}RasterSource`,`${prefix}VectorSource`].forEach(id => {
-					if (map.getSource(id)) map.removeSource(id);
-				});
-			}
-
-			function addTempLayers(omUrl) {
-				removeLayers('omTemp');
-				map.addSource('omTempRasterSource', { url: 'om://'+omUrl, type: 'raster', maxzoom: 12 });
-				map.addLayer({ id:'omTempRasterLayer', type:'raster', source:'omTempRasterSource',
-					paint:{'raster-opacity': tempOpacity} }, getInsertionLayer(false));
-				map.addSource('omTempVectorSource', { url: 'om://'+omUrl, type: 'vector' });
-				map.addLayer({ id:'omTempVectorLayer', type:'line', source:'omTempVectorSource',
-					'source-layer':'contours',
-					layout:{ visibility: tempContours ? 'visible' : 'none' },
-					paint:{'line-color':'rgba(0,0,0,0.85)','line-width':1}
-				}, getInsertionLayer(true));
-				map.addLayer({ id:'omTempVectorLabels', type:'symbol', source:'omTempVectorSource',
-					'source-layer':'contours',
-					layout:{ visibility: tempContours ? 'visible' : 'none',
-						'symbol-placement':'line-center','symbol-spacing':1,
-						'text-font':['Noto Sans Regular'],'text-field':['to-string',['get','value']],
-						'text-padding':1,'text-offset':[0,-0.6] }
-				}, getInsertionLayer(true));
-			}
-
-			function addMoistLayers(omUrl) {
-				removeLayers('omMoist');
-				map.addSource('omMoistRasterSource', { url: 'om://'+omUrl, type: 'raster', maxzoom: 12 });
-				map.addLayer({ id:'omMoistRasterLayer', type:'raster', source:'omMoistRasterSource',
-					paint:{'raster-opacity': moistOpacity} }, getInsertionLayer(false));
-				map.addSource('omMoistVectorSource', { url: 'om://'+omUrl, type: 'vector' });
-				map.addLayer({ id:'omMoistVectorLayer', type:'line', source:'omMoistVectorSource',
-					'source-layer':'contours',
-					layout:{ visibility: moistContours ? 'visible' : 'none' },
-					paint:{'line-color':'rgba(0,0,0,0.6)','line-width':1,'line-dasharray':[3,2]}
-				}, getInsertionLayer(true));
-				map.addLayer({ id:'omMoistVectorLabels', type:'symbol', source:'omMoistVectorSource',
-					'source-layer':'contours',
-					layout:{ visibility: moistContours ? 'visible' : 'none',
-						'symbol-placement':'line-center','symbol-spacing':1,
-						'text-font':['Noto Sans Regular'],'text-field':['to-string',['get','value']],
-						'text-padding':1,'text-offset':[0,-0.6] }
-				}, getInsertionLayer(true));
-			}
-
-			// ─── Apply ────────────────────────────────────────────────────────────────
-			function applySettings() {
-				if (!tempActive && !moistActive) { alert('Enable at least one layer.'); return; }
-
-				let tempMinC = rangeMinC, tempMaxC = rangeMaxC;
-				let moistMinV = 0.1, moistMaxV = 0.4;
-
-				if (tempActive) {
-					const vals = getInputsAsC();
-					if (vals.min >= vals.max) { alert('Temperature: Min must be less than Max.'); return; }
-					tempMinC = vals.min; tempMaxC = vals.max;
-					rangeMinC = tempMinC; rangeMaxC = tempMaxC;
-				}
-
-				if (moistActive) {
-					moistMinV = parseFloat(document.getElementById('input-moist-min').value);
-					moistMaxV = parseFloat(document.getElementById('input-moist-max').value);
-					if (moistMinV >= moistMaxV) { alert('Moisture: Min must be less than Max.'); return; }
-					moistMinV = round3(moistMinV); moistMaxV = round3(moistMaxV);
-				}
-
-				registerProtocol(tempMinC, tempMaxC, moistMinV, moistMaxV);
-
-				if (mapLoaded) {
-					if (tempActive)  addTempLayers(buildTempUrl(tempMinC, tempMaxC));
-					else             removeLayers('omTemp');
-					if (moistActive) addMoistLayers(buildMoistUrl(moistMinV, moistMaxV));
-					else             removeLayers('omMoist');
-				}
-			}
-
-			// ─── Init ─────────────────────────────────────────────────────────────────
-			buildColorEditor('temp');
-			buildColorEditor('moist');
-
-			registerProtocol(rangeMinC, rangeMaxC, 0.1, 0.4);
-
-			const map = new maplibregl.Map({
-				container: 'map',
-				style: 'https://tiles.openfreemap.org/styles/liberty',
-				center: [-98.5, 39.5],
-				zoom: 3.5,
-				hash: true
+		function addRasterOverlayToMap(key) {
+			if (!mapLoaded) return;
+			const def = RASTER_OVERLAYS[key]; if (!def) return;
+			const srcId = rasterOverlaySrcId(key), lyrId = rasterOverlayLyrId(key);
+			if (map.getLayer(lyrId)) return;
+			const tileUrl = def.bbox
+				? def.url  // already has {bbox-epsg-3857} baked in
+				: def.url;
+			
+			// Add source with attribution
+			map.addSource(srcId, { 
+				type: 'raster', 
+				tiles: [tileUrl], 
+				tileSize: 256, 
+				maxzoom: def.maxzoom,
+				attribution: def.attribution || ''  // Add attribution here
 			});
+			
+			map.addLayer({
+				id: lyrId, type: 'raster', source: srcId,
+				paint: {
+					'raster-opacity': 1,
+					'raster-saturation': def.sat,
+					'raster-brightness-min': Math.max(0, def.bright),
+					'raster-brightness-max': Math.min(1, 1 + def.bright),
+					'raster-contrast': def.contrast,
+				}
+			}, getOverlayInsertionLayer());
+		}
+		function removeRasterOverlayFromMap(key) {
+			const srcId = rasterOverlaySrcId(key), lyrId = rasterOverlayLyrId(key);
+			if (map.getLayer(lyrId)) map.removeLayer(lyrId);
+			if (map.getSource(srcId)) map.removeSource(srcId);
+		}
+		let activeRasterOverlay = null; // single-select: only one overlay at a time
 
-			map.on('load', () => {
+		function toggleRasterOverlay(key) {
+			// Deactivate current overlay (if any)
+			if (activeRasterOverlay) {
+				const prev = document.getElementById('bmo-' + activeRasterOverlay);
+				if (prev) prev.classList.remove('active');
+				removeRasterOverlayFromMap(activeRasterOverlay);
+				const wasActive = activeRasterOverlay === key;
+				activeRasterOverlay = null;
+				if (wasActive) return; // clicking active row toggles it off
+			}
+			// Activate new overlay
+			activeRasterOverlay = key;
+			const row = document.getElementById('bmo-' + key);
+			if (row) row.classList.add('active');
+			addRasterOverlayToMap(key);
+		}
+		function readdAllRasterOverlays() {
+			if (activeRasterOverlay) addRasterOverlayToMap(activeRasterOverlay);
+		}
+
+		const map = new maplibregl.Map({container:'map', style:BASEMAPS['liberty'], center:[-98.5,39.5], zoom:3.5, hash:true});
+		map.on('load', () => { mapLoaded=true; addTempLayers(buildTempUrl(rangeMinC,rangeMaxC)); });
+
+		function toggleBmPopup() {
+			const popup = document.getElementById('bm-popup');
+			const fab   = document.getElementById('bm-fab');
+			const open  = popup.classList.toggle('open');
+			fab.classList.toggle('open', open);
+		}
+
+		function setBasemap(key) {
+			if (activeBasemap === key) { toggleBmPopup(); return; }
+			activeBasemap = key;
+			document.querySelectorAll('.bm-btn').forEach(b => b.classList.remove('active'));
+			const btn = document.getElementById('bm-' + key);
+			if (btn) btn.classList.add('active');
+			map.setStyle(BASEMAPS[key]);
+			map.once('style.load', () => {
 				mapLoaded = true;
-				addTempLayers(buildTempUrl(rangeMinC, rangeMaxC));
+				registerProtocol(rangeMinC, rangeMaxC, 0.1, 0.4);
+				if (tempActive)  addTempLayers(buildTempUrl(rangeMinC, rangeMaxC));
+				if (moistActive) addMoistLayers(buildMoistUrl(
+					parseFloat(document.getElementById('input-moist-min').value),
+					parseFloat(document.getElementById('input-moist-max').value)
+				));
+				readdAllRasterOverlays();
+				activeSlices.forEach((_, id) => addSliceLayer(id));
 			});
+			toggleBmPopup();
+		}
+
+		// Close popup when clicking outside
+		document.addEventListener('click', e => {
+			const popup = document.getElementById('bm-popup');
+			const fab   = document.getElementById('bm-fab');
+			if (popup.classList.contains('open') && !popup.contains(e.target) && e.target !== fab) {
+				popup.classList.remove('open');
+				fab.classList.remove('open');
+			}
+		});
+
+		// ═══════════════════════════════════════════════════════════════════════════
+		// TREE SPECIES
+		// ═══════════════════════════════════════════════════════════════════════════
+		const TREE_SVC='https://imagery.geoplatform.gov/iipp/rest/services/Vegetation/USFS_EDW_FHP_TreeSpeciesMetrics_BasalArea/ImageServer';
+
+		// ── Tree-type icon classification ─────────────────────────────────────────
+		const TREE_TYPE_RULES = [
+			{ keywords: ['spruce','picea'],                icon: '🌲', label: 'Spruce'     },
+			{ keywords: ['fir','abies','balsam'],          icon: '🌲', label: 'Fir'        },
+			{ keywords: ['pine','pinus','lodgepole','ponderosa','whitebark','bristlecone'], icon: '🌲', label: 'Pine' },
+			{ keywords: ['hemlock','tsuga'],               icon: '🌲', label: 'Hemlock'    },
+			{ keywords: ['cedar','thuja','juniper','cupressus','chamaecyparis'], icon: '🌲', label: 'Cedar/Juniper' },
+			{ keywords: ['larch','larix','tamarack'],      icon: '🌲', label: 'Larch'      },
+			{ keywords: ['redwood','sequoia','taxodium'],  icon: '🌲', label: 'Redwood'    },
+			{ keywords: ['douglas','pseudotsuga'],         icon: '🌲', label: 'Douglas-fir'},
+			{ keywords: ['oak','quercus'],                 icon: '🌳', label: 'Oak'        },
+			{ keywords: ['maple','acer'],                  icon: '🍁', label: 'Maple'      },
+			{ keywords: ['birch','betula'],                icon: '🌳', label: 'Birch'      },
+			{ keywords: ['aspen','poplar','populus','cottonwood'], icon: '🌳', label: 'Aspen/Poplar' },
+			{ keywords: ['elm','ulmus'],                   icon: '🌳', label: 'Elm'        },
+			{ keywords: ['ash','fraxinus'],                icon: '🌳', label: 'Ash'        },
+			{ keywords: ['beech','fagus'],                 icon: '🌳', label: 'Beech'      },
+			{ keywords: ['hickory','carya'],               icon: '🌳', label: 'Hickory'    },
+			{ keywords: ['walnut','juglans'],              icon: '🌳', label: 'Walnut'     },
+			{ keywords: ['alder','alnus'],                 icon: '🌳', label: 'Alder'      },
+			{ keywords: ['willow','salix'],                icon: '🌿', label: 'Willow'     },
+			{ keywords: ['cherry','prunus'],               icon: '🌸', label: 'Cherry'     },
+			{ keywords: ['magnolia'],                      icon: '🌳', label: 'Magnolia'   },
+			{ keywords: ['palm','arecaceae'],              icon: '🌴', label: 'Palm'       },
+			{ keywords: ['mangrove'],                      icon: '🌿', label: 'Mangrove'   },
+		];
+		function getTreeTypeInfo(varName) {
+			const lc = varName.toLowerCase();
+			for (const rule of TREE_TYPE_RULES) {
+				if (rule.keywords.some(k => lc.includes(k))) return rule;
+			}
+			return { icon: '🌿', label: 'Other' };
+		}
+
+		// ── Color ramps via ESRI @arcgis/core ESM ────────────────────────────────
+		const RAMP_NAMES = [
+			'Black to White','Blue Bright','Blue Light to Dark',
+			'Blue-Green Bright','Blue-Green Light to Dark','Brown Light to Dark',
+			'Brown to Blue Green Diverging, Bright','Brown to Blue Green Diverging, Dark',
+			'Coefficient Bias','Cold to Hot Diverging','Condition Number',
+			'Cyan to Purple','Cyan-Light to Blue-Dark','Distance',
+			'Elevation #1','Elevation #2','Errors','Gray Light to Dark',
+			'Green Bright','Green Light to Dark','Green to Blue',
+			'Orange Bright','Orange Light to Dark',
+			'Partial Spectrum','Partial Spectrum 1 Diverging','Partial Spectrum 2 Diverging',
+			'Pink to YellowGreen Diverging, Bright','Pink to YellowGreen Diverging, Dark',
+			'Precipitation','Prediction','Purple Bright',
+			'Purple to Green Diverging, Bright','Purple to Green Diverging, Dark',
+			'Purple-Blue Bright','Purple-Blue Light to Dark',
+			'Purple-Red Bright','Purple-Red Light to Dark',
+			'Red Bright','Red Light to Dark',
+			'Red to Blue Diverging, Bright','Red to Blue Diverging, Dark',
+			'Red to Green','Red to Green Diverging, Bright','Red to Green Diverging, Dark',
+			'Slope','Spectrum-Full Bright','Spectrum-Full Dark','Spectrum-Full Light',
+			'Surface','Temperature','Yellow to Dark Red',
+			'Yellow to Green to Dark Blue','Yellow to Red',
+			'Yellow-Green Bright','Yellow-Green Light to Dark',
+		];
+
+		let COLOR_RAMPS = [];
+
+		// Visually distinct ramps cycled across successive layer additions.
+		const RAMP_ROTATION_NAMES = [
+			'Green Light to Dark',
+			'Yellow to Dark Red',
+			'Purple-Blue Light to Dark',
+			'Cold to Hot Diverging',
+			'Brown Light to Dark',
+			'Cyan-Light to Blue-Dark',
+			'Orange Light to Dark',
+			'Purple to Green Diverging, Bright',
+		];
+		let layerAddCount = 0;
+
+		// Resolve a rotation name to its live index in COLOR_RAMPS (fallback 0).
+		function resolveRampIdx(name) {
+			if (!COLOR_RAMPS.length) return 0;
+			const idx = COLOR_RAMPS.findIndex(r => r.name === name);
+			return idx >= 0 ? idx : 0;
+		}
+
+		// Default per-layer settings; slot picks the starting ramp from the rotation.
+		const DEFAULT_LAYER_SETTINGS = (slot = 0) => ({
+			rampRotationName: RAMP_ROTATION_NAMES[slot % RAMP_ROTATION_NAMES.length],
+			rampIdx: 0, // resolved lazily via resolveRampIdx when COLOR_RAMPS is ready
+			rampFlipped: false,
+			opacity: 0.75,
+			stretchType: 5,
+			dra: false,
+			gamma: 1.0,
+			pctMin: 0.3, pctMax: 0.3,
+			sdn: 2,
+			stMin: 1, stMax: 1088, stMean: 43.2, stStddev: 42.0,
+		});
+
+		// Slice state: Map<sliceId, {varName, year, settings:{...}}>
+		let speciesGroups = new Map(), activeSlices = new Map(), searchQuery = '';
+		// Track which drawer is open
+		let openDrawerSliceId = null;
+
+		async function loadColorRamps() {
+			const loadEl = document.getElementById('ramp-list-loading');
+			loadEl.style.display = '';
+			try {
+				const { byName } = await import('https://js.arcgis.com/4.32/@arcgis/core/smartMapping/raster/support/colorRamps.js');
+				COLOR_RAMPS = RAMP_NAMES.map(name => {
+					const ramp = byName(name);
+					const colors = ramp ? ramp.colors : null;
+					return { name, colors };
+				}).filter(r => r.colors && r.colors.length);
+			} catch(err) {
+				console.warn('ESRI ramp load failed, using fallback:', err);
+				COLOR_RAMPS = FALLBACK_RAMPS;
+			}
+			loadEl.style.display = 'none';
+			// Resolve rampIdx for all active layers now that ramps are loaded
+			activeSlices.forEach(info => {
+				info.settings.rampIdx = resolveRampIdx(info.settings.rampRotationName);
+			});
+			refreshAllTreeLayers();
+			updateSelectionSummary();
+		}
+
+		// Convert ESRI color array [{r,g,b,a},...] to CSS gradient string
+		function esriColorsToGradientCss(colors, flipped) {
+			const arr = flipped ? [...colors].reverse() : colors;
+			const stops = arr.map((c, i) => {
+				const pct = Math.round((i / (arr.length - 1)) * 100);
+				return `rgb(${c.r},${c.g},${c.b}) ${pct}%`;
+			});
+			return stops.join(',');
+		}
+
+		function esriColorsToColorRampJson(colors, flipped) {
+			const arr = flipped ? [...colors].reverse() : colors;
+			const parts = [];
+			for (let i = 0; i < arr.length - 1; i++) {
+				parts.push({
+					type: 'algorithmic', algorithm: 'esriCIELabAlgorithm',
+					fromColor: [arr[i].r,   arr[i].g,   arr[i].b,   255],
+					toColor:   [arr[i+1].r, arr[i+1].g, arr[i+1].b, 255],
+				});
+			}
+			return { type: 'multipart', colorRamps: parts };
+		}
+
+		function getRampCss(settings) {
+			if (!COLOR_RAMPS.length) return 'linear-gradient(to right,#ccc,#333)';
+			const ramp = COLOR_RAMPS[settings.rampIdx] || COLOR_RAMPS[0];
+			return `linear-gradient(to right, ${esriColorsToGradientCss(ramp.colors, settings.rampFlipped)})`;
+		}
+
+		// Fallback ramps
+		const FALLBACK_RAMP_STOPS = [
+			{name:'Black to White',        stops:[[0,0,0],[255,255,255]]},
+			{name:'Blue Bright',           stops:[[204,204,255],[0,0,224]]},
+			{name:'Green Light to Dark',   stops:[[220,245,233],[34,102,51]]},
+			{name:'Cold to Hot Diverging', stops:[[69,117,181],[255,255,191],[214,47,39]]},
+			{name:'Red to Green',          stops:[[245,0,0],[245,245,0],[0,245,0]]},
+			{name:'Yellow to Dark Red',    stops:[[255,255,128],[242,167,46],[107,0,0]]},
+			{name:'Slope',                 stops:[[56,168,0],[255,255,0],[255,0,0]]},
+			{name:'Precipitation',         stops:[[194,82,60],[237,161,19],[255,255,0],[0,219,0],[11,44,122]]},
+		];
+		const FALLBACK_RAMPS = FALLBACK_RAMP_STOPS.map(r => ({
+			name: r.name,
+			colors: r.stops.map(([rr,g,b]) => ({r:rr,g,b,a:255}))
+		}));
+
+		// ── Collapsible helper ────────────────────────────────────────────────────
+		function toggleCollapsible(key){
+			document.getElementById('hdr-'+key).classList.toggle('open');
+			document.getElementById('body-'+key).classList.toggle('open');
+		}
+
+		// ── Slice URL / layer management ──────────────────────────────────────────
+		function buildSliceTileUrl(varName, year, settings){
+			return `${TREE_SVC}/exportImage?f=image&format=jpgpng&transparent=true&size=256,256`
+				+`&bbox={bbox-epsg-3857}&bboxSR=102100&imageSR=102100`
+				+`&renderingRule=${encodeURIComponent(JSON.stringify(buildRenderingRule(varName, settings)))}`
+				+`&mosaicRule=${encodeURIComponent(JSON.stringify(buildMosaicRule(year)))}`;
+		}
+
+		function buildRenderingRule(varName, s) {
+			const st    = s.stretchType;
+			const dra   = s.dra;
+			const gamma = s.gamma;
+			const useG  = Math.abs(gamma - 1) > 0.001;
+			const stats = dra ? [] : [[s.stMin, s.stMax, s.stMean, s.stStddev]];
+
+			const stretchArgs = {
+				StretchType: st, Statistics: stats, DRA: dra,
+				UseGamma: useG, Gamma: [gamma], ComputeGamma: false, Min: 0, Max: 255,
+				Raster: {rasterFunctionArguments:{BandIds:[0],Raster:{rasterFunction:varName}},rasterFunction:'ExtractBand'}
+			};
+			if (st === 6) { stretchArgs.MinPercent = s.pctMin; stretchArgs.MaxPercent = s.pctMax; }
+			if (st === 3) { stretchArgs.NumberOfStandardDeviations = s.sdn; }
+
+			const stretchFn = {rasterFunctionArguments:stretchArgs,rasterFunction:'Stretch',outputPixelType:'U8',variableName:'Raster'};
+			const ramp = COLOR_RAMPS[s.rampIdx];
+			const cmArgs = ramp
+				? { colorRamp: esriColorsToColorRampJson(ramp.colors, s.rampFlipped), Raster: stretchFn }
+				: { colorRampName: 'Black to White', Raster: stretchFn };
+			return { rasterFunctionArguments: cmArgs, rasterFunction: 'Colormap', variableName: 'Raster' };
+		}
+
+		function buildMosaicRule(year){
+			return{ascending:true,mosaicMethod:'esriMosaicNorthwest',multidimensionalDefinition:[{variableName:'',dimensionName:'year',values:[year],isSlice:true}],mosaicOperation:'MT_MAX'};
+		}
+
+		function sliceLayerId(id){return `treeSlice_${id}`;}
+		function sliceSrcId(id) {return `treeSliceSrc_${id}`;}
+
+		function addSliceLayer(sliceId){
+			if (!mapLoaded) return;
+			const info = activeSlices.get(sliceId); if (!info) return;
+			const lyrId = sliceLayerId(sliceId), srcId = sliceSrcId(sliceId);
+			if (map.getLayer(lyrId)) return;
+			map.addSource(srcId, {type:'raster', tiles:[buildSliceTileUrl(info.varName, info.year, info.settings)], tileSize:256, maxzoom:14, attribution:'© USFS EDW FHP'});
+			map.addLayer({id:lyrId, type:'raster', source:srcId, paint:{'raster-opacity':info.settings.opacity}}, getInsertionLayer(false));
+		}
+		function removeSliceLayer(sliceId){
+			const lyrId=sliceLayerId(sliceId), srcId=sliceSrcId(sliceId);
+			if (map.getLayer(lyrId)) map.removeLayer(lyrId);
+			if (map.getSource(srcId)) map.removeSource(srcId);
+		}
+		function refreshSliceLayer(sliceId){
+			removeSliceLayer(sliceId);
+			addSliceLayer(sliceId);
+		}
+		function refreshAllTreeLayers(){
+			activeSlices.forEach((_,id) => refreshSliceLayer(id));
+		}
+
+		function toggleSlice(sliceId, varName, year){
+			if (activeSlices.has(sliceId)) {
+				activeSlices.delete(sliceId);
+				removeSliceLayer(sliceId);
+				if (openDrawerSliceId === sliceId) openDrawerSliceId = null;
+			} else {
+				if (activeSlices.size >= 3) return; // hard cap — badge already shown
+				const settings = DEFAULT_LAYER_SETTINGS(layerAddCount++);
+				settings.rampIdx = resolveRampIdx(settings.rampRotationName);
+				activeSlices.set(sliceId, {varName, year, settings});
+				addSliceLayer(sliceId);
+			}
+			updateLimitBadge();
+			renderTreeList(); updateSelectionSummary();
+		}
+		function clearAllTreeLayers(){
+			activeSlices.forEach((_,id) => removeSliceLayer(id));
+			activeSlices.clear();
+			openDrawerSliceId = null;
+			layerAddCount = 0;
+			updateLimitBadge();
+			renderTreeList(); updateSelectionSummary();
+		}
+		function updateLimitBadge() {
+			const el = document.getElementById('tree-layer-limit');
+			el.classList.toggle('visible', activeSlices.size >= 3);
+		}
+
+		// ── Per-layer settings drawer ─────────────────────────────────────────────
+		function toggleDrawer(sliceId) {
+			if (openDrawerSliceId === sliceId) { openDrawerSliceId = null; }
+			else { openDrawerSliceId = sliceId; }
+			updateSelectionSummary();
+		}
+
+		function buildLayerSettingsDrawer(sliceId) {
+			const info = activeSlices.get(sliceId); if (!info) return null;
+			const s = info.settings;
+			const div = document.createElement('div');
+			div.className = 'layer-settings-drawer open';
+			div.id = `drawer_${sliceId}`;
+
+			// Opacity
+			div.innerHTML = `
+				<div class="lsd-section-label">Opacity &amp; Ramp</div>
+				<div class="lsd-row">
+					<span class="lsd-label">Opacity</span>
+					<input type="range" min="0" max="1" step="0.05" value="${s.opacity}"
+						oninput="updateLayerOpacity(${sliceId},this.value);this.nextElementSibling.textContent=Math.round(this.value*100)+'%'" />
+					<span style="min-width:28px;text-align:right;font-size:10px">${Math.round(s.opacity*100)}%</span>
+				</div>
+				<div class="lsd-row" style="align-items:flex-start;flex-direction:column;gap:3px">
+					<div style="display:flex;gap:5px;width:100%;align-items:center">
+						<span class="lsd-label">Ramp</span>
+						<button class="lsd-flip-btn" onclick="flipLayerRamp(${sliceId})">↕ Flip</button>
+					</div>
+					<div class="lsd-ramp-list" id="lsd-ramp-list-${sliceId}"></div>
+				</div>
+				<div class="lsd-section-label" style="margin-top:4px">Stretch &amp; Rendering</div>
+				<div class="lsd-row">
+					<span class="lsd-label">Stretch</span>
+					<select onchange="updateLayerStretch(${sliceId},this.value)">
+						<option value="0" ${s.stretchType===0?'selected':''}>None</option>
+						<option value="5" ${s.stretchType===5?'selected':''}>Min / Max</option>
+						<option value="6" ${s.stretchType===6?'selected':''}>% Clip</option>
+						<option value="3" ${s.stretchType===3?'selected':''}>Std Dev</option>
+					</select>
+				</div>
+				<div class="lsd-row" id="lsd-pct-${sliceId}" style="${s.stretchType===6?'':'display:none'}">
+					<span class="lsd-label">% Clip</span>
+					<input type="number" value="${s.pctMin}" step="0.1" min="0" max="50" style="max-width:46px"
+						oninput="updateLayerSetting(${sliceId},'pctMin',+this.value)" />
+					<span style="font-size:10px;color:#aaa">–</span>
+					<input type="number" value="${s.pctMax}" step="0.1" min="0" max="50" style="max-width:46px"
+						oninput="updateLayerSetting(${sliceId},'pctMax',+this.value)" />
+				</div>
+				<div class="lsd-row" id="lsd-sdn-${sliceId}" style="${s.stretchType===3?'':'display:none'}">
+					<span class="lsd-label">Std Dev n</span>
+					<input type="number" value="${s.sdn}" step="0.5" min="0.5" max="10"
+						oninput="updateLayerSetting(${sliceId},'sdn',+this.value)" />
+				</div>
+				<div class="lsd-row">
+					<span class="lsd-label">DRA</span>
+					<label style="font-size:11px;display:flex;align-items:center;gap:4px;cursor:pointer">
+						<input type="checkbox" ${s.dra?'checked':''} style="accent-color:#16a34a"
+							onchange="updateLayerSetting(${sliceId},'dra',this.checked)" />
+						Dynamic Range Adj.
+					</label>
+				</div>
+				<div class="lsd-row">
+					<span class="lsd-label">Gamma</span>
+					<input type="range" min="0.1" max="10" step="0.01" value="${s.gamma}"
+						oninput="updateLayerSetting(${sliceId},'gamma',+this.value);this.nextElementSibling.value=parseFloat(this.value).toFixed(2)" />
+					<input type="number" value="${s.gamma.toFixed(2)}" step="0.01" min="0.1" max="10" style="max-width:46px"
+						oninput="updateLayerSetting(${sliceId},'gamma',+this.value);this.previousElementSibling.value=this.value" />
+				</div>
+				<div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:2px 0"
+					onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display?'':'none';this.querySelector('.lsd-cchev').style.transform=this.nextElementSibling.style.display?'':'rotate(180deg)'">
+					<span class="lsd-section-label" style="margin:0">Statistics</span>
+					<span class="lsd-cchev" style="font-size:9px;color:#aaa;transition:transform 0.18s">▼</span>
+				</div>
+				<div class="lsd-stats-grid" style="display:none">
+					<label>Min</label>    <input type="number" value="${s.stMin}"    step="1"   oninput="updateLayerSetting(${sliceId},'stMin',+this.value)" />
+					<label>Max</label>    <input type="number" value="${s.stMax}"    step="1"   oninput="updateLayerSetting(${sliceId},'stMax',+this.value)" />
+					<label>Mean</label>   <input type="number" value="${s.stMean}"   step="0.1" oninput="updateLayerSetting(${sliceId},'stMean',+this.value)" />
+					<label>Std Dev</label><input type="number" value="${s.stStddev}" step="0.1" oninput="updateLayerSetting(${sliceId},'stStddev',+this.value)" />
+				</div>
+			`;
+
+			// Build mini ramp list
+			setTimeout(() => {
+				const rampList = document.getElementById(`lsd-ramp-list-${sliceId}`);
+				if (!rampList || !COLOR_RAMPS.length) return;
+				rampList.innerHTML = '';
+				COLOR_RAMPS.forEach((ramp, idx) => {
+					const row = document.createElement('div');
+					row.className = 'lsd-ramp-row' + (idx === s.rampIdx ? ' active' : '');
+					const bar = document.createElement('div');
+					bar.className = 'lsd-ramp-bar';
+					bar.style.background = `linear-gradient(to right, ${esriColorsToGradientCss(ramp.colors, s.rampFlipped)})`;
+					const lbl = document.createElement('span');
+					lbl.textContent = ramp.name;
+					row.appendChild(bar); row.appendChild(lbl);
+					row.onclick = () => { updateLayerRamp(sliceId, idx); };
+					rampList.appendChild(row);
+				});
+			}, 0);
+
+			return div;
+		}
+
+		function updateLayerOpacity(sliceId, val) {
+			const info = activeSlices.get(sliceId); if (!info) return;
+			info.settings.opacity = parseFloat(val);
+			const lyrId = sliceLayerId(sliceId);
+			if (map.getLayer(lyrId)) map.setPaintProperty(lyrId, 'raster-opacity', info.settings.opacity);
+			// Update ramp preview mini-strip in summary row
+			updateSummaryRampPreview(sliceId);
+		}
+		function updateLayerRamp(sliceId, rampIdx) {
+			const info = activeSlices.get(sliceId); if (!info) return;
+			info.settings.rampIdx = rampIdx;
+			refreshSliceLayer(sliceId);
+			updateSelectionSummary();
+		}
+		function flipLayerRamp(sliceId) {
+			const info = activeSlices.get(sliceId); if (!info) return;
+			info.settings.rampFlipped = !info.settings.rampFlipped;
+			refreshSliceLayer(sliceId);
+			updateSelectionSummary();
+		}
+		function updateLayerStretch(sliceId, val) {
+			const info = activeSlices.get(sliceId); if (!info) return;
+			info.settings.stretchType = parseInt(val);
+			const pctEl = document.getElementById(`lsd-pct-${sliceId}`);
+			const sdnEl = document.getElementById(`lsd-sdn-${sliceId}`);
+			if (pctEl) pctEl.style.display = info.settings.stretchType === 6 ? '' : 'none';
+			if (sdnEl) sdnEl.style.display = info.settings.stretchType === 3 ? '' : 'none';
+			refreshSliceLayer(sliceId);
+		}
+		function updateLayerSetting(sliceId, key, val) {
+			const info = activeSlices.get(sliceId); if (!info) return;
+			info.settings[key] = val;
+			refreshSliceLayer(sliceId);
+		}
+		function updateSummaryRampPreview(sliceId) {
+			const el = document.getElementById(`ramp-prev-${sliceId}`);
+			const info = activeSlices.get(sliceId);
+			if (el && info) el.style.background = getRampCss(info.settings);
+		}
+
+		// ── Tree list rendering ───────────────────────────────────────────────────
+		const fmtLabel = v => v.replace(/_/g,' ').replace(/\b\w/g, c => c.toUpperCase());
+
+		function renderTreeList(){
+			const container = document.getElementById('tree-list'); container.innerHTML = '';
+			const q = searchQuery.toLowerCase(); let any = false;
+			const atCap = activeSlices.size >= 3;
+			const limitEl = document.getElementById('tree-layer-limit');
+			if (limitEl) limitEl.classList.toggle('visible', atCap);
+			speciesGroups.forEach((group, varName) => {
+				if (q && !group.label.toLowerCase().includes(q) && !varName.toLowerCase().includes(q)) return;
+				any = true;
+				const activeCount = group.years.filter(y => activeSlices.has(y.sliceId)).length;
+				const treeInfo = getTreeTypeInfo(varName);
+				const groupEl = document.createElement('div'); groupEl.className = 'species-group';
+				const header = document.createElement('div');
+				header.className = 'species-group-header' + (activeCount > 0 ? ' has-active' : '');
+				header.innerHTML = `<span style="font-size:15px;flex-shrink:0" title="${treeInfo.label}">${treeInfo.icon}</span><span class="species-group-name">${group.label}</span><span class="species-group-badge ${activeCount>0?'visible':''}">${activeCount}</span><span class="species-group-chevron">▼</span>`;
+				const yearsEl = document.createElement('div'); yearsEl.className = 'species-years';
+				group.years.forEach(({sliceId, year}) => {
+					const isActive = activeSlices.has(sliceId);
+					const blocked = atCap && !isActive;
+					const pill = document.createElement('span');
+					pill.className = 'year-pill' + (isActive ? ' active' : '') + (blocked ? ' disabled' : '');
+					if (blocked) pill.style.cssText = 'opacity:0.38;cursor:not-allowed';
+					pill.textContent = year;
+					pill.title = blocked ? `Max 3 layers active — remove one first` : `${group.label} · ${year} (slice ${sliceId})`;
+					if (!blocked) pill.onclick = e => { e.stopPropagation(); toggleSlice(sliceId, varName, year); };
+					yearsEl.appendChild(pill);
+				});
+				header.onclick = () => { const o = yearsEl.classList.contains('open'); yearsEl.classList.toggle('open',!o); header.querySelector('.species-group-chevron').classList.toggle('open',!o); };
+				if (activeCount > 0 || q) { yearsEl.classList.add('open'); header.querySelector('.species-group-chevron').classList.add('open'); }
+				groupEl.appendChild(header); groupEl.appendChild(yearsEl); container.appendChild(groupEl);
+			});
+			if (!any) container.innerHTML = '<div style="font-size:11px;color:#aaa;padding:4px 6px">No results</div>';
+		}
+
+		function updateSelectionSummary(){
+			const el = document.getElementById('tree-selection-summary'); el.innerHTML = '';
+			if (activeSlices.size === 0) { el.classList.remove('visible'); return; }
+			el.classList.add('visible');
+			activeSlices.forEach((info, sliceId) => {
+				const treeInfo = getTreeTypeInfo(info.varName);
+				const isOpen = openDrawerSliceId === sliceId;
+				const wrapper = document.createElement('div');
+				wrapper.style.cssText = 'display:flex;flex-direction:column;gap:0';
+
+				const row = document.createElement('div'); row.className = 'summary-row';
+				row.innerHTML = `
+					<div class="summary-row-top">
+						<span style="font-size:13px;flex-shrink:0" title="${treeInfo.label}">${treeInfo.icon}</span>
+						<span class="sum-label">${fmtLabel(info.varName)} · ${info.year}</span>
+						<div class="summary-ramp-preview" id="ramp-prev-${sliceId}" style="background:${getRampCss(info.settings)}"></div>
+						<span class="summary-gear" title="Layer settings" onclick="toggleDrawer(${sliceId})">${isOpen ? '⚙️' : '⚙'}</span>
+						<span class="summary-remove" onclick="toggleSlice(${sliceId},'${info.varName}',${info.year})">✕</span>
+					</div>`;
+				wrapper.appendChild(row);
+				if (isOpen) {
+					const drawer = buildLayerSettingsDrawer(sliceId);
+					if (drawer) wrapper.appendChild(drawer);
+				}
+				el.appendChild(wrapper);
+			});
+		}
+
+		function filterTreeList(){ searchQuery = document.getElementById('tree-search').value; renderTreeList(); }
+
+		// ── Slice loading ─────────────────────────────────────────────────────────
+		async function loadTreeSlices(){
+			const statusEl = document.getElementById('tree-status');
+			try {
+				const res = await fetch(`${TREE_SVC}/slices?f=json`);
+				const data = await res.json();
+				if (!data.slices || !data.slices.length) { statusEl.textContent = 'No species data available.'; return; }
+				speciesGroups.clear();
+				data.slices.forEach(s => {
+					const def = s.multidimensionalDefinition && s.multidimensionalDefinition[0];
+					const varName = def ? def.variableName : (s.sliceName || `slice_${s.sliceId}`);
+					const year = def ? def.values[0] : s.sliceId;
+					if (!speciesGroups.has(varName)) speciesGroups.set(varName, {label:fmtLabel(varName), varName, years:[]});
+					speciesGroups.get(varName).years.push({sliceId:s.sliceId, year});
+				});
+				speciesGroups.forEach(g => g.years.sort((a,b) => a.year - b.year));
+				statusEl.style.display = 'none';
+				document.getElementById('tree-list').style.display = 'flex';
+				document.getElementById('tree-none-btn').style.display = '';
+				renderTreeList();
+				loadColorRamps();
+			} catch(err) { statusEl.textContent = '⚠ Failed to load species list.'; console.error(err); }
+		}
+
+		let treePanelMinimized = false;
+		function toggleTreePanel(){
+			treePanelMinimized = !treePanelMinimized;
+			const btn = document.getElementById('tree-minimize-btn');
+			btn.style.transform = treePanelMinimized ? 'rotate(180deg)' : '';
+			btn.style.transition = 'transform 0.2s';
+			document.getElementById('tree-panel-body').style.display = treePanelMinimized ? 'none' : 'flex';
+		}
+
+		loadTreeSlices();
+
+		// ═══════════════════════════════════════════════════════════════════════════
+		// SOIL VALUE POPUP (pixel-read from raster canvas, open-meteo style)
+		// ═══════════════════════════════════════════════════════════════════════════
+
+		// ── State ────────────────────────────────────────────────────────────────
+		let popupMode = 'off';        // 'off' | 'follow' | 'draggable'
+		let popupVisible = false;
+		let dragPopupLngLat = null;   // geo-anchor for draggable mode
+
+		// ── DOM: popup element ────────────────────────────────────────────────────
+		// The popup is positioned so its DOT TIP sits exactly at the coordinate.
+		// Layout (top→bottom inside .soil-popup):
+		//   [coords label]  ← absolutely positioned above wrapper
+		//   [wrapper box ]  ← the frosted card
+		//   [stem + dot  ]  ← hangs below the wrapper, dot is at bottom = the anchor
+		// We translate the whole element so the dot tip aligns with left/top.
+		const popupEl = document.createElement('div');
+		popupEl.className = 'soil-popup';
+		popupEl.id = 'soil-popup';
+		popupEl.innerHTML = `
+			<div class="popup-wrapper">
+				<div class="popup-content" id="popup-content">–</div>
+				<div class="popup-coords" id="popup-coords"></div>
+			</div>
+			<div class="popup-stem"><div class="popup-dot"></div></div>
+		`;
+		popupEl.style.display = 'none';
+		document.getElementById('map').appendChild(popupEl);
+
+		// ── Pixel reading: use an offscreen 2D canvas that we blit into ──────────
+		// MapLibre uses preserveDrawingBuffer:false so readPixels returns zeros
+		// during mousemove. Fix: after each render, blit the WebGL canvas into a
+		// persistent 2D canvas we can read any time.
+		let _pixelCanvas = null;
+		let _pixelCtx    = null;
+
+		function ensurePixelCanvas() {
+			if (_pixelCanvas) return;
+			_pixelCanvas = document.createElement('canvas');
+			_pixelCanvas.style.display = 'none';
+			document.body.appendChild(_pixelCanvas);
+			_pixelCtx = _pixelCanvas.getContext('2d');
+		}
+
+		function syncPixelCanvas() {
+			ensurePixelCanvas();
+			const src = map.getCanvas();
+			const dpr = window.devicePixelRatio || 1;
+			const w   = src.width;
+			const h   = src.height;
+			if (_pixelCanvas.width !== w || _pixelCanvas.height !== h) {
+				_pixelCanvas.width  = w;
+				_pixelCanvas.height = h;
+			}
+			try { _pixelCtx.drawImage(src, 0, 0); } catch(e) {}
+		}
+
+		// Blit after every rendered frame
+		map.on('render', syncPixelCanvas);
+
+		function getCanvasPixel(screenPoint) {
+			if (!_pixelCtx) return null;
+			const dpr = window.devicePixelRatio || 1;
+			const x   = Math.round(screenPoint.x * dpr);
+			const y   = Math.round(screenPoint.y * dpr);
+			try {
+				const d = _pixelCtx.getImageData(x, y, 1, 1).data;
+				return { r: d[0], g: d[1], b: d[2], a: d[3] };
+			} catch(e) { return null; }
+		}
+
+		// ── Color scale interpolation ─────────────────────────────────────────────
+		function lerpColor(c1, c2, t) {
+			return [
+				Math.round(c1[0] + (c2[0] - c1[0]) * t),
+				Math.round(c1[1] + (c2[1] - c1[1]) * t),
+				Math.round(c1[2] + (c2[2] - c1[2]) * t),
+			];
+		}
+		function valueToColor(value, breakpoints, colors) {
+			if (value <= breakpoints[0]) return colors[0];
+			if (value >= breakpoints[breakpoints.length - 1]) return colors[colors.length - 1];
+			for (let i = 0; i < breakpoints.length - 1; i++) {
+				if (value >= breakpoints[i] && value <= breakpoints[i + 1]) {
+					const t = (value - breakpoints[i]) / (breakpoints[i + 1] - breakpoints[i]);
+					return lerpColor(colors[i], colors[i + 1], t);
+				}
+			}
+			return colors[0];
+		}
+
+		// ── Reverse-map pixel color → closest soil value on the ramp ─────────────
+		function colorToValue(r, g, b, breakpoints, colors) {
+			const steps   = 500;
+			const minBp   = breakpoints[0];
+			const maxBp   = breakpoints[breakpoints.length - 1];
+			let bestVal   = minBp;
+			let bestDist  = Infinity;
+			for (let i = 0; i <= steps; i++) {
+				const v = minBp + (i / steps) * (maxBp - minBp);
+				const c = valueToColor(v, breakpoints, colors);
+				const d = (c[0]-r)**2 + (c[1]-g)**2 + (c[2]-b)**2;
+				if (d < bestDist) { bestDist = d; bestVal = v; }
+			}
+			return { value: bestVal, colorDist: bestDist };
+		}
+
+		// ── Read soil value(s) at a screen point ──────────────────────────────────
+		function readSoilAtPoint(screenPt) {
+			const pixel = getCanvasPixel(screenPt);
+			if (!pixel || pixel.a < 20) return null;
+
+			const results = [];
+
+			if (tempActive) {
+				const bpC = DEFAULT_TEMP_BREAKPOINTS;
+				const res = colorToValue(pixel.r, pixel.g, pixel.b, bpC, userTempColors);
+				if (res.colorDist < 15000) {
+					const valC      = res.value;
+					const valDisplay = currentUnit === 'F'
+						? (valC * 9/5 + 32).toFixed(1) + ' °F'
+						: valC.toFixed(1) + ' °C';
+					results.push({ label: '🌡', value: valDisplay, swatch: valueToColor(valC, bpC, userTempColors) });
+				}
+			}
+
+			if (moistActive) {
+				const bpM = DEFAULT_MOIST_BREAKPOINTS;
+				const res = colorToValue(pixel.r, pixel.g, pixel.b, bpM, userMoistColors);
+				if (res.colorDist < 15000) {
+					const valM = res.value;
+					results.push({ label: '💧', value: valM.toFixed(3) + ' m³/m³', swatch: valueToColor(valM, bpM, userMoistColors) });
+				}
+			}
+
+			return results.length > 0 ? results : null;
+		}
+
+		// ── Position popup so the dot tip sits at (x, y) ─────────────────────────
+		// The popup element is structured so that its bottom is the dot tip.
+		// We use CSS transform to shift horizontally centered + upward by total height.
+		function positionPopup(screenPt) {
+			// left/top place the top-left corner; we use transform to center-x
+			// and shift the whole element up so the dot bottom aligns with the point.
+			popupEl.style.left      = screenPt.x + 'px';
+			popupEl.style.top       = screenPt.y + 'px';
+			// translateX(-50%) centers; translateY(-100%) shifts the whole element above the point
+			popupEl.style.transform = 'translateX(-50%) translateY(-100%)';
+		}
+
+		// ── Format lngLat ─────────────────────────────────────────────────────────
+		function fmtCoords(lngLat) {
+			const lat = (lngLat.lat >= 0 ? lngLat.lat.toFixed(3) + '°N' : Math.abs(lngLat.lat).toFixed(3) + '°S');
+			const lng = (lngLat.lng >= 0 ? lngLat.lng.toFixed(3) + '°E' : Math.abs(lngLat.lng).toFixed(3) + '°W');
+			return `${lat}, ${lng}`;
+		}
+
+		// ── Render popup at a screen point + lngLat ───────────────────────────────
+		function updatePopupAt(screenPt, lngLat) {
+			const contentEl = document.getElementById('popup-content');
+			const coordsEl  = document.getElementById('popup-coords');
+
+			coordsEl.textContent = fmtCoords(lngLat);
+
+			if (!tempActive && !moistActive) {
+				contentEl.innerHTML = '<span style="color:#888;font-size:11px">No layer</span>';
+			} else {
+				const results = readSoilAtPoint(screenPt);
+				if (!results) {
+					contentEl.innerHTML = '<span style="color:#888;font-size:11px">No data</span>';
+				} else {
+					contentEl.innerHTML = results.map(r => {
+						const [sr, sg, sb] = r.swatch;
+						return `<span class="popup-value-row"><span class="popup-swatch" style="background:rgb(${sr},${sg},${sb})"></span>${r.label} ${r.value}</span>`;
+					}).join('<span style="margin:0 3px;color:#bbb">·</span>');
+				}
+			}
+
+			positionPopup(screenPt);
+			popupEl.style.display = 'block';
+			popupVisible = true;
+		}
+
+		// ── Hide popup ────────────────────────────────────────────────────────────
+		function hidePopup() {
+			popupEl.style.display = 'none';
+			popupVisible = false;
+		}
+
+		// ── Draggable popup: real mousedown→mousemove drag on the element ─────────
+		let _isDraggingPopup = false;
+		let _dragOffsetX = 0;
+		let _dragOffsetY = 0;
+
+		popupEl.addEventListener('mousedown', e => {
+			if (popupMode !== 'draggable') return;
+			e.preventDefault();
+			e.stopPropagation();
+			_isDraggingPopup = true;
+			// Offset from element's current screen position to mouse
+			const rect = map.getContainer().getBoundingClientRect();
+			const curX = parseFloat(popupEl.style.left);
+			const curY = parseFloat(popupEl.style.top);
+			_dragOffsetX = e.clientX - rect.left - curX;
+			_dragOffsetY = e.clientY - rect.top  - curY;
+			popupEl.style.cursor = 'grabbing';
+			map.dragPan.disable();
+		});
+
+		document.addEventListener('mousemove', e => {
+			if (!_isDraggingPopup) return;
+			const rect    = map.getContainer().getBoundingClientRect();
+			const newX    = e.clientX - rect.left - _dragOffsetX;
+			const newY    = e.clientY - rect.top  - _dragOffsetY;
+			const screenPt = { x: newX, y: newY };
+			dragPopupLngLat = map.unproject([newX, newY]);
+			updatePopupAt(screenPt, dragPopupLngLat);
+		});
+
+		document.addEventListener('mouseup', e => {
+			if (!_isDraggingPopup) return;
+			_isDraggingPopup = false;
+			popupEl.style.cursor = 'grab';
+			map.dragPan.enable();
+		});
+
+		// ── Mode switching ────────────────────────────────────────────────────────
+		function setPopupMode(mode) {
+			popupMode = mode;
+			['off', 'follow', 'draggable'].forEach(m => {
+				const btn = document.getElementById('popup-mode-' + m);
+				if (btn) btn.classList.toggle('active', m === mode);
+			});
+
+			popupEl.classList.toggle('draggable-mode', mode === 'draggable');
+
+			if (mode === 'off') {
+				hidePopup();
+				dragPopupLngLat = null;
+				map.off('mousemove', onMapMouseMove);
+				map.off('click',     onMapClick);
+				map.getCanvas().style.cursor = '';
+			} else if (mode === 'follow') {
+				dragPopupLngLat = null;
+				map.on('mousemove', onMapMouseMove);
+				map.off('click',    onMapClick);
+				map.getCanvas().style.cursor = 'crosshair';
+			} else if (mode === 'draggable') {
+				map.off('mousemove', onMapMouseMove);
+				map.on('click',      onMapClick);
+				map.getCanvas().style.cursor = 'crosshair';
+				if (dragPopupLngLat) {
+					const pt = map.project(dragPopupLngLat);
+					updatePopupAt(pt, dragPopupLngLat);
+				} else {
+					hidePopup();
+				}
+			}
+		}
+
+		// ── Follow-mouse handler ──────────────────────────────────────────────────
+		function onMapMouseMove(e) {
+			if (popupMode !== 'follow') return;
+			updatePopupAt(e.point, e.lngLat);
+		}
+
+		// ── Click-to-place handler (draggable mode, initial placement) ────────────
+		function onMapClick(e) {
+			if (popupMode !== 'draggable') return;
+			dragPopupLngLat = e.lngLat;
+			updatePopupAt(e.point, e.lngLat);
+		}
+
+		// ── Reproject popup when map pans/zooms ───────────────────────────────────
+		map.on('move', () => {
+			if (popupVisible && dragPopupLngLat && popupMode === 'draggable' && !_isDraggingPopup) {
+				positionPopup(map.project(dragPopupLngLat));
+			}
+		});
+
+		// ── Re-read values after tiles finish loading ─────────────────────────────
+		map.on('idle', () => {
+			if (popupMode === 'draggable' && dragPopupLngLat && popupVisible) {
+				updatePopupAt(map.project(dragPopupLngLat), dragPopupLngLat);
+			}
+		});
+
 		</script>
 	</body>
 </html>
