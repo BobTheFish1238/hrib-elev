@@ -7,7 +7,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.17.0/dist/maplibre-gl.css" />
 		<script src="https://unpkg.com/maplibre-gl@5.17.0/dist/maplibre-gl.js"></script>
-		<script src="https://unpkg.com/@openmeteo/mapbox-layer@0.0.15/dist/index.js"></script>
+		<script src="https://unpkg.com/@openmeteo/weather-map-layer@0.0.16/dist/index.js"></script>
 		<style>
 			html, body, #map { margin: 0; padding: 0; height: 100%; }
 
@@ -52,10 +52,10 @@
 			.color-rows { display: none; flex-direction: column; gap: 4px; margin-top: 4px; }
 			.color-rows.open { display: flex; }
 			.color-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #444; }
-			.color-row input[type="color"] { width: 32px; height: 22px; padding: 1px 2px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; background: none; }
-			.color-row .bp-label { min-width: 52px; font-size: 11px; color: #666; }
-			.color-row input[type="range"] { flex: 1; accent-color: #2563eb; max-width:100px; }
-			.opacity-val { font-size: 11px; color: #888; min-width: 28px; text-align: right; }
+			.color-row input[type="color"] { min-width: 32px; height: 22px; padding: 1px 2px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; background: none; }
+			.color-row .bp-label { min-width: 30px; font-size: 11px; color: #666; }
+			.color-row input[type="range"] { flex: 1; accent-color: #2563eb; max-width:30%; }
+			.opacity-val { font-size: 11px; color: #888; min-width: 28px; text-align: left; }
 			.reset-colors-btn { font-size: 11px; padding: 3px 8px; border: 1px solid #ccc; border-radius: 5px; background: #f5f5f5; cursor: pointer; color: #555; align-self: flex-end; margin-top: 2px; }
 			.reset-colors-btn:hover { background: #e8e8e8; }
 
@@ -63,7 +63,7 @@
 			.layer-tabs-wrapper { display: flex; flex-direction: column; gap: 6px; }
 			.layer-tab-bar { display: flex; border-radius: 8px; overflow: hidden; border: 1px solid #ccc; }
 			.layer-tab-bar button {
-				flex: 1; padding: 7px 6px; border: none; background: #f0f0f0;
+				width: 50%; flex: 1; padding: 7px 6px; border: none; background: #f0f0f0;
 				cursor: pointer; font-size: 12px; font-weight: 600; color: #555;
 				transition: background 0.15s, color 0.15s; white-space: nowrap;
 				display: flex; align-items: center; justify-content: center; gap: 4px;
@@ -106,7 +106,7 @@
 				background: rgba(255,255,255,0.96); border-radius: 10px;
 				padding: 14px 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.18);
 				font-family: sans-serif; font-size: 13px; max-width: 200px;
-				max-height: calc(100vh - 40px); display: flex; flex-direction: column; gap: 8px;
+				max-height: calc(100vh - 80px); display: flex; flex-direction: column; gap: 8px;
 			}
 			#tree-panel h3 { margin: 0; font-size: 13px; font-weight: 700; color: #333; letter-spacing: 0.03em; text-transform: uppercase; display: flex; align-items: center; justify-content: space-between; }
 			#tree-panel-body { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; flex: 1; min-height: 0; padding-right: 2px; }
@@ -114,7 +114,7 @@
 			.tree-search:focus { outline: 2px solid #2563eb44; border-color: #2563eb; }
 			.tree-list {
 				display: flex; flex-direction: column; gap: 4px;
-				overflow-y: auto; max-height: 260px; padding-right: 2px; flex-shrink: 0;
+				overflow-y: auto; max-height: calc(50vh); padding-right: 2px; flex-shrink: 1;
 			}
 			.species-group {}
 			.species-group-header {
@@ -138,7 +138,7 @@
 			.year-pill { padding: 3px 9px; border-radius: 12px; border: 1px solid #ccc; background: #f8f8f8; font-size: 11px; color: #444; cursor: pointer; transition: background 0.12s, border-color 0.12s, color 0.12s; user-select: none; }
 			.year-pill:hover { background: #e8f0ff; border-color: #93c5fd; }
 			.year-pill.active { background: #2563eb; border-color: #2563eb; color: #fff; font-weight: 600; }
-			#tree-selection-summary { display: none; flex-direction: column; gap: 4px; font-size: 11px; color: #444; background: #f0f7ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 6px 8px; max-height: 340px; overflow-y: auto; }
+			#tree-selection-summary { display: none; flex-direction: column; gap: 4px; font-size: 11px; color: #444; background: #f0f7ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 6px 8px; max-height: calc(100vh - 120px); overflow-y: auto; flex-shrink: 0;}
 			#tree-selection-summary.visible { display: flex; }
 			.summary-row { display: flex; align-items: center; justify-content: space-between; gap: 4px; flex-wrap: wrap; }
 			.summary-row-top { display: flex; align-items: center; gap: 4px; width: 100%; }
@@ -152,7 +152,7 @@
 			.layer-settings-drawer { display: none; width: 100%; background: #fff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 7px 8px; box-sizing: border-box; flex-direction: column; gap: 5px; margin-top: 2px; }
 			.layer-settings-drawer.open { display: flex; }
 			.lsd-row { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #555; }
-			.lsd-row .lsd-label { min-width: 52px; font-weight: 600; flex-shrink: 0; }
+			.lsd-row .lsd-label { min-width: 35px; font-weight: 600; flex-shrink: 0; }
 			.lsd-row input[type="range"] { flex: 1; accent-color: #16a34a; }
 			.lsd-row select { flex: 1; padding: 2px 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 11px; background: #fafafa; }
 			.lsd-row input[type="number"] { flex: 1; padding: 2px 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 11px; background: #fafafa; width: 100%; box-sizing: border-box; }
@@ -187,6 +187,24 @@
 			.stats-grid label { font-weight: 600; white-space: nowrap; }
 			.stats-grid input[type="number"] { padding: 3px 5px; border: 1px solid #ccc; border-radius: 5px; font-size: 11px; background: #fafafa; width: 100%; box-sizing: border-box; }
 
+			@media (max-width: 600px) {
+				#controls {
+					max-width: calc(40vw);
+					left: 8px;
+					top: 8px;
+					font-size: 12px;
+				}
+				#tree-panel {
+					max-width: calc(38vw);
+					right: 8px;
+					top: 8px;
+					font-size: 12px;
+				}
+				#tree-selection-summary {
+					max-height: min(200px, 22vh);
+				}
+			}
+
 			/* ── Soil Value Popup (open-meteo style) ─────────────────────────── */
 			.soil-popup {
 				position: absolute;
@@ -215,13 +233,13 @@
 			}
 			.popup-content {
 				justify-content: center;
-				align-items: center;
-				gap: 2px;
+				align-items: flex-start;
 				min-height: 22px;
 				padding: .2rem .4rem;
 				font-weight: 700;
 				transition: all .15s;
 				display: flex;
+				flex-direction: column;
 				font-family: sans-serif;
 				font-size: 13px;
 				white-space: nowrap;
@@ -411,7 +429,7 @@
 		<!-- Basemap popup panel -->
 		<div id="bm-popup">
 			<div class="bm-popup-title">🗺 Map Style
-				<a href="https://maps.open-meteo.com/?domain=ncep_nam_conus&variable=soil_temperature_0_to_10cm"
+				<a href="https://maps.open-meteo.com/?domain=ncep_nam_conus&variable=soil_temperature_10_to_40cm"
 				   target="_blank" style="font-size:10px;margin:0 8px 0 8px;color:#4aa3ff;text-decoration:none">(Open-Meteo Map)</a>
 			</div>
 
@@ -575,8 +593,8 @@
 		<div id="controls">
 			<h3 style="display:flex;align-items:center;margin:0;cursor:pointer;user-select:none" onclick="toggleMinimize()">
 				<div class="hrib-svg"></div>
-				<b><span style="color:#8B4513">Hrib</span><span style="color:#ac713a">Soil</span></b>
-				<span id="subtitle" style="white-space:nowrap;font-size:10px;">&nbsp;- Soil Data Explorer</span>
+				<b><span style="color:#8B4513">Hrib</span><span style="color:#12167f">Soil</span></b>
+				<span id="subtitle" style="white-space:wrap;font-size:10px;display:flex; text-align:center;">&nbsp;- Soil Data Explorer</span>
 				<button id="minimize-btn"
 					style="background:none;border:none;cursor:pointer;font-size:16px;color:#888;padding:0;margin-left:10px;line-height:1;pointer-events:none">⌃</button>
 			</h3>
@@ -597,16 +615,16 @@
 			</select>
 			<hr class="divider" />
 
-			<div class="section-label">Active Layers</div>
+			<div class="section-label">Soil Layers</div>
 			<div class="layer-tabs-wrapper">
 				<div class="layer-tab-bar">
-					<button id="tab-temp" class="active layer-on" style="font-size:10px" onclick="selectLayerTab('temp')">
-						<input type="checkbox" id="layer-temp-check" checked
+					<button id="tab-temp" class="active layer-on" style="font-size:9px" onclick="selectLayerTab('temp')">
+						<input type="checkbox" id="layer-temp-check" style="margin:0 0 0 10px" checked
 							onclick="event.stopPropagation()"
 							onchange="onLayerCheckChange()" />
 						🌡 Temperature
 					</button>
-					<button id="tab-moist" style="font-size:10px" onclick="selectLayerTab('moist')">
+					<button id="tab-moist" style="font-size:9px" onclick="selectLayerTab('moist')">
 						<input type="checkbox" id="layer-moist-check"
 							onclick="event.stopPropagation()"
 							onchange="onLayerCheckChange()" />
@@ -615,12 +633,12 @@
 				</div>
 				<div class="layer-tab-opacity" id="tab-opacity-row-temp">
 					<label>Opacity</label>
-					<input type="range" id="temp-master-opacity" min="0" max="1" step="0.05" value="0.75" oninput="setMasterOpacity('temp',this.value)" style="max-width:140px" />
+					<input type="range" id="temp-master-opacity" min="0" max="1" step="0.05" value="0.75" oninput="setMasterOpacity('temp',this.value)" style="max-width:50%" />
 					<span id="temp-opacity-val">75%</span>
 				</div>
 				<div class="layer-tab-opacity" id="tab-opacity-row-moist" style="display:none">
 					<label>Opacity</label>
-					<input type="range" id="moist-master-opacity" min="0" max="1" step="0.05" value="0.75" oninput="setMasterOpacity('moist',this.value)" style="max-width:140px" />
+					<input type="range" id="moist-master-opacity" min="0" max="1" step="0.05" value="0.75" oninput="setMasterOpacity('moist',this.value)" style="max-width:50%" />
 					<span id="moist-opacity-val">75%</span>
 				</div>
 			</div>
@@ -628,10 +646,10 @@
 
 			<div id="temp-section">
 				<div class="section-label" style="margin-bottom:6px">🌡 Temperature</div>
-				<div class="section-label" style="font-size:10px;margin-bottom:2px">Depth</div>
+				<div class="section-label" style="font-size:10px;margin-bottom:2px">Soil Depth</div>
 				<div class="depth-group" id="depth-group-temp">
-					<button class="active" data-depth="0_to_10cm"    onclick="setDepth('temp',this)">0 – 10 cm</button>
-					<button data-depth="10_to_40cm"   onclick="setDepth('temp',this)">10 – 40 cm</button>
+					<button data-depth="0_to_10cm"    onclick="setDepth('temp',this)">0 – 10 cm</button>
+					<button class="active" data-depth="10_to_40cm"   onclick="setDepth('temp',this)">10 – 40 cm</button>
 					<button data-depth="40_to_100cm"  onclick="setDepth('temp',this)">40 – 100 cm</button>
 					<button data-depth="100_to_200cm" onclick="setDepth('temp',this)">100 – 200 cm</button>
 				</div>
@@ -653,6 +671,11 @@
 						<input type="checkbox" id="contour-check-temp" checked onchange="syncContourCheck('temp')" />Show contours
 					</label>
 				</div>
+				<div class="control-row" style="margin-top:6px">
+					<label>Z Order</label>
+					<input type="number" id="input-temp-z" value="1" min="1" max="10" step="1" style="width:52px"
+						onchange="tempZOrder=+this.value; reorderAllLayers()" />
+				</div>
 				<div style="margin-top:8px">
 					<div class="color-editor-header" id="temp-color-header" onclick="toggleColorEditor('temp')">
 						<span>Colors</span><span class="chevron">▼</span>
@@ -665,10 +688,10 @@
 
 			<div id="moist-section" style="display:none">
 				<div class="section-label" style="margin-bottom:6px">💧 Moisture</div>
-				<div class="section-label" style="font-size:10px;margin-bottom:2px">Depth</div>
+				<div class="section-label" style="font-size:10px;margin-bottom:2px">Soil Depth</div>
 				<div class="depth-group" id="depth-group-moist">
-					<button class="active" data-depth="0_to_10cm"    onclick="setDepth('moist',this)">0 – 10 cm</button>
-					<button data-depth="10_to_40cm"   onclick="setDepth('moist',this)">10 – 40 cm</button>
+					<button data-depth="0_to_10cm"    onclick="setDepth('moist',this)">0 – 10 cm</button>
+					<button class="active" data-depth="10_to_40cm"   onclick="setDepth('moist',this)">10 – 40 cm</button>
 					<button data-depth="40_to_100cm"  onclick="setDepth('moist',this)">40 – 100 cm</button>
 					<button data-depth="100_to_200cm" onclick="setDepth('moist',this)">100 – 200 cm</button>
 				</div>
@@ -686,6 +709,11 @@
 						<input type="checkbox" id="contour-check-moist" onchange="syncContourCheck('moist')" />Show contours
 					</label>
 				</div>
+				<div class="control-row" style="margin-top:6px">
+					<label>Z Order</label>
+					<input type="number" id="input-moist-z" value="2" min="1" max="10" step="1" style="width:52px"
+						onchange="moistZOrder=+this.value; reorderAllLayers()" />
+				</div>
 				<div style="margin-top:8px">
 					<div class="color-editor-header" id="moist-color-header" onclick="toggleColorEditor('moist')">
 						<span>Colors</span><span class="chevron">▼</span>
@@ -697,14 +725,14 @@
 			<hr class="divider" />
 
 			<!-- Popup Settings -->
-			<!-- <div class="popup-settings-section"> -->
-				<!-- <div class="section-label">🔍 Popup</div> -->
-				<!-- <div class="popup-mode-group"> -->
-					<!-- <button id="popup-mode-off"      onclick="setPopupMode('off')"      class="active">Off</button> -->
-					<!-- <button id="popup-mode-follow"   onclick="setPopupMode('follow')">Follows mouse</button> -->
-					<!-- <button id="popup-mode-draggable" onclick="setPopupMode('draggable')">Draggable</button> -->
-				<!-- </div> -->
-			<!-- </div> -->
+			<div class="popup-settings-section">
+				<div class="section-label">🔍 Popup</div>
+				<div class="popup-mode-group">
+					<button id="popup-mode-off"      onclick="setPopupMode('off')"      class="active">Off</button>
+					<button id="popup-mode-follow"   onclick="setPopupMode('follow')">Follows mouse</button>
+					<button id="popup-mode-draggable" onclick="setPopupMode('draggable')">Draggable</button>
+				</div>
+			</div>
 		</div> <!-- end controls-scroll -->
 		<div id="controls-footer">
 			<button id="apply-btn" onclick="applySettings()">Apply</button>
@@ -727,12 +755,13 @@
 
 				<div id="tree-status">Loading species list…</div>
 				<div class="tree-list" id="tree-list" style="display:none"></div>
-
-				<div id="tree-selection-summary"></div>
-
-				<button class="tree-none-btn" id="tree-none-btn" style="display:none" onclick="clearAllTreeLayers()">✕ Clear all selections</button>
 				<div id="ramp-list-loading" style="display:none;font-size:11px;color:#888;text-align:center;padding:4px 0">Loading ramps…</div>
 			</div>
+
+			<div id="tree-selection-summary"></div>
+
+			<button class="tree-none-btn" id="tree-none-btn" style="display:none" onclick="clearAllTreeLayers()">✕ Clear all selections</button>
+
 		</div>
 
 		<script>
@@ -755,11 +784,12 @@
 		let userMoistOpacity = DEFAULT_MOIST_BREAKPOINTS.map(()=>0.75);
 
 		// ─── Soil: state ──────────────────────────────────────────────────────────
-		let currentUnit='F', tempDepth='0_to_10cm', moistDepth='0_to_10cm';
+		let currentUnit='F', tempDepth='10_to_40cm', moistDepth='10_to_40cm';
 		let tempActive=true, moistActive=false, tempContours=true, moistContours=false;
 		let rangeMinC=5, rangeMaxC=10, mapLoaded=false, tempOpacity=0.75, moistOpacity=0.75;
+		let tempZOrder=1, moistZOrder=2, treeZOrder=3;
 
-		let minimized=false;
+		let minimized=true;
 		let activeLayerTab='temp'; // 'temp' | 'moist'
 
 		function selectLayerTab(type){
@@ -797,6 +827,14 @@
 			document.getElementById('controls-footer').style.display = minimized ? 'none' : '';
 			if(!minimized) syncLayerSectionVisibility();
 		}
+		(function(){
+			const btn=document.getElementById('minimize-btn');
+			const subtitle=document.getElementById('subtitle');
+			subtitle.style.display='none';
+			btn.style.transform='rotate(180deg)';
+			document.getElementById('controls-scroll').style.display='none';
+			document.getElementById('controls-footer').style.display='none';
+		})();
 		// Only update section visibility without touching map layers
 		function syncLayerSectionVisibility(){
 			tempActive=document.getElementById('layer-temp-check').checked;
@@ -1033,11 +1071,11 @@
 		}
 
 		function registerProtocol(tempMinC,tempMaxC,moistMinV,moistMaxV){
-			const options=OpenMeteoMapboxLayer.defaultOmProtocolSettings;
+			const options=OMWeatherMapLayer.defaultOmProtocolSettings;
 			options.colorScales={};
 			if(tempActive)  options.colorScales[`soil_temperature_${tempDepth}`]=buildTempColorScale(tempMinC,tempMaxC);
 			if(moistActive) options.colorScales[`soil_moisture_${moistDepth}`]=buildMoistureColorScale(moistMinV,moistMaxV);
-			maplibregl.addProtocol('om',(params,abortController)=>OpenMeteoMapboxLayer.omProtocol(params,abortController,options));
+			maplibregl.addProtocol('om',(params,abortController)=>OMWeatherMapLayer.omProtocol(params,abortController,options));
 		}
 
 		const buildTempUrl=(minC,maxC)=>`https://map-tiles.open-meteo.com/data_spatial/ncep_nam_conus/latest.json?time_step=current_time_1H&variable=soil_temperature_${tempDepth}&contours=true&intervals=${minC},${maxC}`;
@@ -1302,7 +1340,7 @@
 			if (activeRasterOverlay) addRasterOverlayToMap(activeRasterOverlay);
 		}
 
-		const map = new maplibregl.Map({container:'map', style:BASEMAPS['liberty'], center:[-98.5,39.5], zoom:3.5, hash:true});
+		const map = new maplibregl.Map({container:'map', style:BASEMAPS['liberty'], center:[-98.5,39.5], zoom:3.5, hash:true, preserveDrawingBuffer:true});
 		map.on('load', () => { mapLoaded=true; addTempLayers(buildTempUrl(rangeMinC,rangeMaxC)); });
 
 		function toggleBmPopup() {
@@ -1386,42 +1424,30 @@
 
 		// ── Color ramps via ESRI @arcgis/core ESM ────────────────────────────────
 		const RAMP_NAMES = [
-			'Black to White','Blue Bright','Blue Light to Dark',
+			'Black to White','Condition Number','Cyan to Purple','Spectrum-Full Bright','Blue Bright','Blue Light to Dark',
 			'Blue-Green Bright','Blue-Green Light to Dark','Brown Light to Dark',
 			'Brown to Blue Green Diverging, Bright','Brown to Blue Green Diverging, Dark',
-			'Coefficient Bias','Cold to Hot Diverging','Condition Number',
-			'Cyan to Purple','Cyan-Light to Blue-Dark','Distance',
-			'Elevation #1','Elevation #2','Errors','Gray Light to Dark',
+			'Coefficient Bias','Cold to Hot Diverging',
+			'Cyan-Light to Blue-Dark','Distance',
+			'Errors','Gray Light to Dark',
 			'Green Bright','Green Light to Dark','Green to Blue',
 			'Orange Bright','Orange Light to Dark',
 			'Partial Spectrum','Partial Spectrum 1 Diverging','Partial Spectrum 2 Diverging',
 			'Pink to YellowGreen Diverging, Bright','Pink to YellowGreen Diverging, Dark',
-			'Precipitation','Prediction','Purple Bright',
+			'Prediction','Purple Bright',
 			'Purple to Green Diverging, Bright','Purple to Green Diverging, Dark',
 			'Purple-Blue Bright','Purple-Blue Light to Dark',
 			'Purple-Red Bright','Purple-Red Light to Dark',
 			'Red Bright','Red Light to Dark',
 			'Red to Blue Diverging, Bright','Red to Blue Diverging, Dark',
 			'Red to Green','Red to Green Diverging, Bright','Red to Green Diverging, Dark',
-			'Slope','Spectrum-Full Bright','Spectrum-Full Dark','Spectrum-Full Light',
-			'Surface','Temperature','Yellow to Dark Red',
+			'Slope','Spectrum-Full Dark','Spectrum-Full Light',
+			'Surface','Yellow to Dark Red',
 			'Yellow to Green to Dark Blue','Yellow to Red',
 			'Yellow-Green Bright','Yellow-Green Light to Dark',
 		];
 
 		let COLOR_RAMPS = [];
-
-		// Visually distinct ramps cycled across successive layer additions.
-		const RAMP_ROTATION_NAMES = [
-			'Green Light to Dark',
-			'Yellow to Dark Red',
-			'Purple-Blue Light to Dark',
-			'Cold to Hot Diverging',
-			'Brown Light to Dark',
-			'Cyan-Light to Blue-Dark',
-			'Orange Light to Dark',
-			'Purple to Green Diverging, Bright',
-		];
 		let layerAddCount = 0;
 
 		// Resolve a rotation name to its live index in COLOR_RAMPS (fallback 0).
@@ -1443,6 +1469,7 @@
 			pctMin: 0.3, pctMax: 0.3,
 			sdn: 2,
 			stMin: 1, stMax: 1088, stMean: 43.2, stStddev: 42.0,
+			zOrder: 3,
 		});
 
 		// Slice state: Map<sliceId, {varName, year, settings:{...}}>
@@ -1582,6 +1609,23 @@
 		function refreshAllTreeLayers(){
 			activeSlices.forEach((_,id) => refreshSliceLayer(id));
 		}
+		function reorderAllLayers() {
+			// Collect all active data layers with their z-order
+			const layers = [];
+			if (tempActive)  layers.push({ z: tempZOrder,  readd: () => addTempLayers(buildTempUrl(rangeMinC, rangeMaxC)) });
+			if (moistActive) layers.push({ z: moistZOrder, readd: () => addMoistLayers(buildMoistUrl(
+				parseFloat(document.getElementById('input-moist-min').value),
+				parseFloat(document.getElementById('input-moist-max').value)
+			))});
+			activeSlices.forEach((info, id) => layers.push({ z: info.settings.zOrder ?? 3, readd: () => addSliceLayer(id) }));
+
+			// Remove all, then re-add in z-order (lowest first = drawn first = appears underneath)
+			if (tempActive)  removeLayers('omTemp');
+			if (moistActive) removeLayers('omMoist');
+			activeSlices.forEach((_, id) => removeSliceLayer(id));
+
+			layers.sort((a, b) => a.z - b.z).forEach(l => l.readd());
+		}
 
 		function toggleSlice(sliceId, varName, year){
 			if (activeSlices.has(sliceId)) {
@@ -1590,9 +1634,8 @@
 				if (openDrawerSliceId === sliceId) openDrawerSliceId = null;
 			} else {
 				if (activeSlices.size >= 3) return; // hard cap — badge already shown
-				const slot = layerAddCount++;
+				const slot = activeSlices.size; // use current count, not a monotonic counter
 				const settings = DEFAULT_LAYER_SETTINGS(slot);
-				// Assign ramp index sequentially; if COLOR_RAMPS not loaded yet, it will be 0 and resolved later
 				settings.rampIdx = COLOR_RAMPS.length ? (slot % COLOR_RAMPS.length) : slot;
 				activeSlices.set(sliceId, {varName, year, settings});
 				addSliceLayer(sliceId);
@@ -1629,10 +1672,15 @@
 
 			// Opacity
 			div.innerHTML = `
+				<div class="lsd-row">
+					<span class="lsd-label">Z Order</span>
+					<input type="number" value="${s.zOrder ?? 3}" min="1" max="10" step="1" style="max-width:46px"
+						oninput="updateLayerSetting(${sliceId},'zOrder',+this.value); reorderAllLayers()" />
+				</div>
 				<div class="lsd-section-label">Opacity &amp; Ramp</div>
 				<div class="lsd-row">
 					<span class="lsd-label">Opacity</span>
-					<input type="range" min="0" max="1" step="0.05" value="${s.opacity}"
+					<input type="range" style="max-width: 60px" min="0" max="1" step="0.05" value="${s.opacity}"
 						oninput="updateLayerOpacity(${sliceId},this.value);this.nextElementSibling.textContent=Math.round(this.value*100)+'%'" />
 					<span style="min-width:28px;text-align:right;font-size:10px">${Math.round(s.opacity*100)}%</span>
 				</div>
@@ -1676,9 +1724,9 @@
 				</div>
 				<div class="lsd-row">
 					<span class="lsd-label">Gamma</span>
-					<input type="range" min="0.1" max="10" step="0.01" value="${s.gamma}"
+					<input type="range" style="max-width: 60px" min="0.1" max="10" step="0.01" value="${s.gamma}"
 						oninput="updateLayerSetting(${sliceId},'gamma',+this.value);this.nextElementSibling.value=parseFloat(this.value).toFixed(2)" />
-					<input type="number" value="${s.gamma.toFixed(2)}" step="0.01" min="0.1" max="10" style="max-width:46px"
+					<input type="number" value="${s.gamma.toFixed(2)}" step="0.01" min="0.1" max="10" style="max-width:46px; font-size:8px"
 						oninput="updateLayerSetting(${sliceId},'gamma',+this.value);this.previousElementSibling.value=this.value" />
 				</div>
 				<div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:2px 0"
@@ -1809,7 +1857,7 @@
 						<span style="font-size:13px;flex-shrink:0" title="${treeInfo.label}">${treeInfo.icon}</span>
 						<span class="sum-label">${fmtLabel(info.varName)} · ${info.year}</span>
 						<div class="summary-ramp-preview" id="ramp-prev-${sliceId}" style="background:${getRampCss(info.settings)}"></div>
-						<span class="summary-gear" title="Layer settings" onclick="toggleDrawer(${sliceId})">${isOpen ? '⚙️' : '⚙'}</span>
+						<span class="summary-gear" title="Layer settings" onclick="toggleDrawer(${sliceId})">${isOpen ? '⚙️' : '⚙️'}</span>
 						<span class="summary-remove" onclick="toggleSlice(${sliceId},'${info.varName}',${info.year})">✕</span>
 					</div>`;
 				wrapper.appendChild(row);
@@ -1841,25 +1889,32 @@
 				speciesGroups.forEach(g => g.years.sort((a,b) => a.year - b.year));
 				statusEl.style.display = 'none';
 				document.getElementById('tree-list').style.display = 'flex';
-				document.getElementById('tree-none-btn').style.display = '';
 				renderTreeList();
 				loadColorRamps();
 			} catch(err) { statusEl.textContent = '⚠ Failed to load species list.'; console.error(err); }
 		}
 
-		let treePanelMinimized = false;
+		let treePanelMinimized = true;
 		function toggleTreePanel(){
 			treePanelMinimized = !treePanelMinimized;
 			const btn = document.getElementById('tree-minimize-btn');
 			btn.style.transform = treePanelMinimized ? 'rotate(180deg)' : '';
 			btn.style.transition = 'transform 0.2s';
 			document.getElementById('tree-panel-body').style.display = treePanelMinimized ? 'none' : 'flex';
+			document.getElementById('tree-none-btn').style.display = treePanelMinimized ? 'none' : '';
 		}
+		// Initialize tree panel as minimized on page load
+		(function(){
+			const btn = document.getElementById('tree-minimize-btn');
+			btn.style.transform = 'rotate(180deg)';
+			document.getElementById('tree-panel-body').style.display = 'none';
+			document.getElementById('tree-none-btn').style.display = 'none';
+		})();
 
 		loadTreeSlices();
 
 		// ═══════════════════════════════════════════════════════════════════════════
-		// SOIL VALUE POPUP (pixel-read from raster canvas, open-meteo style)
+		// SOIL VALUE POPUP (async open-meteo getValueFromLatLong + tree pixel read)
 		// ═══════════════════════════════════════════════════════════════════════════
 
 		// ── State ────────────────────────────────────────────────────────────────
@@ -1868,12 +1923,6 @@
 		let dragPopupLngLat = null;   // geo-anchor for draggable mode
 
 		// ── DOM: popup element ────────────────────────────────────────────────────
-		// The popup is positioned so its DOT TIP sits exactly at the coordinate.
-		// Layout (top→bottom inside .soil-popup):
-		//   [coords label]  ← absolutely positioned above wrapper
-		//   [wrapper box ]  ← the frosted card
-		//   [stem + dot  ]  ← hangs below the wrapper, dot is at bottom = the anchor
-		// We translate the whole element so the dot tip aligns with left/top.
 		const popupEl = document.createElement('div');
 		popupEl.className = 'soil-popup';
 		popupEl.id = 'soil-popup';
@@ -1887,171 +1936,168 @@
 		popupEl.style.display = 'none';
 		document.getElementById('map').appendChild(popupEl);
 
-		// ── Color scale helpers (kept for swatch rendering) ──────────────────────
-		function lerpColor(c1, c2, t) {
-			return [
-				Math.round(c1[0] + (c2[0] - c1[0]) * t),
-				Math.round(c1[1] + (c2[1] - c1[1]) * t),
-				Math.round(c1[2] + (c2[2] - c1[2]) * t),
-			];
-		}
-		function valueToColor(value, breakpoints, colors) {
-			if (value <= breakpoints[0]) return colors[0];
-			if (value >= breakpoints[breakpoints.length - 1]) return colors[colors.length - 1];
-			for (let i = 0; i < breakpoints.length - 1; i++) {
-				if (value >= breakpoints[i] && value <= breakpoints[i + 1]) {
-					const t = (value - breakpoints[i]) / (breakpoints[i + 1] - breakpoints[i]);
-					return lerpColor(colors[i], colors[i + 1], t);
-				}
-			}
-			return colors[0];
-		}
-
-		// ── Accurate value reading via queryRenderedFeatures on contour tiles ────
-		// The open-meteo vector tiles expose contour lines with a `value` property
-		// containing the exact encoded data value — no color reverse-mapping needed.
-		// Strategy:
-		//   1. Query a small box around the cursor for contour features.
-		//   2. If features are found, interpolate between the two bracketing
-		//      contour values weighted by distance (nearest two contours).
-		//   3. If only one contour is nearby, use it directly.
-		//   4. Fall back to null if no contours are within the search radius.
-
-		const QUERY_RADIUS = 40; // px half-width of query box
-
-		function queryContourValue(screenPt, layerId, sourceId) {
-			if (!map.getLayer(layerId) || !map.getSource(sourceId)) return null;
-
-			// Query a box around the point
-			const bbox = [
-				[screenPt.x - QUERY_RADIUS, screenPt.y - QUERY_RADIUS],
-				[screenPt.x + QUERY_RADIUS, screenPt.y + QUERY_RADIUS],
-			];
-
-			let features;
-			try {
-				features = map.queryRenderedFeatures(bbox, { layers: [layerId] });
-			} catch(e) { return null; }
-
-			if (!features || features.length === 0) return null;
-
-			// Collect unique contour values with their approximate screen distances
-			// We compute the midpoint of each feature's geometry projected to screen.
-			const candidates = [];
-			const seen = new Set();
-			for (const f of features) {
-				const v = f.properties && (f.properties.value ?? f.properties.val ?? f.properties.level);
-				if (v == null || isNaN(+v)) continue;
-				const num = +v;
-				if (seen.has(num)) continue;
-				seen.add(num);
-
-				// Estimate screen distance by projecting the feature's first coordinate
-				let dist = Infinity;
-				try {
-					const coords = f.geometry.type === 'LineString'
-						? f.geometry.coordinates
-						: f.geometry.coordinates[0];
-					if (coords && coords.length) {
-						// Sample up to 8 points along the line for distance
-						const step = Math.max(1, Math.floor(coords.length / 8));
-						for (let i = 0; i < coords.length; i += step) {
-							const pt = map.project({ lng: coords[i][0], lat: coords[i][1] });
-							const dx = pt.x - screenPt.x, dy = pt.y - screenPt.y;
-							const d  = Math.sqrt(dx*dx + dy*dy);
-							if (d < dist) dist = d;
-						}
-					}
-				} catch(e) {}
-
-				candidates.push({ value: num, dist });
-			}
-
-			if (candidates.length === 0) return null;
-
-			// Sort by distance — closest first
-			candidates.sort((a, b) => a.dist - b.dist);
-
-			if (candidates.length === 1) return candidates[0].value;
-
-			// Interpolate between two nearest contours weighted by inverse distance
-			const c0 = candidates[0], c1 = candidates[1];
-			if (c0.dist < 1) return c0.value; // basically sitting on the line
-			const totalInvD = (1 / c0.dist) + (1 / c1.dist);
-			return (c0.value * (1/c0.dist) + c1.value * (1/c1.dist)) / totalInvD;
-		}
-
-		// ── Read soil value(s) at a screen point using tile data ──────────────────
-		function readSoilAtPoint(screenPt) {
-			const results = [];
-
-			if (tempActive) {
-				const raw = queryContourValue(screenPt, 'omTempVectorLayer', 'omTempVectorSource');
-				if (raw !== null) {
-					const valC       = raw;
-					const valDisplay = currentUnit === 'F'
-						? (valC * 9/5 + 32).toFixed(1) + ' °F'
-						: valC.toFixed(1) + ' °C';
-					const swatch = valueToColor(valC, DEFAULT_TEMP_BREAKPOINTS, userTempColors);
-					results.push({ label: '🌡', value: valDisplay, swatch });
-				}
-			}
-
-			if (moistActive) {
-				const raw = queryContourValue(screenPt, 'omMoistVectorLayer', 'omMoistVectorSource');
-				if (raw !== null) {
-					const valM   = raw;
-					const swatch = valueToColor(valM, DEFAULT_MOIST_BREAKPOINTS, userMoistColors);
-					results.push({ label: '💧', value: valM.toFixed(3) + ' m³/m³', swatch });
-				}
-			}
-
-			return results.length > 0 ? results : null;
-		}
-
-		// ── Position popup so the dot tip sits at (x, y) ─────────────────────────
-		// The popup element is structured so that its bottom is the dot tip.
-		// We use CSS transform to shift horizontally centered + upward by total height.
+		// ── Tree pixel-read: sample WebGL canvas → nearest ramp color → value ────
+		// Returns { value, rampT } or null if the pixel is transparent / outside domain.
+		// ── Position popup ────────────────────────────────────────────────────────
 		function positionPopup(screenPt) {
-			// left/top place the top-left corner; we use transform to center-x
-			// and shift the whole element up so the dot bottom aligns with the point.
 			popupEl.style.left      = screenPt.x + 'px';
 			popupEl.style.top       = screenPt.y + 'px';
-			// translateX(-50%) centers; translateY(-100%) shifts the whole element above the point
 			popupEl.style.transform = 'translateX(-50%) translateY(-100%)';
 		}
 
 		// ── Format lngLat ─────────────────────────────────────────────────────────
 		function fmtCoords(lngLat) {
-			const lat = (lngLat.lat >= 0 ? lngLat.lat.toFixed(3) + '°N' : Math.abs(lngLat.lat).toFixed(3) + '°S');
-			const lng = (lngLat.lng >= 0 ? lngLat.lng.toFixed(3) + '°E' : Math.abs(lngLat.lng).toFixed(3) + '°W');
+			const lat = lngLat.lat >= 0 ? lngLat.lat.toFixed(3) + '°N' : Math.abs(lngLat.lat).toFixed(3) + '°S';
+			const lng = lngLat.lng >= 0 ? lngLat.lng.toFixed(3) + '°E' : Math.abs(lngLat.lng).toFixed(3) + '°W';
 			return `${lat}, ${lng}`;
 		}
 
-		// ── Render popup at a screen point + lngLat ───────────────────────────────
-		function updatePopupAt(screenPt, lngLat) {
+		// ── ESRI ImageServer identify for a single tree slice ────────────────────
+		function latLngToWebMercator(lat, lng) {
+			const x = lng * 20037508.34 / 180;
+			let y = Math.log(Math.tan((90 + lat) * Math.PI / 360)) / (Math.PI / 180);
+			y = y * 20037508.34 / 180;
+			return { x, y };
+		}
+		// Returns { value, unit } or null if outside domain / no data.
+		async function identifyTreeSlice(lat, lng, varName, year) {
+			const { x, y } = latLngToWebMercator(lat, lng);
+
+			const geometry = JSON.stringify({x, y, spatialReference: { wkid: 3857 }});
+			//const mosaicRule = JSON.stringify(buildMosaicRule(year));
+			// Apply the variable's rasterFunction so the identify reads the right band.
+			const renderingRule = JSON.stringify({
+				rasterFunction: 'ExtractBand',
+				rasterFunctionArguments: { BandIds: [0], Raster: { rasterFunction: varName } }
+			});
+			const params = new URLSearchParams({
+				f:                         'json',
+				geometry,
+				geometryType:              'esriGeometryPoint',
+				inSR:                      '3857',
+				//mosaicRule,
+				renderingRule,
+				pixelSize: 				   '30,30',
+				returnGeometry:            'false',
+				returnCatalogItems:        'false',
+				returnAllPixelValues:      'false',
+				processAsMultidimensional: 'false',
+			});
+			try {
+				const res  = await fetch(`${TREE_SVC}/identify?${params}`);
+				const json = await res.json();
+				const raw  = json?.value;
+				if (raw == null || raw === 'NoData' || raw === '') return null;
+				const num = parseFloat(raw);
+				return isFinite(num) ? { value: num, unit: 'ft²/ac' } : null;
+			} catch(e) { return null; }
+		}
+
+		// ── Async render: soil via OMWeatherMapLayer + tree via ESRI identify ──────
+		async function updatePopupAt(screenPt, lngLat) {
 			const contentEl = document.getElementById('popup-content');
 			const coordsEl  = document.getElementById('popup-coords');
 
 			coordsEl.textContent = fmtCoords(lngLat);
-
-			if (!tempActive && !moistActive) {
-				contentEl.innerHTML = '<span style="color:#888;font-size:11px">No layer</span>';
-			} else {
-				const results = readSoilAtPoint(screenPt);
-				if (!results) {
-					contentEl.innerHTML = '<span style="color:#888;font-size:11px">No data</span>';
-				} else {
-					contentEl.innerHTML = results.map(r => {
-						const [sr, sg, sb] = r.swatch;
-						return `<span class="popup-value-row"><span class="popup-swatch" style="background:rgb(${sr},${sg},${sb})"></span>${r.label} ${r.value}</span>`;
-					}).join('<span style="margin:0 3px;color:#bbb">·</span>');
-				}
-			}
-
 			positionPopup(screenPt);
 			popupEl.style.display = 'block';
 			popupVisible = true;
+
+			const hasAnything = tempActive || moistActive || (activeSlices && activeSlices.size > 0);
+			if (!hasAnything) {
+				contentEl.innerHTML = '<span style="color:#888;font-size:11px">No layer</span>';
+				return;
+			}
+
+			contentEl.innerHTML = '<span style="color:#888;font-size:11px">…</span>';
+
+			const rows = [];
+
+			// ── Soil: async fetch ─────────────────────────────────────────────────
+			if (tempActive) {
+				const tempUrl = 'om://' + buildTempUrl(rangeMinC, rangeMaxC);
+				try {
+					const { value } = await OMWeatherMapLayer.getValueFromLatLong(lngLat.lat, lngLat.lng, tempUrl);
+					if (isFinite(value)) {
+						const colorScale = OMWeatherMapLayer.getColorScale(
+							`soil_temperature_${tempDepth}`, false,
+							OMWeatherMapLayer.defaultOmProtocolSettings.colorScales
+						);
+						const color   = OMWeatherMapLayer.getColor(colorScale, value);
+						const display = currentUnit === 'F'
+							? (value * 9/5 + 32).toFixed(1) + ' °F'
+							: value.toFixed(1) + ' °C';
+						rows.push(`<span class="popup-value-row"><span class="popup-swatch" style="background:rgba(${color.join(',')})"></span>🌡 ${display}</span>`);
+					} else {
+						rows.push(`<span style="color:#888;font-size:11px">🌡 Outside domain</span>`);
+					}
+				} catch(e) {
+					rows.push(`<span style="color:#888;font-size:11px">🌡 –</span>`);
+				}
+			}
+
+			if (moistActive) {
+				const moistMinV = parseFloat(document.getElementById('input-moist-min').value);
+				const moistMaxV = parseFloat(document.getElementById('input-moist-max').value);
+				const moistUrl  = 'om://' + buildMoistUrl(moistMinV, moistMaxV);
+				try {
+					const { value } = await OMWeatherMapLayer.getValueFromLatLong(lngLat.lat, lngLat.lng, moistUrl);
+					if (isFinite(value)) {
+						const colorScale = OMWeatherMapLayer.getColorScale(
+							`soil_moisture_${moistDepth}`, false,
+							OMWeatherMapLayer.defaultOmProtocolSettings.colorScales
+						);
+						const color = OMWeatherMapLayer.getColor(colorScale, value);
+						rows.push(`<span class="popup-value-row"><span class="popup-swatch" style="background:rgba(${color.join(',')})"></span>💧 ${value.toFixed(3)} m³/m³</span>`);
+					} else {
+						rows.push(`<span style="color:#888;font-size:11px">💧 Outside domain</span>`);
+					}
+				} catch(e) {
+					rows.push(`<span style="color:#888;font-size:11px">💧 –</span>`);
+				}
+			}
+
+			// ── Tree layers: ESRI ImageServer identify debounced — only fetch after mouse stops moving ────────────────────────────
+			if (activeSlices && activeSlices.size > 0) {
+				clearTimeout(_treeDebounceTimer);
+				const captureLngLat = { lat: lngLat.lat, lng: lngLat.lng };
+				_treeDebounceTimer = setTimeout(async () => {
+					const treePromises = [];
+					activeSlices.forEach((info) => {
+						treePromises.push(
+							identifyTreeSlice(captureLngLat.lat, captureLngLat.lng, info.varName, info.year)
+								.then(result => ({ info, result }))
+						);
+					});
+					const treeResults = await Promise.all(treePromises);
+					const treeRows = [];
+					for (const { info, result } of treeResults) {
+						if (!result) continue;
+						const typeInfo    = getTreeTypeInfo(info.varName);
+						const rampCss     = getRampCss(info.settings);
+						const swatchStyle = `background:${rampCss};width:22px;height:10px;border-radius:2px;border:1px solid rgba(0,0,0,0.18);flex-shrink:0`;
+						const label       = info.varName.replace(/_/g, ' ');
+						const valStr = `${result.value.toFixed(1)} ${result.unit}`;
+						treeRows.push(`<span class="popup-value-row"><span class="popup-swatch" style="${swatchStyle}"></span>${typeInfo.icon} <span style="font-size:10px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${label} (${info.year})">${label}</span>&nbsp;<span style="color:#666;font-size:10px">${valStr}</span></span>`);
+					}
+					// Append tree rows to whatever is already displayed
+					const contentEl = document.getElementById('popup-content');
+					if (contentEl) {
+						const existing = contentEl.innerHTML
+							.replace(/<span[^>]*>🌲[^<]*<\/span><br[^>]*>/gi, '')
+							.replace(/<span[^>]*>🌲[^<]*<\/span>/gi, '');
+						if (treeRows.length) {
+							contentEl.innerHTML = (existing ? existing + '<br style="margin:1px 0">' : '') + treeRows.join('<br style="margin:1px 0">');
+						} else {
+							contentEl.innerHTML = existing || '<span style="color:#888;font-size:11px">No data</span>';
+						}
+					}
+				}, 400); // 400ms after mouse stops
+			}
+
+			contentEl.innerHTML = rows.length
+				? rows.join('<br style="margin:1px 0">')
+				: '<span style="color:#888;font-size:11px">No data</span>';
 		}
 
 		// ── Hide popup ────────────────────────────────────────────────────────────
@@ -2061,6 +2107,7 @@
 		}
 
 		// ── Draggable popup: real mousedown→mousemove drag on the element ─────────
+		let _treeDebounceTimer = null;
 		let _isDraggingPopup = false;
 		let _dragOffsetX = 0;
 		let _dragOffsetY = 0;
@@ -2070,7 +2117,6 @@
 			e.preventDefault();
 			e.stopPropagation();
 			_isDraggingPopup = true;
-			// Offset from element's current screen position to mouse
 			const rect = map.getContainer().getBoundingClientRect();
 			const curX = parseFloat(popupEl.style.left);
 			const curY = parseFloat(popupEl.style.top);
@@ -2082,12 +2128,11 @@
 
 		document.addEventListener('mousemove', e => {
 			if (!_isDraggingPopup) return;
-			const rect    = map.getContainer().getBoundingClientRect();
-			const newX    = e.clientX - rect.left - _dragOffsetX;
-			const newY    = e.clientY - rect.top  - _dragOffsetY;
-			const screenPt = { x: newX, y: newY };
+			const rect = map.getContainer().getBoundingClientRect();
+			const newX = e.clientX - rect.left - _dragOffsetX;
+			const newY = e.clientY - rect.top  - _dragOffsetY;
 			dragPopupLngLat = map.unproject([newX, newY]);
-			updatePopupAt(screenPt, dragPopupLngLat);
+			updatePopupAt({ x: newX, y: newY }, dragPopupLngLat);
 		});
 
 		document.addEventListener('mouseup', e => {
