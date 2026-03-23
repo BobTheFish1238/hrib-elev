@@ -1,7 +1,8 @@
 <!doctype html>
 <html lang="en">
 	<head>
-		<title>Soil Data Explorer</title>
+		<title>HribSoil</title>
+		<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' width='512' height='512'%3E%3Cdefs%3E%3CradialGradient id='capGradient' cx='50%25' cy='35%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%238b4513'/%3E%3Cstop offset='100%25' stop-color='%235a2d0c'/%3E%3C/radialGradient%3E%3ClinearGradient id='stemGradient' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%23f6e6c8'/%3E%3Cstop offset='100%25' stop-color='%23d2b48c'/%3E%3C/linearGradient%3E%3ClinearGradient id='soilGradient' x1='0%25' y1='0%25' x2='100%25' y2='0%25'%3E%3Cstop offset='0%25' stop-color='%23F0BA70'/%3E%3Cstop offset='100%25' stop-color='%2312167f'/%3E%3C/linearGradient%3E%3C/defs%3E%3C!-- Background circle --%3E%3Ccircle cx='256' cy='256' r='256' fill='url(%23soilGradient)'/%3E%3C!-- Cap --%3E%3Cpath d='M96 220 C110 140, 200 110, 256 110 C312 110, 402 140, 416 220 C420 250, 390 270, 256 270 C122 270, 92 250, 96 220 Z' fill='url(%23capGradient)'/%3E%3C!-- Cap underside --%3E%3Cellipse cx='256' cy='255' rx='150' ry='22' fill='%23e8d6b0'/%3E%3C!-- Stem --%3E%3Cpath d='M200 270 C190 330, 190 390, 210 430 C230 465, 282 465, 302 430 C322 390, 322 330, 312 270 Z' fill='url(%23stemGradient)'/%3E%3C!-- Stem texture --%3E%3Cg fill='%23c9a877' opacity='0.7'%3E%3Cellipse cx='240' cy='310' rx='4' ry='8'/%3E%3Cellipse cx='270' cy='330' rx='5' ry='10'/%3E%3Cellipse cx='255' cy='360' rx='4' ry='9'/%3E%3Cellipse cx='235' cy='385' rx='3' ry='7'/%3E%3Cellipse cx='275' cy='395' rx='4' ry='8'/%3E%3C/g%3E%3C/svg%3E">
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.17.0/dist/maplibre-gl.css" />
@@ -13,10 +14,19 @@
 			#controls {
 				position: absolute; top: 12px; left: 12px; z-index: 10;
 				background: rgba(255,255,255,0.96); border-radius: 10px;
-				padding: 14px 18px; box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+				padding: 14px 18px 14px 18px; box-shadow: 0 2px 12px rgba(0,0,0,0.18);
 				font-family: sans-serif; font-size: 14px;
+				display: flex; flex-direction: column; gap: 0;
+				max-width: 268px; max-height: calc(100vh - 120px); overflow: hidden;
+			}
+			#controls-scroll {
 				display: flex; flex-direction: column; gap: 10px;
-				min-width: 240px; max-height: calc(100vh - 40px); overflow-y: auto;
+				overflow-y: auto; overflow-x: hidden; flex: 1; min-height: 0;
+				padding-bottom: 4px;
+			}
+			#controls-footer {
+				padding-top: 10px; flex-shrink: 0;
+				border-top: 1px solid #e5e5e5;
 			}
 			#controls h3 { margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #333; letter-spacing: 0.03em; text-transform: uppercase; }
 			.section-label { font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: -4px; }
@@ -49,12 +59,53 @@
 			.reset-colors-btn { font-size: 11px; padding: 3px 8px; border: 1px solid #ccc; border-radius: 5px; background: #f5f5f5; cursor: pointer; color: #555; align-self: flex-end; margin-top: 2px; }
 			.reset-colors-btn:hover { background: #e8e8e8; }
 
+			/* ── Active Layer Tabs ───────────────────────────────────────────── */
+			.layer-tabs-wrapper { display: flex; flex-direction: column; gap: 6px; }
+			.layer-tab-bar { display: flex; border-radius: 8px; overflow: hidden; border: 1px solid #ccc; }
+			.layer-tab-bar button {
+				flex: 1; padding: 7px 6px; border: none; background: #f0f0f0;
+				cursor: pointer; font-size: 12px; font-weight: 600; color: #555;
+				transition: background 0.15s, color 0.15s; white-space: nowrap;
+				display: flex; align-items: center; justify-content: center; gap: 4px;
+			}
+			.layer-tab-bar button:not(:last-child) { border-right: 1px solid #ccc; }
+			.layer-tab-bar button.active { background: #2563eb; color: #fff; }
+			.layer-tab-bar button.layer-on { background: #dbeafe; color: #1d4ed8; }
+			.layer-tab-bar button.active.layer-on { background: #2563eb; color: #fff; }
+			.layer-tab-opacity { display: flex; align-items: center; gap: 6px; padding: 2px 2px 0; }
+			.layer-tab-opacity label { font-size: 11px; color: #888; flex-shrink: 0; }
+			.layer-tab-opacity input[type="range"] { flex: 1; accent-color: #2563eb; }
+			.layer-tab-opacity span { font-size: 11px; color: #888; min-width: 28px; text-align: right; }
+
+			.hrib-svg {
+				width: 20px;
+				height: 20px;
+				background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' width='512' height='512'%3E%3Cdefs%3E%3CradialGradient id='capGradient' cx='50%25' cy='35%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%238b4513'/%3E%3Cstop offset='100%25' stop-color='%235a2d0c'/%3E%3C/radialGradient%3E%3ClinearGradient id='stemGradient' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%23f6e6c8'/%3E%3Cstop offset='100%25' stop-color='%23d2b48c'/%3E%3C/linearGradient%3E%3ClinearGradient id='soilGradient' x1='0%25' y1='0%25' x2='100%25' y2='0%25'%3E%3Cstop offset='0%25' stop-color='%23F0BA70'/%3E%3Cstop offset='100%25' stop-color='%2312167f'/%3E%3C/linearGradient%3E%3C/defs%3E%3C!-- Background circle --%3E%3Ccircle cx='256' cy='256' r='256' fill='url(%23soilGradient)'/%3E%3C!-- Cap --%3E%3Cpath d='M96 220 C110 140, 200 110, 256 110 C312 110, 402 140, 416 220 C420 250, 390 270, 256 270 C122 270, 92 250, 96 220 Z' fill='url(%23capGradient)'/%3E%3C!-- Cap underside --%3E%3Cellipse cx='256' cy='255' rx='150' ry='22' fill='%23e8d6b0'/%3E%3C!-- Stem --%3E%3Cpath d='M200 270 C190 330, 190 390, 210 430 C230 465, 282 465, 302 430 C322 390, 322 330, 312 270 Z' fill='url(%23stemGradient)'/%3E%3C!-- Stem texture --%3E%3Cg fill='%23c9a877' opacity='0.7'%3E%3Cellipse cx='240' cy='310' rx='4' ry='8'/%3E%3Cellipse cx='270' cy='330' rx='5' ry='10'/%3E%3Cellipse cx='255' cy='360' rx='4' ry='9'/%3E%3Cellipse cx='235' cy='385' rx='3' ry='7'/%3E%3Cellipse cx='275' cy='395' rx='4' ry='8'/%3E%3C/g%3E%3C/svg%3E");
+				background-size: 20px 20px;
+				background-position: center center;
+				background-repeat: no-repeat;
+				flex-shrink: 0;
+				margin-right: 6px;
+			}
+
+			.layer-tab-bar button input[type="checkbox"] {
+				accent-color: #2563eb;
+				cursor: pointer;
+				width: 13px;
+				height: 13px;
+				margin: 0;
+				flex-shrink: 0;
+			}
+			.layer-tab-bar button.active input[type="checkbox"] {
+				accent-color: #2563eb;
+			}
+
 			/* ── Tree Panel ─────────────────────────────────────────────────────── */
 			#tree-panel {
 				position: absolute; top: 12px; right: 12px; z-index: 10;
 				background: rgba(255,255,255,0.96); border-radius: 10px;
 				padding: 14px 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.18);
-				font-family: sans-serif; font-size: 13px; width: 268px;
+				font-family: sans-serif; font-size: 13px; max-width: 200px;
 				max-height: calc(100vh - 40px); display: flex; flex-direction: column; gap: 8px;
 			}
 			#tree-panel h3 { margin: 0; font-size: 13px; font-weight: 700; color: #333; letter-spacing: 0.03em; text-transform: uppercase; display: flex; align-items: center; justify-content: space-between; }
@@ -296,7 +347,7 @@
 				box-shadow: 0 4px 20px rgba(0,0,0,0.22); padding: 12px;
 				font-family: sans-serif; width: 284px;
 				display: none; flex-direction: column; gap: 6px;
-				max-height: 500px;
+				max-height: 480px;
 				overflow-y: auto;
 			}
 			#bm-popup.open { display: flex; }
@@ -359,117 +410,161 @@
 
 		<!-- Basemap popup panel -->
 		<div id="bm-popup">
-			<div class="bm-popup-title" style="margin-bottom:4px">🗺 Map Style</div>
+			<div class="bm-popup-title">🗺 Map Style
+				<a href="https://maps.open-meteo.com/?domain=ncep_nam_conus&variable=soil_temperature_0_to_10cm"
+				   target="_blank" style="font-size:10px;margin:0 8px 0 8px;color:#4aa3ff;text-decoration:none">(Open-Meteo Map)</a>
+			</div>
 
-			<!-- Overlay Layers become the basemap options -->
+			<div class="bm-section-label">Light</div>
+			<div class="bm-grid">
+				<button class="bm-btn active" onclick="setBasemap('liberty')" id="bm-liberty">
+					<div class="bm-thumb" style="background:linear-gradient(160deg,#d4e9b0 0%,#b2d8f0 55%,#e8e0c8 100%)"></div>
+					<span class="bm-label">Liberty</span>
+				</button>
+				<button class="bm-btn" onclick="setBasemap('positron')" id="bm-positron">
+					<div class="bm-thumb" style="background:linear-gradient(160deg,#f0f0ee 0%,#e4e8ec 55%,#fafaf8 100%)"></div>
+					<span class="bm-label">Positron</span>
+				</button>
+				<button class="bm-btn" onclick="setBasemap('bright')" id="bm-bright">
+					<div class="bm-thumb" style="background:linear-gradient(160deg,#ffffff 0%,#dce8f5 55%,#f8f8f8 100%)"></div>
+					<span class="bm-label">Bright</span>
+				</button>
+				<button class="bm-btn" onclick="setBasemap('voyager')" id="bm-voyager">
+					<div class="bm-thumb" style="background:linear-gradient(160deg,#e8f0f8 0%,#ccd8e8 55%,#f0f4f0 100%)"></div>
+					<span class="bm-label">Voyager</span>
+				</button>
+			</div>
+			<div class="bm-section-label">Dark</div>
+			<div class="bm-grid">
+				<button class="bm-btn" onclick="setBasemap('dark-matter')" id="bm-dark-matter">
+					<div class="bm-thumb" style="background:linear-gradient(160deg,#1a1a2e 0%,#16213e 55%,#0f3460 100%)"></div>
+					<span class="bm-label">Dark</span>
+				</button>
+				<button class="bm-btn" onclick="setBasemap('dark-matter-nolabels')" id="bm-dark-matter-nolabels">
+					<div class="bm-thumb" style="background:linear-gradient(160deg,#111118 0%,#0d0d1a 55%,#0a0a14 100%)"></div>
+					<span class="bm-label">Dark No Labels</span>
+				</button>
+				<button class="bm-btn" onclick="setBasemap('fiord')" id="bm-fiord">
+					<div class="bm-thumb" style="background:linear-gradient(160deg,#2d3a4a 0%,#3d5068 55%,#22303f 100%)"></div>
+					<span class="bm-label">Fiord</span>
+				</button>
+				<button class="bm-btn" onclick="setBasemap('dark')" id="bm-fiord">
+					<div class="bm-thumb" style="background:linear-gradient(160deg,#0a0a14 0%,#3d5068 55%,#111118 100%)"></div>
+					<span class="bm-label">Dark</span>
+				</button>
+			</div>
+
+			<hr class="bm-divider" />
+			<div class="bm-popup-title" style="font-size:11px;color:#555;margin-top:2px">🔲 Overlay Layers</div>
+
 			<div class="bm-section-label">Watercolor</div>
-			<div class="bm-overlay-row" id="bmo-watercolor" onclick="setBasemapOverlay('watercolor')">
+			<div class="bm-overlay-row" id="bmo-watercolor" onclick="toggleRasterOverlay('watercolor')">
 				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#f5deb3,#d2b48c,#b0c4de)"></div>
 				<span class="bm-overlay-name">Stamen Watercolor</span><div class="bm-overlay-radio"></div>
 			</div>
-			<div class="bm-overlay-row" id="bmo-watercolor_muted" onclick="setBasemapOverlay('watercolor_muted')">
+			<div class="bm-overlay-row" id="bmo-watercolor_muted" onclick="toggleRasterOverlay('watercolor_muted')">
 				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#ddd,#c8c8c8,#b8b8b8)"></div>
 				<span class="bm-overlay-name">Watercolor Muted</span><div class="bm-overlay-radio"></div>
 			</div>
-			<div class="bm-overlay-row" id="bmo-watercolor_gray" onclick="setBasemapOverlay('watercolor_gray')">
+			<div class="bm-overlay-row" id="bmo-watercolor_gray" onclick="toggleRasterOverlay('watercolor_gray')">
 				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#e0e0e0,#b0b0b0,#888)"></div>
 				<span class="bm-overlay-name">Watercolor Gray</span><div class="bm-overlay-radio"></div>
 			</div>
-			<div class="bm-overlay-row" id="bmo-watercolor_darkgray" onclick="setBasemapOverlay('watercolor_darkgray')">
+			<div class="bm-overlay-row" id="bmo-watercolor_darkgray" onclick="toggleRasterOverlay('watercolor_darkgray')">
 				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#555,#333,#222)"></div>
 				<span class="bm-overlay-name">Watercolor Dark Gray</span><div class="bm-overlay-radio"></div>
 			</div>
 
 			<div class="bm-section-label">OpenStreetMap</div>
-			<div class="bm-overlay-row" id="bmo-osm_std" onclick="setBasemapOverlay('osm_std')">
+			<div class="bm-overlay-row" id="bmo-osm_std" onclick="toggleRasterOverlay('osm_std')">
 				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#f2f2f0,#b5d0d0,#f8f4f0)"></div>
 				<span class="bm-overlay-name">OSM Standard</span><div class="bm-overlay-radio"></div>
 			</div>
-			<div class="bm-overlay-row" id="bmo-osm_de" onclick="setBasemapOverlay('osm_de')">
+			<div class="bm-overlay-row" id="bmo-osm_de" onclick="toggleRasterOverlay('osm_de')">
 				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#eef0e8,#c8d0b8,#f0ece4)"></div>
 				<span class="bm-overlay-name">OSM DE</span><div class="bm-overlay-radio"></div>
 			</div>
-			<div class="bm-overlay-row" id="bmo-osm_fr" onclick="setBasemapOverlay('osm_fr')">
+			<div class="bm-overlay-row" id="bmo-osm_fr" onclick="toggleRasterOverlay('osm_fr')">
 				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#f0ece4,#c0c8b0,#e8e4dc)"></div>
 				<span class="bm-overlay-name">OSM FR</span><div class="bm-overlay-radio"></div>
 			</div>
-			<div class="bm-overlay-row" id="bmo-osm_hot" onclick="setBasemapOverlay('osm_hot')">
+			<div class="bm-overlay-row" id="bmo-osm_hot" onclick="toggleRasterOverlay('osm_hot')">
 				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#fef0dc,#e8c8a0,#f8e8d0)"></div>
 				<span class="bm-overlay-name">OSM HOT</span><div class="bm-overlay-radio"></div>
 			</div>
-			<div class="bm-overlay-row" id="bmo-osm_lightgray" onclick="setBasemapOverlay('osm_lightgray')">
+			<div class="bm-overlay-row" id="bmo-osm_lightgray" onclick="toggleRasterOverlay('osm_lightgray')">
 				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#f0f0f0,#d8d8d8,#f8f8f8)"></div>
 				<span class="bm-overlay-name">OSM Light Gray</span><div class="bm-overlay-radio"></div>
 			</div>
-			<div class="bm-overlay-row" id="bmo-osm_medgray" onclick="setBasemapOverlay('osm_medgray')">
+			<div class="bm-overlay-row" id="bmo-osm_medgray" onclick="toggleRasterOverlay('osm_medgray')">
 				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#888,#666,#999)"></div>
 				<span class="bm-overlay-name">OSM Medium Gray</span><div class="bm-overlay-radio"></div>
 			</div>
-			<div class="bm-overlay-row" id="bmo-osm_medgray2" onclick="setBasemapOverlay('osm_medgray2')">
+			<div class="bm-overlay-row" id="bmo-osm_medgray2" onclick="toggleRasterOverlay('osm_medgray2')">
 				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#777,#555,#888)"></div>
 				<span class="bm-overlay-name">OSM Medium Gray 2</span><div class="bm-overlay-radio"></div>
 			</div>
-			<div class="bm-overlay-row" id="bmo-osm_darkgray" onclick="setBasemapOverlay('osm_darkgray')">
+			<div class="bm-overlay-row" id="bmo-osm_darkgray" onclick="toggleRasterOverlay('osm_darkgray')">
 				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#333,#222,#444)"></div>
 				<span class="bm-overlay-name">OSM Dark Gray</span><div class="bm-overlay-radio"></div>
 			</div>
-			<div class="bm-overlay-row" id="bmo-osm_darkest" onclick="setBasemapOverlay('osm_darkest')">
+			<div class="bm-overlay-row" id="bmo-osm_darkest" onclick="toggleRasterOverlay('osm_darkest')">
 				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#1a1a1a,#111,#222)"></div>
 				<span class="bm-overlay-name">OSM Darkest</span><div class="bm-overlay-radio"></div>
 			</div>
 
 			<div class="bm-section-label">Topographic</div>
-			<div class="bm-overlay-row" id="bmo-otm" onclick="setBasemapOverlay('otm')">
+			<div class="bm-overlay-row" id="bmo-otm" onclick="toggleRasterOverlay('otm')">
 				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#e8e0c8,#c8d8b0,#b0c890)"></div>
 				<span class="bm-overlay-name">OpenTopoMap</span><div class="bm-overlay-radio"></div>
 			</div>
-			<div class="bm-overlay-row" id="bmo-otm_muted" onclick="setBasemapOverlay('otm_muted')">
+			<div class="bm-overlay-row" id="bmo-otm_muted" onclick="toggleRasterOverlay('otm_muted')">
 				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#d8d0b8,#b8c8a0,#a0b880)"></div>
 				<span class="bm-overlay-name">OpenTopoMap Muted</span><div class="bm-overlay-radio"></div>
 			</div>
-			<div class="bm-overlay-row" id="bmo-eox_terrain" onclick="setBasemapOverlay('eox_terrain')">
+			<div class="bm-overlay-row" id="bmo-eox_terrain" onclick="toggleRasterOverlay('eox_terrain')">
 				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#d4c8a8,#a8c890,#8898c0)"></div>
 				<span class="bm-overlay-name">EOX Terrain</span><div class="bm-overlay-radio"></div>
 			</div>
-			<div class="bm-overlay-row" id="bmo-eox_terrain_light" onclick="setBasemapOverlay('eox_terrain_light')">
+			<div class="bm-overlay-row" id="bmo-eox_terrain_light" onclick="toggleRasterOverlay('eox_terrain_light')">
 				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#ece8d8,#c8d8b8,#a8c0d8)"></div>
 				<span class="bm-overlay-name">EOX Terrain Light</span><div class="bm-overlay-radio"></div>
 			</div>
-			<div class="bm-overlay-row" id="bmo-usgs_topo" onclick="setBasemapOverlay('usgs_topo')">
+			<div class="bm-overlay-row" id="bmo-usgs_topo" onclick="toggleRasterOverlay('usgs_topo')">
 				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#f0ece0,#d0e0c0,#c8d8e8)"></div>
 				<span class="bm-overlay-name">USGS Topo</span><div class="bm-overlay-radio"></div>
 			</div>
-			<div class="bm-overlay-row" id="bmo-usgs_hillshade" onclick="setBasemapOverlay('usgs_hillshade')">
+			<div class="bm-overlay-row" id="bmo-usgs_hillshade" onclick="toggleRasterOverlay('usgs_hillshade')">
 				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#f0f0f0,#a0a0a0,#404040)"></div>
 				<span class="bm-overlay-name">USGS Hillshade</span><div class="bm-overlay-radio"></div>
 			</div>
-			<div class="bm-overlay-row" id="bmo-usgs_aspect" onclick="setBasemapOverlay('usgs_aspect')">
+			<div class="bm-overlay-row" id="bmo-usgs_aspect" onclick="toggleRasterOverlay('usgs_aspect')">
 				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#4040c0,#40c040,#c04040)"></div>
 				<span class="bm-overlay-name">USGS Aspect Map</span><div class="bm-overlay-radio"></div>
 			</div>
-			<div class="bm-overlay-row" id="bmo-usgs_slope" onclick="setBasemapOverlay('usgs_slope')">
+			<div class="bm-overlay-row" id="bmo-usgs_slope" onclick="toggleRasterOverlay('usgs_slope')">
 				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#e8f0e0,#c0d890,#405830)"></div>
 				<span class="bm-overlay-name">USGS Slope Map</span><div class="bm-overlay-radio"></div>
 			</div>
 
 			<div class="bm-section-label">Satellite &amp; Imagery</div>
-			<div class="bm-overlay-row" id="bmo-eox_blackmarble" onclick="setBasemapOverlay('eox_blackmarble')">
+			<div class="bm-overlay-row" id="bmo-eox_blackmarble" onclick="toggleRasterOverlay('eox_blackmarble')">
 				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#080818,#101828,#0c1020)"></div>
 				<span class="bm-overlay-name">EOX Black Marble</span><div class="bm-overlay-radio"></div>
 			</div>
-			<div class="bm-overlay-row" id="bmo-eox_bluemarble" onclick="setBasemapOverlay('eox_bluemarble')">
+			<div class="bm-overlay-row" id="bmo-eox_bluemarble" onclick="toggleRasterOverlay('eox_bluemarble')">
 				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#2860a0,#60a840,#80c8e8)"></div>
 				<span class="bm-overlay-name">EOX Blue Marble</span><div class="bm-overlay-radio"></div>
 			</div>
-			<div class="bm-overlay-row" id="bmo-sentinel_2024" onclick="setBasemapOverlay('sentinel_2024')">
+			<div class="bm-overlay-row" id="bmo-sentinel_2024" onclick="toggleRasterOverlay('sentinel_2024')">
 				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#508830,#88a848,#a0c0d8)"></div>
 				<span class="bm-overlay-name">Sentinel-2 2024</span><div class="bm-overlay-radio"></div>
 			</div>
-			<div class="bm-overlay-row" id="bmo-usgs_img" onclick="setBasemapOverlay('usgs_img')">
+			<div class="bm-overlay-row" id="bmo-usgs_img" onclick="toggleRasterOverlay('usgs_img')">
 				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#384828,#507038,#708858)"></div>
 				<span class="bm-overlay-name">USGS Imagery</span><div class="bm-overlay-radio"></div>
 			</div>
-			<div class="bm-overlay-row" id="bmo-usgs_imgtopo" onclick="setBasemapOverlay('usgs_imgtopo')">
+			<div class="bm-overlay-row" id="bmo-usgs_imgtopo" onclick="toggleRasterOverlay('usgs_imgtopo')">
 				<div class="bm-overlay-swatch" style="background:linear-gradient(to right,#405030,#607040,#a0b090)"></div>
 				<span class="bm-overlay-name">USGS Imagery+Topo</span><div class="bm-overlay-radio"></div>
 			</div>
@@ -478,17 +573,17 @@
 
 		<!-- Left: Soil Controls -->
 		<div id="controls">
-			<h3 style="display:flex;align-items:center;justify-content:space-between;margin:0">
-				<span>
-					Soil Data Explorer
-					<a href="https://maps.open-meteo.com/?domain=ncep_nam_conus&variable=soil_temperature_0_to_10cm"
-					   target="_blank" style="font-size:10px;margin-left:8px;margin-right:8px;color:#4aa3ff;text-decoration:none">(Open-Meteo Map)</a>
-				</span>
-				<button id="minimize-btn" onclick="toggleMinimize()"
-					style="background:none;border:none;cursor:pointer;font-size:16px;color:#888;padding:0;line-height:1">⌃</button>
+			<h3 style="display:flex;align-items:center;margin:0;cursor:pointer;user-select:none" onclick="toggleMinimize()">
+				<div class="hrib-svg"></div>
+				<b><span style="color:#8B4513">Hrib</span><span style="color:#ac713a">Soil</span></b>
+				<span id="subtitle" style="white-space:nowrap;font-size:10px;">&nbsp;- Soil Data Explorer</span>
+				<button id="minimize-btn"
+					style="background:none;border:none;cursor:pointer;font-size:16px;color:#888;padding:0;margin-left:10px;line-height:1;pointer-events:none">⌃</button>
 			</h3>
 
-			<div class="section-label">Mushroom Presets</div>
+			<div id="controls-scroll">
+
+			<div class="section-label" style="margin:10px 0 0 0">Mushroom Presets</div>
 			<select id="mushroom-preset" onchange="applyPreset(this.value)"
 				style="width:100%;padding:5px 6px;border:1px solid #ccc;border-radius:6px;font-size:13px;color:#444;background:#fafafa;cursor:pointer">
 				<option value="">— Select a preset —</option>
@@ -503,24 +598,30 @@
 			<hr class="divider" />
 
 			<div class="section-label">Active Layers</div>
-			<div style="display:flex;flex-direction:column;gap:6px">
-				<div style="display:flex;align-items:center;gap:6px">
-					<label class="checkbox-label" style="min-width:130px;white-space:nowrap;flex-shrink:0">
-						<input type="checkbox" id="layer-temp-check" checked onchange="onLayerCheckChange()" />
-						🌡 Soil Temperature
-					</label>
-					<input type="range" id="temp-master-opacity" min="0" max="1" step="0.05" value="0.75"
-						style="max-width:100px;accent-color:#2563eb" oninput="setMasterOpacity('temp',this.value)" />
-					<span id="temp-opacity-val" style="font-size:11px;color:#888;min-width:28px;text-align:right">75%</span>
+			<div class="layer-tabs-wrapper">
+				<div class="layer-tab-bar">
+					<button id="tab-temp" class="active layer-on" style="font-size:10px" onclick="selectLayerTab('temp')">
+						<input type="checkbox" id="layer-temp-check" checked
+							onclick="event.stopPropagation()"
+							onchange="onLayerCheckChange()" />
+						🌡 Temperature
+					</button>
+					<button id="tab-moist" style="font-size:10px" onclick="selectLayerTab('moist')">
+						<input type="checkbox" id="layer-moist-check"
+							onclick="event.stopPropagation()"
+							onchange="onLayerCheckChange()" />
+						💧 Moisture
+					</button>
 				</div>
-				<div style="display:flex;align-items:center;gap:6px">
-					<label class="checkbox-label" style="min-width:130px;white-space:nowrap;flex-shrink:0">
-						<input type="checkbox" id="layer-moist-check" onchange="onLayerCheckChange()" />
-						💧 Soil Moisture
-					</label>
-					<input type="range" id="moist-master-opacity" min="0" max="1" step="0.05" value="0.75"
-						style="max-width:100px;accent-color:#2563eb" oninput="setMasterOpacity('moist',this.value)" />
-					<span id="moist-opacity-val" style="font-size:11px;color:#888;min-width:28px;text-align:right">75%</span>
+				<div class="layer-tab-opacity" id="tab-opacity-row-temp">
+					<label>Opacity</label>
+					<input type="range" id="temp-master-opacity" min="0" max="1" step="0.05" value="0.75" oninput="setMasterOpacity('temp',this.value)" style="max-width:140px" />
+					<span id="temp-opacity-val">75%</span>
+				</div>
+				<div class="layer-tab-opacity" id="tab-opacity-row-moist" style="display:none">
+					<label>Opacity</label>
+					<input type="range" id="moist-master-opacity" min="0" max="1" step="0.05" value="0.75" oninput="setMasterOpacity('moist',this.value)" style="max-width:140px" />
+					<span id="moist-opacity-val">75%</span>
 				</div>
 			</div>
 			<hr class="divider" />
@@ -596,25 +697,26 @@
 			<hr class="divider" />
 
 			<!-- Popup Settings -->
-			<div class="popup-settings-section">
-				<div class="section-label">🔍 Popup</div>
-				<div class="popup-mode-group">
-					<button id="popup-mode-off"      onclick="setPopupMode('off')"      class="active">Off</button>
-					<button id="popup-mode-follow"   onclick="setPopupMode('follow')">Follows mouse</button>
-					<button id="popup-mode-draggable" onclick="setPopupMode('draggable')">Draggable</button>
-				</div>
-			</div>
-
-			<hr class="divider" />
+			<!-- <div class="popup-settings-section"> -->
+				<!-- <div class="section-label">🔍 Popup</div> -->
+				<!-- <div class="popup-mode-group"> -->
+					<!-- <button id="popup-mode-off"      onclick="setPopupMode('off')"      class="active">Off</button> -->
+					<!-- <button id="popup-mode-follow"   onclick="setPopupMode('follow')">Follows mouse</button> -->
+					<!-- <button id="popup-mode-draggable" onclick="setPopupMode('draggable')">Draggable</button> -->
+				<!-- </div> -->
+			<!-- </div> -->
+		</div> <!-- end controls-scroll -->
+		<div id="controls-footer">
 			<button id="apply-btn" onclick="applySettings()">Apply</button>
 		</div>
+	</div>
 
 		<!-- Right: Tree Species Panel -->
 		<div id="tree-panel">
-			<h3>
+			<h3 style="cursor:pointer;user-select:none" onclick="toggleTreePanel()">
 				🌲 Tree Species
-				<button id="tree-minimize-btn" onclick="toggleTreePanel()"
-					style="background:none;border:none;cursor:pointer;font-size:16px;color:#888;padding:0;line-height:1">⌃</button>
+				<button id="tree-minimize-btn"
+					style="background:none;border:none;cursor:pointer;font-size:16px;color:#888;padding:0;margin-left:10px;line-height:1;pointer-events:none">⌃</button>
 			</h3>
 			<div id="tree-panel-body">
 				<div class="section-label" style="font-size:10px;margin:0">USFS Basal Area · Species + Year · <strong>max 3 active</strong></div>
@@ -658,13 +760,50 @@
 		let rangeMinC=5, rangeMaxC=10, mapLoaded=false, tempOpacity=0.75, moistOpacity=0.75;
 
 		let minimized=false;
+		let activeLayerTab='temp'; // 'temp' | 'moist'
+
+		function selectLayerTab(type){
+			activeLayerTab=type;
+			const tabTemp=document.getElementById('tab-temp');
+			const tabMoist=document.getElementById('tab-moist');
+			tabTemp.classList.toggle('active', type==='temp');
+			tabMoist.classList.toggle('active', type==='moist');
+
+			// Preserve layer-on class based on checkbox state
+			tabTemp.classList.toggle('layer-on', document.getElementById('layer-temp-check').checked);
+			tabMoist.classList.toggle('layer-on', document.getElementById('layer-moist-check').checked);
+
+			document.getElementById('tab-opacity-row-temp').style.display=type==='temp'?'':'none';
+			document.getElementById('tab-opacity-row-moist').style.display=type==='moist'?'':'none';
+
+			// Only show section if that layer is actually enabled
+			const tempOn=document.getElementById('layer-temp-check').checked;
+			const moistOn=document.getElementById('layer-moist-check').checked;
+			document.getElementById('temp-section').style.display=(type==='temp'&&tempOn)?'':'none';
+			document.getElementById('moist-section').style.display=(type==='moist'&&moistOn)?'':'none';
+			document.getElementById('divider-moist').style.display='none';
+
+			tempActive=tempOn; moistActive=moistOn;
+		}
+
 		function toggleMinimize(){
 			minimized=!minimized;
 			const btn=document.getElementById('minimize-btn');
+		    const subtitle = document.getElementById("subtitle");
+		    subtitle.style.display = subtitle.style.display === "none" ? "inline" : "none";
 			btn.style.transform=minimized?'rotate(180deg)':'';
 			btn.style.transition='transform 0.2s';
-			document.querySelectorAll('#controls > *:not(h3)').forEach(el=>{el.style.display=minimized?'none':'';});
-			if(!minimized) onLayerCheckChange();
+			document.getElementById('controls-scroll').style.display = minimized ? 'none' : '';
+			document.getElementById('controls-footer').style.display = minimized ? 'none' : '';
+			if(!minimized) syncLayerSectionVisibility();
+		}
+		// Only update section visibility without touching map layers
+		function syncLayerSectionVisibility(){
+			tempActive=document.getElementById('layer-temp-check').checked;
+			moistActive=document.getElementById('layer-moist-check').checked;
+			document.getElementById('temp-section').style.display=(activeLayerTab==='temp'&&tempActive)?'':'none';
+			document.getElementById('moist-section').style.display=(activeLayerTab==='moist'&&moistActive)?'':'none';
+			document.getElementById('divider-moist').style.display='none';
 		}
 
 		function setBasemapOverlay(key) {
@@ -734,7 +873,8 @@
 			const p=MUSHROOM_PRESETS[key];
 			document.getElementById('layer-temp-check').checked=true;
 			document.getElementById('layer-moist-check').checked=true;
-			tempActive=true; moistActive=true; onLayerCheckChange();
+			tempActive=true; moistActive=true;
+			selectLayerTab('temp');
 			const[minF,maxF]=p.tempF;
 			document.getElementById('input-min').value=currentUnit==='F'?minF:round1(toC(minF));
 			document.getElementById('input-max').value=currentUnit==='F'?maxF:round1(toC(maxF));
@@ -752,9 +892,15 @@
 		function onLayerCheckChange(){
 			tempActive=document.getElementById('layer-temp-check').checked;
 			moistActive=document.getElementById('layer-moist-check').checked;
-			document.getElementById('temp-section').style.display=tempActive?'':'none';
-			document.getElementById('moist-section').style.display=moistActive?'':'none';
-			document.getElementById('divider-moist').style.display=(tempActive&&moistActive)?'':'none';
+
+			// Update tab button styling to reflect on/off state
+			document.getElementById('tab-temp').classList.toggle('layer-on', tempActive);
+			document.getElementById('tab-moist').classList.toggle('layer-on', moistActive);
+
+			document.getElementById('temp-section').style.display=(activeLayerTab==='temp'&&tempActive)?'':'none';
+			document.getElementById('moist-section').style.display=(activeLayerTab==='moist'&&moistActive)?'':'none';
+			document.getElementById('divider-moist').style.display='none';
+
 			if(mapLoaded){
 				if(!tempActive) removeLayers('omTemp');
 				else { registerProtocol(rangeMinC,rangeMaxC,parseFloat(document.getElementById('input-moist-min').value),parseFloat(document.getElementById('input-moist-max').value)); addTempLayers(buildTempUrl(rangeMinC,rangeMaxC)); }
@@ -777,6 +923,13 @@
 			currentUnit=unit;
 			document.getElementById('unit-label-min').textContent=`°${unit}`;document.getElementById('unit-label-max').textContent=`°${unit}`;
 			document.getElementById('btn-c').classList.toggle('active',unit==='C');document.getElementById('btn-f').classList.toggle('active',unit==='F');
+			// Rebuild color editor so breakpoint labels reflect the new unit
+			buildColorEditor('temp');
+			// Re-open the editor if it was open
+			if(document.getElementById('temp-color-rows').classList.contains('open')){
+				document.getElementById('temp-color-header').classList.add('open');
+				document.getElementById('temp-color-rows').classList.add('open');
+			}
 		}
 
 		function setDepth(type,btn){
@@ -789,10 +942,12 @@
 		function syncContourCheck(type){
 			if(type==='temp'){
 				tempContours=document.getElementById('contour-check-temp').checked;
-				['omTempVectorLayer','omTempVectorLabels'].forEach(id=>{if(map.getLayer(id))map.setLayoutProperty(id,'visibility',tempContours?'visible':'none');});
+				// Toggle only the visual display layers; omTempVectorLayer stays visible for queryRenderedFeatures
+				['omTempVectorDisplay','omTempVectorLabels'].forEach(id=>{if(map.getLayer(id))map.setLayoutProperty(id,'visibility',tempContours?'visible':'none');});
 			} else {
 				moistContours=document.getElementById('contour-check-moist').checked;
-				['omMoistVectorLayer','omMoistVectorLabels'].forEach(id=>{if(map.getLayer(id))map.setLayoutProperty(id,'visibility',moistContours?'visible':'none');});
+				// Toggle only the visual display layers; omMoistVectorLayer stays visible for queryRenderedFeatures
+				['omMoistVectorDisplay','omMoistVectorLabels'].forEach(id=>{if(map.getLayer(id))map.setLayoutProperty(id,'visibility',moistContours?'visible':'none');});
 			}
 		}
 
@@ -806,12 +961,15 @@
 			const bps=isTemp?DEFAULT_TEMP_BREAKPOINTS:DEFAULT_MOIST_BREAKPOINTS;
 			const colors=isTemp?userTempColors:userMoistColors;
 			const ops=isTemp?userTempOpacity:userMoistOpacity;
-			const unit=isTemp?'°C':'';
+			// For temperature, show labels in the currently selected unit
+			const unit=isTemp?(currentUnit==='F'?'°F':'°C'):'';
 			const container=document.getElementById(`${type}-color-rows`);
 			container.innerHTML='';
 			bps.forEach((bp,i)=>{
 				const row=document.createElement('div'); row.className='color-row';
-				const lbl=document.createElement('span'); lbl.className='bp-label'; lbl.textContent=unit?`${bp}${unit}`:bp.toFixed(2);
+				// Convert breakpoint value to display unit if needed
+				const displayBp = (isTemp && currentUnit==='F') ? Math.round(toF(bp)*10)/10 : bp;
+				const lbl=document.createElement('span'); lbl.className='bp-label'; lbl.textContent=unit?`${displayBp}${unit}`:bp.toFixed(2);
 				const picker=document.createElement('input'); picker.type='color'; picker.value=rgbToHex(...colors[i]);
 				picker.addEventListener('input',e=>{const rgb=hexToRgb(e.target.value);if(isTemp)userTempColors[i]=rgb;else userMoistColors[i]=rgb;});
 				const slider=document.createElement('input'); slider.type='range'; slider.min=0;slider.max=1;slider.step=0.05;slider.value=ops[i];
@@ -886,7 +1044,7 @@
 		const buildMoistUrl=(minV,maxV)=>`https://map-tiles.open-meteo.com/data_spatial/ncep_nam_conus/latest.json?time_step=current_time_1H&variable=soil_moisture_${moistDepth}&contours=true&intervals=${minV},${maxV}`;
 
 		function removeLayers(prefix){
-			[`${prefix}VectorLabels`,`${prefix}VectorLayer`,`${prefix}RasterLayer`].forEach(id=>{if(map.getLayer(id))map.removeLayer(id);});
+			[`${prefix}VectorLabels`,`${prefix}VectorDisplay`,`${prefix}VectorLayer`,`${prefix}RasterLayer`].forEach(id=>{if(map.getLayer(id))map.removeLayer(id);});
 			[`${prefix}RasterSource`,`${prefix}VectorSource`].forEach(id=>{if(map.getSource(id))map.removeSource(id);});
 		}
 		function addTempLayers(omUrl){
@@ -894,7 +1052,10 @@
 			map.addSource('omTempRasterSource',{url:'om://'+omUrl,type:'raster',maxzoom:12});
 			map.addLayer({id:'omTempRasterLayer',type:'raster',source:'omTempRasterSource',paint:{'raster-opacity':tempOpacity}},getInsertionLayer(false));
 			map.addSource('omTempVectorSource',{url:'om://'+omUrl,type:'vector'});
-			map.addLayer({id:'omTempVectorLayer',type:'line',source:'omTempVectorSource','source-layer':'contours',layout:{visibility:tempContours?'visible':'none'},paint:{'line-color':'rgba(0,0,0,0.85)','line-width':1}},getInsertionLayer(true));
+			// Invisible wide query layer — always visible so queryRenderedFeatures works even when display is off
+			map.addLayer({id:'omTempVectorLayer',type:'line',source:'omTempVectorSource','source-layer':'contours',layout:{visibility:'visible'},paint:{'line-color':'rgba(0,0,0,0)','line-width':8,'line-opacity':0}},getInsertionLayer(true));
+			// Visual display layers — toggled by "Show contours" checkbox
+			map.addLayer({id:'omTempVectorDisplay',type:'line',source:'omTempVectorSource','source-layer':'contours',layout:{visibility:tempContours?'visible':'none'},paint:{'line-color':'rgba(0,0,0,0.85)','line-width':1}},getInsertionLayer(true));
 			map.addLayer({id:'omTempVectorLabels',type:'symbol',source:'omTempVectorSource','source-layer':'contours',layout:{visibility:tempContours?'visible':'none','symbol-placement':'line-center','symbol-spacing':1,'text-font':['Noto Sans Regular'],'text-field':['to-string',['get','value']],'text-padding':1,'text-offset':[0,-0.6]}},getInsertionLayer(true));
 		}
 		function addMoistLayers(omUrl){
@@ -902,7 +1063,10 @@
 			map.addSource('omMoistRasterSource',{url:'om://'+omUrl,type:'raster',maxzoom:12});
 			map.addLayer({id:'omMoistRasterLayer',type:'raster',source:'omMoistRasterSource',paint:{'raster-opacity':moistOpacity}},getInsertionLayer(false));
 			map.addSource('omMoistVectorSource',{url:'om://'+omUrl,type:'vector'});
-			map.addLayer({id:'omMoistVectorLayer',type:'line',source:'omMoistVectorSource','source-layer':'contours',layout:{visibility:moistContours?'visible':'none'},paint:{'line-color':'rgba(0,0,0,0.6)','line-width':1,'line-dasharray':[3,2]}},getInsertionLayer(true));
+			// Invisible wide query layer — always visible so queryRenderedFeatures works even when display is off
+			map.addLayer({id:'omMoistVectorLayer',type:'line',source:'omMoistVectorSource','source-layer':'contours',layout:{visibility:'visible'},paint:{'line-color':'rgba(0,0,0,0)','line-width':8,'line-opacity':0}},getInsertionLayer(true));
+			// Visual display layers — toggled by "Show contours" checkbox
+			map.addLayer({id:'omMoistVectorDisplay',type:'line',source:'omMoistVectorSource','source-layer':'contours',layout:{visibility:moistContours?'visible':'none'},paint:{'line-color':'rgba(0,0,0,0.6)','line-width':1,'line-dasharray':[3,2]}},getInsertionLayer(true));
 			map.addLayer({id:'omMoistVectorLabels',type:'symbol',source:'omMoistVectorSource','source-layer':'contours',layout:{visibility:moistContours?'visible':'none','symbol-placement':'line-center','symbol-spacing':1,'text-font':['Noto Sans Regular'],'text-field':['to-string',['get','value']],'text-padding':1,'text-offset':[0,-0.6]}},getInsertionLayer(true));
 		}
 
@@ -941,11 +1105,7 @@
 			'dark-matter':          'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
 			'dark-matter-nolabels': 'https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json',
 			'fiord':                'https://tiles.openfreemap.org/styles/fiord',
-			'alidade-dark':         'https://tiles.stadiamaps.com/styles/alidade_dark.json',
-			'topo':                 'https://demotiles.maplibre.org/style.json',
-			'stamen-terrain':       'https://tiles.stadiamaps.com/styles/stamen_terrain.json',
-			'outdoor':              'https://tiles.stadiamaps.com/styles/outdoors.json',
-			'stamen-toner':         'https://tiles.stadiamaps.com/styles/stamen_toner.json',
+			'dark':                'https://tiles.openfreemap.org/styles/dark',
 		};
 		let activeBasemap = 'liberty';
 
@@ -1150,6 +1310,8 @@
 			const fab   = document.getElementById('bm-fab');
 			const open  = popup.classList.toggle('open');
 			fab.classList.toggle('open', open);
+			// Minimize controls when opening the basemap panel
+			if (open && !minimized) toggleMinimize();
 		}
 
 		function setBasemap(key) {
@@ -1269,10 +1431,10 @@
 			return idx >= 0 ? idx : 0;
 		}
 
-		// Default per-layer settings; slot picks the starting ramp from the rotation.
+		// Default per-layer settings; slot picks the starting ramp sequentially from COLOR_RAMPS.
 		const DEFAULT_LAYER_SETTINGS = (slot = 0) => ({
-			rampRotationName: RAMP_ROTATION_NAMES[slot % RAMP_ROTATION_NAMES.length],
-			rampIdx: 0, // resolved lazily via resolveRampIdx when COLOR_RAMPS is ready
+			rampRotationName: null, // not used for sequential assignment
+			rampIdx: slot, // sequential: 0, 1, 2, … (resolved after COLOR_RAMPS loads)
 			rampFlipped: false,
 			opacity: 0.75,
 			stretchType: 5,
@@ -1303,9 +1465,9 @@
 				COLOR_RAMPS = FALLBACK_RAMPS;
 			}
 			loadEl.style.display = 'none';
-			// Resolve rampIdx for all active layers now that ramps are loaded
+			// Clamp sequential rampIdx to the actual number of loaded ramps
 			activeSlices.forEach(info => {
-				info.settings.rampIdx = resolveRampIdx(info.settings.rampRotationName);
+				info.settings.rampIdx = info.settings.rampIdx % COLOR_RAMPS.length;
 			});
 			refreshAllTreeLayers();
 			updateSelectionSummary();
@@ -1428,8 +1590,10 @@
 				if (openDrawerSliceId === sliceId) openDrawerSliceId = null;
 			} else {
 				if (activeSlices.size >= 3) return; // hard cap — badge already shown
-				const settings = DEFAULT_LAYER_SETTINGS(layerAddCount++);
-				settings.rampIdx = resolveRampIdx(settings.rampRotationName);
+				const slot = layerAddCount++;
+				const settings = DEFAULT_LAYER_SETTINGS(slot);
+				// Assign ramp index sequentially; if COLOR_RAMPS not loaded yet, it will be 0 and resolved later
+				settings.rampIdx = COLOR_RAMPS.length ? (slot % COLOR_RAMPS.length) : slot;
 				activeSlices.set(sliceId, {varName, year, settings});
 				addSliceLayer(sliceId);
 			}
@@ -1723,49 +1887,7 @@
 		popupEl.style.display = 'none';
 		document.getElementById('map').appendChild(popupEl);
 
-		// ── Pixel reading: use an offscreen 2D canvas that we blit into ──────────
-		// MapLibre uses preserveDrawingBuffer:false so readPixels returns zeros
-		// during mousemove. Fix: after each render, blit the WebGL canvas into a
-		// persistent 2D canvas we can read any time.
-		let _pixelCanvas = null;
-		let _pixelCtx    = null;
-
-		function ensurePixelCanvas() {
-			if (_pixelCanvas) return;
-			_pixelCanvas = document.createElement('canvas');
-			_pixelCanvas.style.display = 'none';
-			document.body.appendChild(_pixelCanvas);
-			_pixelCtx = _pixelCanvas.getContext('2d');
-		}
-
-		function syncPixelCanvas() {
-			ensurePixelCanvas();
-			const src = map.getCanvas();
-			const dpr = window.devicePixelRatio || 1;
-			const w   = src.width;
-			const h   = src.height;
-			if (_pixelCanvas.width !== w || _pixelCanvas.height !== h) {
-				_pixelCanvas.width  = w;
-				_pixelCanvas.height = h;
-			}
-			try { _pixelCtx.drawImage(src, 0, 0); } catch(e) {}
-		}
-
-		// Blit after every rendered frame
-		map.on('render', syncPixelCanvas);
-
-		function getCanvasPixel(screenPoint) {
-			if (!_pixelCtx) return null;
-			const dpr = window.devicePixelRatio || 1;
-			const x   = Math.round(screenPoint.x * dpr);
-			const y   = Math.round(screenPoint.y * dpr);
-			try {
-				const d = _pixelCtx.getImageData(x, y, 1, 1).data;
-				return { r: d[0], g: d[1], b: d[2], a: d[3] };
-			} catch(e) { return null; }
-		}
-
-		// ── Color scale interpolation ─────────────────────────────────────────────
+		// ── Color scale helpers (kept for swatch rendering) ──────────────────────
 		function lerpColor(c1, c2, t) {
 			return [
 				Math.round(c1[0] + (c2[0] - c1[0]) * t),
@@ -1785,47 +1907,102 @@
 			return colors[0];
 		}
 
-		// ── Reverse-map pixel color → closest soil value on the ramp ─────────────
-		function colorToValue(r, g, b, breakpoints, colors) {
-			const steps   = 500;
-			const minBp   = breakpoints[0];
-			const maxBp   = breakpoints[breakpoints.length - 1];
-			let bestVal   = minBp;
-			let bestDist  = Infinity;
-			for (let i = 0; i <= steps; i++) {
-				const v = minBp + (i / steps) * (maxBp - minBp);
-				const c = valueToColor(v, breakpoints, colors);
-				const d = (c[0]-r)**2 + (c[1]-g)**2 + (c[2]-b)**2;
-				if (d < bestDist) { bestDist = d; bestVal = v; }
+		// ── Accurate value reading via queryRenderedFeatures on contour tiles ────
+		// The open-meteo vector tiles expose contour lines with a `value` property
+		// containing the exact encoded data value — no color reverse-mapping needed.
+		// Strategy:
+		//   1. Query a small box around the cursor for contour features.
+		//   2. If features are found, interpolate between the two bracketing
+		//      contour values weighted by distance (nearest two contours).
+		//   3. If only one contour is nearby, use it directly.
+		//   4. Fall back to null if no contours are within the search radius.
+
+		const QUERY_RADIUS = 40; // px half-width of query box
+
+		function queryContourValue(screenPt, layerId, sourceId) {
+			if (!map.getLayer(layerId) || !map.getSource(sourceId)) return null;
+
+			// Query a box around the point
+			const bbox = [
+				[screenPt.x - QUERY_RADIUS, screenPt.y - QUERY_RADIUS],
+				[screenPt.x + QUERY_RADIUS, screenPt.y + QUERY_RADIUS],
+			];
+
+			let features;
+			try {
+				features = map.queryRenderedFeatures(bbox, { layers: [layerId] });
+			} catch(e) { return null; }
+
+			if (!features || features.length === 0) return null;
+
+			// Collect unique contour values with their approximate screen distances
+			// We compute the midpoint of each feature's geometry projected to screen.
+			const candidates = [];
+			const seen = new Set();
+			for (const f of features) {
+				const v = f.properties && (f.properties.value ?? f.properties.val ?? f.properties.level);
+				if (v == null || isNaN(+v)) continue;
+				const num = +v;
+				if (seen.has(num)) continue;
+				seen.add(num);
+
+				// Estimate screen distance by projecting the feature's first coordinate
+				let dist = Infinity;
+				try {
+					const coords = f.geometry.type === 'LineString'
+						? f.geometry.coordinates
+						: f.geometry.coordinates[0];
+					if (coords && coords.length) {
+						// Sample up to 8 points along the line for distance
+						const step = Math.max(1, Math.floor(coords.length / 8));
+						for (let i = 0; i < coords.length; i += step) {
+							const pt = map.project({ lng: coords[i][0], lat: coords[i][1] });
+							const dx = pt.x - screenPt.x, dy = pt.y - screenPt.y;
+							const d  = Math.sqrt(dx*dx + dy*dy);
+							if (d < dist) dist = d;
+						}
+					}
+				} catch(e) {}
+
+				candidates.push({ value: num, dist });
 			}
-			return { value: bestVal, colorDist: bestDist };
+
+			if (candidates.length === 0) return null;
+
+			// Sort by distance — closest first
+			candidates.sort((a, b) => a.dist - b.dist);
+
+			if (candidates.length === 1) return candidates[0].value;
+
+			// Interpolate between two nearest contours weighted by inverse distance
+			const c0 = candidates[0], c1 = candidates[1];
+			if (c0.dist < 1) return c0.value; // basically sitting on the line
+			const totalInvD = (1 / c0.dist) + (1 / c1.dist);
+			return (c0.value * (1/c0.dist) + c1.value * (1/c1.dist)) / totalInvD;
 		}
 
-		// ── Read soil value(s) at a screen point ──────────────────────────────────
+		// ── Read soil value(s) at a screen point using tile data ──────────────────
 		function readSoilAtPoint(screenPt) {
-			const pixel = getCanvasPixel(screenPt);
-			if (!pixel || pixel.a < 20) return null;
-
 			const results = [];
 
 			if (tempActive) {
-				const bpC = DEFAULT_TEMP_BREAKPOINTS;
-				const res = colorToValue(pixel.r, pixel.g, pixel.b, bpC, userTempColors);
-				if (res.colorDist < 15000) {
-					const valC      = res.value;
+				const raw = queryContourValue(screenPt, 'omTempVectorLayer', 'omTempVectorSource');
+				if (raw !== null) {
+					const valC       = raw;
 					const valDisplay = currentUnit === 'F'
 						? (valC * 9/5 + 32).toFixed(1) + ' °F'
 						: valC.toFixed(1) + ' °C';
-					results.push({ label: '🌡', value: valDisplay, swatch: valueToColor(valC, bpC, userTempColors) });
+					const swatch = valueToColor(valC, DEFAULT_TEMP_BREAKPOINTS, userTempColors);
+					results.push({ label: '🌡', value: valDisplay, swatch });
 				}
 			}
 
 			if (moistActive) {
-				const bpM = DEFAULT_MOIST_BREAKPOINTS;
-				const res = colorToValue(pixel.r, pixel.g, pixel.b, bpM, userMoistColors);
-				if (res.colorDist < 15000) {
-					const valM = res.value;
-					results.push({ label: '💧', value: valM.toFixed(3) + ' m³/m³', swatch: valueToColor(valM, bpM, userMoistColors) });
+				const raw = queryContourValue(screenPt, 'omMoistVectorLayer', 'omMoistVectorSource');
+				if (raw !== null) {
+					const valM   = raw;
+					const swatch = valueToColor(valM, DEFAULT_MOIST_BREAKPOINTS, userMoistColors);
+					results.push({ label: '💧', value: valM.toFixed(3) + ' m³/m³', swatch });
 				}
 			}
 
