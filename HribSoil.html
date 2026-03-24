@@ -200,9 +200,6 @@
 					top: 8px;
 					font-size: 12px;
 				}
-				#tree-selection-summary {
-					max-height: min(200px, 22vh);
-				}
 			}
 
 			/* ── Soil Value Popup (open-meteo style) ─────────────────────────── */
@@ -365,7 +362,7 @@
 				box-shadow: 0 4px 20px rgba(0,0,0,0.22); padding: 12px;
 				font-family: sans-serif; width: 284px;
 				display: none; flex-direction: column; gap: 6px;
-				max-height: 480px;
+				max-height: calc(100vh - 170px);
 				overflow-y: auto;
 			}
 			#bm-popup.open { display: flex; }
@@ -1902,6 +1899,7 @@
 			btn.style.transition = 'transform 0.2s';
 			document.getElementById('tree-panel-body').style.display = treePanelMinimized ? 'none' : 'flex';
 			document.getElementById('tree-none-btn').style.display = treePanelMinimized ? 'none' : '';
+			document.getElementById('tree-selection-summary').style.display = treePanelMinimized ? 'none' : '';
 		}
 		// Initialize tree panel as minimized on page load
 		(function(){
