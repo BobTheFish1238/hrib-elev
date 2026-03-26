@@ -105,7 +105,7 @@
 				position: absolute; top: 12px; right: 12px; z-index: 10;
 				background: rgba(255,255,255,0.96); border-radius: 10px;
 				padding: 14px 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.18);
-				font-family: sans-serif; font-size: 13px; max-width: 200px;
+				font-family: sans-serif; font-size: 13px; max-width: 230px;
 				max-height: calc(100vh - 80px); display: flex; flex-direction: column; gap: 8px;
 			}
 			#tree-panel h3 { margin: 0; font-size: 13px; font-weight: 700; color: #333; letter-spacing: 0.03em; text-transform: uppercase; display: flex; align-items: center; justify-content: space-between; }
@@ -195,7 +195,7 @@
 					font-size: 12px;
 				}
 				#tree-panel {
-					max-width: calc(38vw);
+					max-width: calc(44vw);
 					right: 8px;
 					top: 8px;
 					font-size: 12px;
@@ -615,13 +615,13 @@
 			<div class="section-label">Soil Layers</div>
 			<div class="layer-tabs-wrapper">
 				<div class="layer-tab-bar">
-					<button id="tab-temp" class="active layer-on" style="font-size:9px" onclick="selectLayerTab('temp')">
+					<button id="tab-temp" class="active layer-on" style="font-size:9px" onclick="handleLayerTabClick('temp')">
 						<input type="checkbox" id="layer-temp-check" style="margin:0 0 0 10px" checked
 							onclick="event.stopPropagation()"
 							onchange="onLayerCheckChange()" />
 						🌡 Temperature
 					</button>
-					<button id="tab-moist" style="font-size:9px" onclick="selectLayerTab('moist')">
+					<button id="tab-moist" style="font-size:9px" onclick="handleLayerTabClick('moist')">
 						<input type="checkbox" id="layer-moist-check"
 							onclick="event.stopPropagation()"
 							onchange="onLayerCheckChange()" />
@@ -736,29 +736,124 @@
 		</div>
 	</div>
 
-		<!-- Right: Tree Species Panel -->
+		<!-- Right: Forest Layers Panel -->
 		<div id="tree-panel">
 			<h3 style="cursor:pointer;user-select:none" onclick="toggleTreePanel()">
-				🌲 Tree Species
+				🌲 Forest Layers
 				<button id="tree-minimize-btn"
 					style="background:none;border:none;cursor:pointer;font-size:16px;color:#888;padding:0;margin-left:10px;line-height:1;pointer-events:none">⌃</button>
 			</h3>
 			<div id="tree-panel-body">
-				<div class="section-label" style="font-size:10px;margin:0">USFS Basal Area · Species + Year · <strong>max 3 active</strong></div>
 
-				<input type="text" class="tree-search" id="tree-search" placeholder="Search species…" oninput="filterTreeList()" />
+				<!-- Forest Layer Tab Bar -->
+				<div style="display:flex;border-radius:7px;overflow:hidden;border:1px solid #ccc;margin-bottom:4px;overflow:auto">
+					<button id="ftab-species" class="active" onclick="handleForestTabClick('species')"
+						style="flex:1;padding:5px 4px;border:none;background:#2563eb;color:#fff;cursor:pointer;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:3px;border-right:1px solid #ccc">
+						<input type="checkbox" id="ftab-species-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('species')" style="accent-color:#fff;cursor:pointer;width:11px;height:11px;margin:0" />
+						🌲 Species
+					</button>
+					<button id="ftab-fires" onclick="handleForestTabClick('fires')"
+						style="flex:1;padding:5px 4px;border:none;background:#f0f0f0;color:#555;cursor:pointer;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:3px;border-right:1px solid #ccc">
+						<input type="checkbox" id="ftab-fires-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('fires')" style="accent-color:#2563eb;cursor:pointer;width:11px;height:11px;margin:0" />
+						🔥 Fires
+					</button>
+					<button id="ftab-timber" onclick="handleForestTabClick('timber')"
+						style="flex:1;padding:5px 4px;border:none;background:#f0f0f0;color:#555;cursor:pointer;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:3px;border-right:1px solid #ccc">
+						<input type="checkbox" id="ftab-timber-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('timber')" style="accent-color:#2563eb;cursor:pointer;width:11px;height:11px;margin:0" />
+						🪵 Timber
+					</button>
+					<button id="ftab-landcover" onclick="handleForestTabClick('landcover')"
+						style="flex:1;padding:5px 4px;border:none;background:#f0f0f0;color:#555;cursor:pointer;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:3px">
+						<input type="checkbox" id="ftab-landcover-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('landcover')" style="accent-color:#2563eb;cursor:pointer;width:11px;height:11px;margin:0" />
+						🗺 Cover
+					</button>
+				</div>
 
-				<div id="tree-layer-limit">⚠ Max 3 layers reached — remove one to add another</div>
+				<!-- Tab: Tree Species -->
+				<div id="forest-tab-species">
+					<div class="section-label" style="font-size:10px;margin:0">USFS Basal Area · Species + Year · <strong>max 3 active</strong></div>
+					<input type="text" class="tree-search" id="tree-search" placeholder="Search species…" oninput="filterTreeList()" />
+					<div id="tree-layer-limit">⚠ Max 3 layers reached — remove one to add another</div>
+					<div id="tree-status">Loading species list…</div>
+					<div class="tree-list" id="tree-list" style="display:none"></div>
+					<div id="ramp-list-loading" style="display:none;font-size:11px;color:#888;text-align:center;padding:4px 0">Loading ramps…</div>
+					<div id="tree-selection-summary"></div>
+					<button class="tree-none-btn" id="tree-none-btn" style="display:none" onclick="clearAllTreeLayers()">✕ Clear all selections</button>
+				</div>
 
-				<div id="tree-status">Loading species list…</div>
-				<div class="tree-list" id="tree-list" style="display:none"></div>
-				<div id="ramp-list-loading" style="display:none;font-size:11px;color:#888;text-align:center;padding:4px 0">Loading ramps…</div>
+				<!-- Tab: Fires -->
+				<div id="forest-tab-fires" style="display:none;flex-direction:column;gap:6px">
+					<div class="section-label" style="font-size:10px;margin:0">WFIGS Interagency Fire Perimeters</div>
+					<div style="display:flex;flex-direction:column;gap:4px">
+						<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
+							<label style="min-width:60px;font-weight:600">Start Date</label>
+							<input type="date" id="fires-start-date" value="2020-01-01"
+								style="flex:1;padding:3px 5px;border:1px solid #ccc;border-radius:5px;font-size:11px;background:#fafafa;color:#333" onchange="refreshFiresLayer()" />
+						</div>
+						<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
+							<label style="min-width:60px;font-weight:600">End Date</label>
+							<input type="date" id="fires-end-date" value="2025-12-31"
+								style="flex:1;padding:3px 5px;border:1px solid #ccc;border-radius:5px;font-size:11px;background:#fafafa;color:#333" onchange="refreshFiresLayer()" />
+						</div>
+					</div>
+					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
+						<label style="min-width:60px;font-weight:600">Opacity</label>
+						<input type="range" id="fires-opacity" min="0" max="1" step="0.05" value="0.7"
+							style="flex:1;accent-color:#2563eb;max-width:40%" oninput="setFiresOpacity(this.value)" />
+						<span id="fires-opacity-val" style="font-size:10px;color:#888;min-width:28px">70%</span>
+					</div>
+					<div id="fires-status" style="font-size:10px;color:#888;text-align:center;padding:2px 0"></div>
+				</div>
+
+				<!-- Tab: Timber Harvests -->
+				<div id="forest-tab-timber" style="display:none;flex-direction:column;gap:6px">
+					<div class="section-label" style="font-size:10px;margin:0">USFS EDW Timber Harvest</div>
+					<div style="display:flex;flex-direction:column;gap:4px">
+						<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
+							<label style="min-width:60px;font-weight:600">Start Date</label>
+							<input type="date" id="timber-start-date" value="2000-01-01"
+								style="flex:1;padding:3px 5px;border:1px solid #ccc;border-radius:5px;font-size:11px;background:#fafafa;color:#333" onchange="refreshTimberLayer()" />
+						</div>
+						<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
+							<label style="min-width:60px;font-weight:600">End Date</label>
+							<input type="date" id="timber-end-date" value="2025-12-31"
+								style="flex:1;padding:3px 5px;border:1px solid #ccc;border-radius:5px;font-size:11px;background:#fafafa;color:#333" onchange="refreshTimberLayer()" />
+						</div>
+					</div>
+					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
+						<label style="min-width:60px;font-weight:600">Opacity</label>
+						<input type="range" id="timber-opacity" min="0" max="1" step="0.05" value="0.7"
+							style="flex:1;accent-color:#2563eb;max-width:40%" oninput="setTimberOpacity(this.value)" />
+						<span id="timber-opacity-val" style="font-size:10px;color:#888;min-width:28px">70%</span>
+					</div>
+					<div id="timber-status" style="font-size:10px;color:#888;text-align:center;padding:2px 0"></div>
+				</div>
+
+				<!-- Tab: Landcover -->
+				<div id="forest-tab-landcover" style="display:none;flex-direction:column;gap:6px">
+					<div class="section-label" style="font-size:10px;margin:0">USFS NLCD Landcover CONUS</div>
+					<div style="display:flex;flex-direction:column;gap:4px">
+						<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
+							<label style="min-width:60px;font-weight:600">Start Date</label>
+							<input type="date" id="landcover-start-date" value="1985-01-01"
+								style="flex:1;padding:3px 5px;border:1px solid #ccc;border-radius:5px;font-size:11px;background:#fafafa;color:#333" onchange="refreshLandcoverLayer()" />
+						</div>
+						<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
+							<label style="min-width:60px;font-weight:600">End Date</label>
+							<input type="date" id="landcover-end-date" value="1988-12-31"
+								style="flex:1;padding:3px 5px;border:1px solid #ccc;border-radius:5px;font-size:11px;background:#fafafa;color:#333" onchange="refreshLandcoverLayer()" />
+						</div>
+					</div>
+					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
+						<label style="min-width:60px;font-weight:600">Opacity</label>
+						<input type="range" id="landcover-opacity" min="0" max="1" step="0.05" value="0.8"
+							style="flex:1;accent-color:#2563eb;max-width:40%" oninput="setLandcoverOpacity(this.value)" />
+						<span id="landcover-opacity-val" style="font-size:10px;color:#888;min-width:28px">80%</span>
+					</div>
+					<div id="landcover-status" style="font-size:10px;color:#888;text-align:center;padding:2px 0"></div>
+				</div>
+
 			</div>
-
-			<div id="tree-selection-summary"></div>
-
-			<button class="tree-none-btn" id="tree-none-btn" style="display:none" onclick="clearAllTreeLayers()">✕ Clear all selections</button>
-
 		</div>
 
 		<script>
@@ -788,6 +883,17 @@
 
 		let minimized=true;
 		let activeLayerTab='temp'; // 'temp' | 'moist'
+
+		function handleLayerTabClick(type) {
+			if (activeLayerTab === type) {
+				// Toggle the checkbox when clicking active tab
+				const checkbox = document.getElementById(`layer-${type}-check`);
+				checkbox.checked = !checkbox.checked;
+				onLayerCheckChange();
+			} else {
+				selectLayerTab(type);
+			}
+		}
 
 		function selectLayerTab(type){
 			activeLayerTab=type;
@@ -925,8 +1031,14 @@
 		const hexToRgb=hex=>[parseInt(hex.slice(1,3),16),parseInt(hex.slice(3,5),16),parseInt(hex.slice(5,7),16)];
 
 		function onLayerCheckChange(){
+			const prevTemp  = tempActive;
+			const prevMoist = moistActive;
 			tempActive=document.getElementById('layer-temp-check').checked;
 			moistActive=document.getElementById('layer-moist-check').checked;
+
+			// Switch to the tab whose checkbox was just turned on
+			if (tempActive  && !prevTemp)  selectLayerTab('temp');
+			else if (moistActive && !prevMoist) selectLayerTab('moist');
 
 			// Update tab button styling to reflect on/off state
 			document.getElementById('tab-temp').classList.toggle('layer-on', tempActive);
@@ -1891,6 +2003,312 @@
 			} catch(err) { statusEl.textContent = '⚠ Failed to load species list.'; console.error(err); }
 		}
 
+		// ── Forest Layers Tab State ───────────────────────────────────────────────
+		let activeForestTab = 'species';
+		const forestTabChecks = { species: false, fires: false, timber: false, landcover: false };
+
+		function handleForestTabClick(tab) {
+			if (activeForestTab === tab) {
+				// Toggle the checkbox when clicking active tab
+				const checkbox = document.getElementById(`ftab-${tab}-check`);
+				checkbox.checked = !checkbox.checked;
+				onForestTabCheckChange(tab);
+			} else {
+				selectForestTab(tab);
+			}
+		}
+
+		function selectForestTab(tab) {
+			activeForestTab = tab;
+			['species','fires','timber','landcover'].forEach(t => {
+				const btn = document.getElementById('ftab-' + t);
+				const panel = document.getElementById('forest-tab-' + t);
+				const isActive = t === tab;
+				const isOn = forestTabChecks[t];
+				btn.style.background = isActive ? '#2563eb' : (isOn ? '#dbeafe' : '#f0f0f0');
+				btn.style.color = isActive ? '#fff' : (isOn ? '#1d4ed8' : '#555');
+				panel.style.display = isActive ? (t === 'species' ? 'flex' : 'flex') : 'none';
+				panel.style.flexDirection = 'column';
+			});
+		}
+
+		function onForestTabCheckChange(tab) {
+			const checked = document.getElementById('ftab-' + tab + '-check').checked;
+			forestTabChecks[tab] = checked;
+			// Switch to the tab whose checkbox was just turned on
+			if (checked) selectForestTab(tab);
+			// Update button highlight
+			const btn = document.getElementById('ftab-' + tab);
+			const isActive = activeForestTab === tab;
+			btn.style.background = isActive ? '#2563eb' : (checked ? '#dbeafe' : '#f0f0f0');
+			btn.style.color = isActive ? '#fff' : (checked ? '#1d4ed8' : '#555');
+			if (tab === 'fires')     { checked ? addFiresLayer()     : removeFiresLayer(); }
+			if (tab === 'timber')    { checked ? addTimberLayer()    : removeTimberLayer(); }
+			if (tab === 'landcover') { checked ? addLandcoverLayer() : removeLandcoverLayer(); }
+		}
+
+		// ── ESRI Query-per-tile protocol helpers (GeoJSON, not PBF) ─────────────
+		// ESRI's f=pbf uses a non-standard field 2 wrapper incompatible with MapLibre MVT.
+		// Instead we use f=geojson per-tile via a custom 'geojsontile://' protocol
+		// that fetches each tile's bbox from the ESRI /query endpoint.
+
+		function tileToWebMercatorBbox(z, x, y) {
+			const size = 20037508.3427892 * 2;
+			const tc = Math.pow(2, z);
+			const xmin = (x / tc) * size - 20037508.3427892;
+			const xmax = ((x + 1) / tc) * size - 20037508.3427892;
+			const ymax = 20037508.3427892 - (y / tc) * size;
+			const ymin = 20037508.3427892 - ((y + 1) / tc) * size;
+			return { xmin, ymin, xmax, ymax };
+		}
+
+		function parseTileCoords(url) {
+			// e.g. "esrifire://7/20/43"
+			const parts = url.replace(/^[a-z]+:\/\//, '').split('/').map(Number);
+			return { z: parts[0], x: parts[1], y: parts[2] };
+		}
+
+		// Build an ESRI /query GeoJSON URL for the tile's bbox
+		function buildEsriGeoJsonUrl(featureServerUrl, bbox, where, outFields, extraParams) {
+			const inSR = JSON.stringify({wkid:102100});
+			const params = new URLSearchParams({
+				f: 'geojson',
+				geometry: `${bbox.xmin},${bbox.ymin},${bbox.xmax},${bbox.ymax}`,
+				geometryType: 'esriGeometryEnvelope',
+				inSR: '102100',
+				spatialRel: 'esriSpatialRelIntersects',
+				outSR: '4326',
+				where: where,
+				outFields: outFields,
+				returnGeometry: 'true',
+				resultType: 'tile',
+				...(extraParams || {})
+			});
+			return `${featureServerUrl}?${params.toString()}`;
+		}
+
+		// Register a named protocol that fetches ESRI GeoJSON per tile and returns it
+		// as a GeoJSON FeatureCollection (MapLibre geojson source handles the rest)
+		// NOTE: MapLibre custom protocols must return ArrayBuffer, but we use a
+		// workaround: we store fetched GeoJSON per-tile in a cache and trigger
+		// a full source refresh when new data arrives.
+		//
+		// Simpler approach: use a single GeoJSON source and refresh on map moveend.
+
+		// ── Fires Layer (GeoJSON, viewport-based refresh) ─────────────────────────
+		const FIRES_SVC = 'https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/WFIGS_Interagency_Perimeters/FeatureServer/0/query';
+		let _firesAbort = null;
+
+		function getFiresWhere() {
+			const s = document.getElementById('fires-start-date').value;
+			const e = document.getElementById('fires-end-date').value;
+			return (s && e)
+				? `attr_FireDiscoveryDateTime >= DATE '${s}' AND attr_FireDiscoveryDateTime <= DATE '${e}'`
+				: '1=1';
+		}
+
+		async function fetchFiresGeoJson() {
+			if (_firesAbort) _firesAbort.abort();
+			_firesAbort = new AbortController();
+			const bounds = map.getBounds();
+			// Convert lng/lat bounds to Web Mercator
+			function lngToWM(lng) { return lng * 20037508.3427892 / 180; }
+			function latToWM(lat) {
+				let y = Math.log(Math.tan((90 + lat) * Math.PI / 360)) / (Math.PI / 180);
+				return y * 20037508.3427892 / 180;
+			}
+			const bbox = {
+				xmin: lngToWM(bounds.getWest()),
+				ymin: latToWM(bounds.getSouth()),
+				xmax: lngToWM(bounds.getEast()),
+				ymax: latToWM(bounds.getNorth())
+			};
+			const url = buildEsriGeoJsonUrl(FIRES_SVC, bbox, getFiresWhere(),
+				'OBJECTID,attr_CpxName,attr_IncidentName,attr_IncidentTypeCategory,attr_IsCpxChild,poly_GISAcres,attr_FireDiscoveryDateTime',
+				{ resultRecordCount: '2000' }
+			);
+			document.getElementById('fires-status').textContent = '🔥 Loading…';
+			try {
+				const res = await fetch(url, { signal: _firesAbort.signal });
+				if (!res.ok) throw new Error(`HTTP ${res.status}`);
+				const gj = await res.json();
+				if (map.getSource('firesSource')) {
+					map.getSource('firesSource').setData(gj);
+					const n = (gj.features || []).length;
+					document.getElementById('fires-status').textContent = n > 0 ? `🔥 ${n} fire perimeters` : '🔥 No fires in view';
+				}
+			} catch(e) {
+				if (e.name === 'AbortError') return;
+				console.error('Fires fetch error:', e);
+				document.getElementById('fires-status').textContent = '⚠ Failed to load fires';
+			}
+		}
+
+		function addFiresLayer() {
+			if (!mapLoaded) return;
+			removeFiresLayer();
+			const opacity = parseFloat(document.getElementById('fires-opacity').value);
+			map.addSource('firesSource', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+			map.addLayer({
+				id: 'firesLayer-fill', type: 'fill', source: 'firesSource',
+				paint: { 'fill-color': '#e53e3e', 'fill-opacity': opacity * 0.45 }
+			}, getInsertionLayer(false));
+			map.addLayer({
+				id: 'firesLayer-line', type: 'line', source: 'firesSource',
+				paint: { 'line-color': '#c53030', 'line-width': 1.5, 'line-opacity': opacity }
+			}, getInsertionLayer(false));
+			map.on('moveend', _onFiresMoveEnd);
+			fetchFiresGeoJson();
+		}
+		function _onFiresMoveEnd() { if (forestTabChecks.fires) fetchFiresGeoJson(); }
+		function removeFiresLayer() {
+			map.off('moveend', _onFiresMoveEnd);
+			if (_firesAbort) { _firesAbort.abort(); _firesAbort = null; }
+			if (map.getLayer('firesLayer-fill')) map.removeLayer('firesLayer-fill');
+			if (map.getLayer('firesLayer-line')) map.removeLayer('firesLayer-line');
+			if (map.getSource('firesSource'))   map.removeSource('firesSource');
+			document.getElementById('fires-status').textContent = '';
+		}
+		function refreshFiresLayer() {
+			if (forestTabChecks.fires) fetchFiresGeoJson();
+		}
+		function setFiresOpacity(val) {
+			document.getElementById('fires-opacity-val').textContent = Math.round(val * 100) + '%';
+			if (map.getLayer('firesLayer-fill')) map.setPaintProperty('firesLayer-fill', 'fill-opacity', parseFloat(val) * 0.45);
+			if (map.getLayer('firesLayer-line')) map.setPaintProperty('firesLayer-line', 'line-opacity', parseFloat(val));
+		}
+
+		// ── Timber Harvests Layer (GeoJSON, viewport-based refresh) ──────────────
+		const TIMBER_SVC = 'https://apps.fs.usda.gov/arcx/rest/services/EDW/EDW_TimberHarvest_01/MapServer/8/query';
+		let _timberAbort = null;
+
+		function getTimberWhere() {
+			const s = document.getElementById('timber-start-date').value;
+			const e = document.getElementById('timber-end-date').value;
+			return (s && e)
+				? `DATE_AWARDED >= DATE '${s}' AND DATE_AWARDED <= DATE '${e}'`
+				: '1=1';
+		}
+
+		async function fetchTimberGeoJson() {
+			if (_timberAbort) _timberAbort.abort();
+			_timberAbort = new AbortController();
+			const bounds = map.getBounds();
+			function lngToWM(lng) { return lng * 20037508.3427892 / 180; }
+			function latToWM(lat) {
+				let y = Math.log(Math.tan((90 + lat) * Math.PI / 360)) / (Math.PI / 180);
+				return y * 20037508.3427892 / 180;
+			}
+			const bbox = {
+				xmin: lngToWM(bounds.getWest()),
+				ymin: latToWM(bounds.getSouth()),
+				xmax: lngToWM(bounds.getEast()),
+				ymax: latToWM(bounds.getNorth())
+			};
+			const url = buildEsriGeoJsonUrl(TIMBER_SVC, bbox, getTimberWhere(),
+				'AU_NAME,ADMIN_FOREST_NAME,DATE_AWARDED,OBJECTID',
+				{ resultRecordCount: '2000', inSR: '102100' }
+			);
+			document.getElementById('timber-status').textContent = '🪵 Loading…';
+			try {
+				const res = await fetch(url, { signal: _timberAbort.signal });
+				if (!res.ok) throw new Error(`HTTP ${res.status}`);
+				const gj = await res.json();
+				if (map.getSource('timberSource')) {
+					map.getSource('timberSource').setData(gj);
+					const n = (gj.features || []).length;
+					document.getElementById('timber-status').textContent = n > 0 ? `🪵 ${n} harvest areas` : '🪵 No harvests in view';
+				}
+			} catch(e) {
+				if (e.name === 'AbortError') return;
+				console.error('Timber fetch error:', e);
+				document.getElementById('timber-status').textContent = '⚠ Failed to load timber';
+			}
+		}
+
+		function addTimberLayer() {
+			if (!mapLoaded) return;
+			removeTimberLayer();
+			const opacity = parseFloat(document.getElementById('timber-opacity').value);
+			map.addSource('timberSource', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+			map.addLayer({
+				id: 'timberLayer-fill', type: 'fill', source: 'timberSource',
+				paint: { 'fill-color': '#d69e2e', 'fill-opacity': opacity * 0.45 }
+			}, getInsertionLayer(false));
+			map.addLayer({
+				id: 'timberLayer-line', type: 'line', source: 'timberSource',
+				paint: { 'line-color': '#b7791f', 'line-width': 1, 'line-opacity': opacity }
+			}, getInsertionLayer(false));
+			map.on('moveend', _onTimberMoveEnd);
+			fetchTimberGeoJson();
+		}
+		function _onTimberMoveEnd() { if (forestTabChecks.timber) fetchTimberGeoJson(); }
+		function removeTimberLayer() {
+			map.off('moveend', _onTimberMoveEnd);
+			if (_timberAbort) { _timberAbort.abort(); _timberAbort = null; }
+			if (map.getLayer('timberLayer-fill')) map.removeLayer('timberLayer-fill');
+			if (map.getLayer('timberLayer-line')) map.removeLayer('timberLayer-line');
+			if (map.getSource('timberSource'))   map.removeSource('timberSource');
+			document.getElementById('timber-status').textContent = '';
+		}
+		function refreshTimberLayer() {
+			if (forestTabChecks.timber) fetchTimberGeoJson();
+		}
+		function setTimberOpacity(val) {
+			document.getElementById('timber-opacity-val').textContent = Math.round(val * 100) + '%';
+			if (map.getLayer('timberLayer-fill')) map.setPaintProperty('timberLayer-fill', 'fill-opacity', parseFloat(val) * 0.45);
+			if (map.getLayer('timberLayer-line')) map.setPaintProperty('timberLayer-line', 'line-opacity', parseFloat(val));
+		}
+
+		// ── Landcover Layer ───────────────────────────────────────────────────────
+		function dateToTimestamp(dateStr) { return new Date(dateStr).getTime(); }
+		function buildLandcoverTileUrl() {
+			const t1 = dateToTimestamp(document.getElementById('landcover-start-date').value);
+			const t2 = dateToTimestamp(document.getElementById('landcover-end-date').value);
+			return `https://imagery.geoplatform.gov/iipp/rest/services/Vegetation/USFS_EDW_NLCD_Landcover_CONUS/ImageServer/exportImage`
+				+ `?f=image&bbox={bbox-epsg-3857}&bboxSR=102100&imageSR=102100&size=256,256&format=jpgpng`
+				+ `&mosaicRule=${encodeURIComponent(JSON.stringify({ascending:true,mosaicMethod:'esriMosaicNorthwest',mosaicOperation:'MT_FIRST'}))}`
+				+ `&renderingRule=${encodeURIComponent(JSON.stringify({rasterFunction:'NLCDLC_AttTbl1'}))}`
+				+ `&time=${t1},${t2}`;
+		}
+		function addLandcoverLayer() {
+			if (!mapLoaded) return;
+			removeLandcoverLayer();
+			const opacity = parseFloat(document.getElementById('landcover-opacity').value);
+			try {
+				map.addSource('landcoverSource', {
+					type: 'raster',
+					tiles: [buildLandcoverTileUrl()],
+					tileSize: 256,
+					maxzoom: 14,
+					attribution: '© USFS EDW NLCD'
+				});
+				map.addLayer({
+					id: 'landcoverLayer',
+					type: 'raster',
+					source: 'landcoverSource',
+					paint: { 'raster-opacity': opacity }
+				}, getInsertionLayer(false));
+				document.getElementById('landcover-status').textContent = '🗺 Landcover layer loaded';
+			} catch(e) {
+				console.error('Landcover layer error:', e);
+				document.getElementById('landcover-status').textContent = '⚠ Failed to load landcover layer';
+			}
+		}
+		function removeLandcoverLayer() {
+			if (map.getLayer('landcoverLayer'))    map.removeLayer('landcoverLayer');
+			if (map.getSource('landcoverSource'))  map.removeSource('landcoverSource');
+			document.getElementById('landcover-status').textContent = '';
+		}
+		function refreshLandcoverLayer() {
+			if (forestTabChecks.landcover) { removeLandcoverLayer(); addLandcoverLayer(); }
+		}
+		function setLandcoverOpacity(val) {
+			document.getElementById('landcover-opacity-val').textContent = Math.round(val * 100) + '%';
+			if (map.getLayer('landcoverLayer')) map.setPaintProperty('landcoverLayer', 'raster-opacity', parseFloat(val));
+		}
+
+		// ── Toggle panel minimize ─────────────────────────────────────────────────
 		let treePanelMinimized = true;
 		function toggleTreePanel(){
 			treePanelMinimized = !treePanelMinimized;
@@ -1898,16 +2316,22 @@
 			btn.style.transform = treePanelMinimized ? 'rotate(180deg)' : '';
 			btn.style.transition = 'transform 0.2s';
 			document.getElementById('tree-panel-body').style.display = treePanelMinimized ? 'none' : 'flex';
-			document.getElementById('tree-none-btn').style.display = treePanelMinimized ? 'none' : '';
-			document.getElementById('tree-selection-summary').style.display = treePanelMinimized ? 'none' : '';
 		}
 		// Initialize tree panel as minimized on page load
 		(function(){
 			const btn = document.getElementById('tree-minimize-btn');
 			btn.style.transform = 'rotate(180deg)';
 			document.getElementById('tree-panel-body').style.display = 'none';
-			document.getElementById('tree-none-btn').style.display = 'none';
+			// Set initial tab appearance
+			selectForestTab('species');
 		})();
+
+		// Re-add overlay layers after map loads
+		map.on('load', function() {
+			if (forestTabChecks.fires)     addFiresLayer();
+			if (forestTabChecks.timber)    addTimberLayer();
+			if (forestTabChecks.landcover) addLandcoverLayer();
+		});
 
 		loadTreeSlices();
 
@@ -2001,7 +2425,7 @@
 			popupEl.style.display = 'block';
 			popupVisible = true;
 
-			const hasAnything = tempActive || moistActive || (activeSlices && activeSlices.size > 0);
+			const hasAnything = tempActive || moistActive || (activeSlices && activeSlices.size > 0) || forestTabChecks.fires || forestTabChecks.timber;
 			if (!hasAnything) {
 				contentEl.innerHTML = '<span style="color:#888;font-size:11px">No layer</span>';
 				return;
@@ -2055,6 +2479,62 @@
 				}
 			}
 
+			// ── Fires: query rendered GeoJSON features at point ──────────────────────
+			if (forestTabChecks.fires && map.getLayer('firesLayer-fill')) {
+				const queryPoint = map.project(lngLat);
+				const firesFeatures = map.queryRenderedFeatures(queryPoint, { layers: ['firesLayer-fill'] });
+				const seen = new Set();
+				for (const f of firesFeatures) {
+					const p = f.properties || {};
+					const name = p.attr_IncidentName || p.attr_CpxName || 'Unknown Fire';
+					const type = p.attr_IncidentTypeCategory ? ` (${p.attr_IncidentTypeCategory})` : '';
+					const key  = name + type;
+					if (seen.has(key)) continue;
+					seen.add(key);
+					// Acres
+					let acresStr = '';
+					if (p.poly_GISAcres != null && isFinite(+p.poly_GISAcres)) {
+						acresStr = ` · ${(+p.poly_GISAcres).toLocaleString(undefined, {maximumFractionDigits:0})} ac`;
+					}
+					// Discovery date — may be ms timestamp or ISO string
+					let discStr = '';
+					if (p.attr_FireDiscoveryDateTime != null) {
+						const raw = p.attr_FireDiscoveryDateTime;
+						const d = typeof raw === 'number' ? new Date(raw) : new Date(String(raw));
+						if (!isNaN(d)) discStr = ` · ${d.toISOString().split('T')[0]}`;
+					}
+					const detail = `${name}${type}${acresStr}${discStr}`;
+					rows.push(`<span class="popup-value-row"><span class="popup-swatch" style="background:#e53e3e;width:10px;height:10px;border-radius:2px;flex-shrink:0"></span>🔥 <span style="font-size:10px;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:wrap" title="${detail}">${detail}</span></span>`);
+					if (seen.size >= 3) break;
+				}
+			}
+
+		// ── Timber: query rendered GeoJSON features at point ─────────────────────
+			if (forestTabChecks.timber && map.getLayer('timberLayer-fill')) {
+				const queryPoint = map.project(lngLat);
+				const timberFeatures = map.queryRenderedFeatures(queryPoint, { layers: ['timberLayer-fill'] });
+				const seen = new Set();
+				for (const f of timberFeatures) {
+					const p    = f.properties || {};
+					const unit = p.AU_NAME || p.ADMIN_FOREST_NAME || 'Unknown Unit';
+					// DATE_AWARDED may be a Unix ms timestamp (number) or an ISO string
+					let dateStr = '';
+					if (p.DATE_AWARDED != null) {
+						const raw = p.DATE_AWARDED;
+						if (typeof raw === 'number') {
+							dateStr = new Date(raw).toISOString().split('T')[0];
+						} else {
+							dateStr = String(raw).split('T')[0];
+						}
+					}
+					const label = dateStr ? `${unit} · ${dateStr}` : unit;
+					if (seen.has(label)) continue;
+					seen.add(label);
+					rows.push(`<span class="popup-value-row"><span class="popup-swatch" style="background:#d69e2e;width:10px;height:10px;border-radius:2px;flex-shrink:0"></span>🪵 <span style="font-size:10px;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:wrap" title="${label}">${label}</span></span>`);
+					if (seen.size >= 3) break;
+				}
+			}
+
 			// ── Tree layers: ESRI ImageServer identify debounced — only fetch after mouse stops moving ────────────────────────────
 			if (activeSlices && activeSlices.size > 0) {
 				clearTimeout(_treeDebounceTimer);
@@ -2076,7 +2556,7 @@
 						const swatchStyle = `background:${rampCss};width:22px;height:10px;border-radius:2px;border:1px solid rgba(0,0,0,0.18);flex-shrink:0`;
 						const label       = info.varName.replace(/_/g, ' ');
 						const valStr = `${result.value.toFixed(1)} ${result.unit}`;
-						treeRows.push(`<span class="popup-value-row"><span class="popup-swatch" style="${swatchStyle}"></span>${typeInfo.icon} <span style="font-size:10px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${label} (${info.year})">${label}</span>&nbsp;<span style="color:#666;font-size:10px">${valStr}</span></span>`);
+						treeRows.push(`<span class="popup-value-row"><span class="popup-swatch" style="${swatchStyle}"></span>${typeInfo.icon} <span style="font-size:10px;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:wrap" title="${label} (${info.year})">${label}</span>&nbsp;<span style="color:#666;font-size:10px">${valStr}</span></span>`);
 					}
 					// Append tree rows to whatever is already displayed
 					const contentEl = document.getElementById('popup-content');
