@@ -24,10 +24,6 @@
 				overflow-y: auto; overflow-x: hidden; flex: 1; min-height: 0;
 				padding-bottom: 4px;
 			}
-			#controls-footer {
-				padding-top: 10px; flex-shrink: 0;
-				border-top: 1px solid #e5e5e5;
-			}
 			#controls h3 { margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #333; letter-spacing: 0.03em; text-transform: uppercase; }
 			.section-label { font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: -4px; }
 			.toggle-group { display: flex; border-radius: 7px; overflow: hidden; border: 1px solid #ccc; width: fit-content; }
@@ -42,8 +38,7 @@
 			.control-row input[type="number"] { width: 72px; padding: 4px 6px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; cursor: ns-resize; }
 			.control-row input[type="number"]:focus { outline: 2px solid #2563eb44; border-color: #2563eb; }
 			.checkbox-label { display: flex; align-items: center; gap: 6px; color: #555; cursor: pointer; user-select: none; }
-			#apply-btn { width: 100%; padding: 7px 0; border: none; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; background: #2563eb; color: #fff; transition: background 0.15s; }
-			#apply-btn:hover { background: #1d4ed8; }
+
 			.divider { border: none; border-top: 1px solid #e5e5e5; margin: 0; }
 			.color-editor-header { display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
 			.color-editor-header span { font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.05em; }
@@ -294,26 +289,33 @@
 			}
 			.popup-mode-group {
 				display: flex;
+				justify-content: center;
 				border-radius: 7px;
-				overflow: hidden;
+				overflow: auto;
+				background: #f0f0f0;
 				border: 1px solid #ccc;
-				width: fit-content;
+				width: 100%;
 			}
 			.popup-mode-group button {
+				display: flex;
+				justify-content: center;
+				overflow: hidden;
 				padding: 4px 10px;
 				border: none;
 				background: #f0f0f0;
 				cursor: pointer;
-				font-size: 12px;
+				font-size: 10px;
 				font-weight: 600;
 				color: #555;
 				transition: background 0.15s, color 0.15s;
-				white-space: nowrap;
+				white-space: wrap;
+				width: 100%;
+				min-width: 10px;
 			}
 			.popup-mode-group button:not(:last-child) { border-right: 1px solid #ccc; }
 			.popup-mode-group button.active { background: #2563eb; color: #fff; }
 			@media (max-width: 768px) {
-				.popup-mode-group button { font-size: 11px; padding: 4px 7px; }
+				.popup-mode-group button { font-size: 9px; padding: 4px 7px; }
 			}
 
 			/* Ramp picker */
@@ -416,31 +418,8 @@
 			.bm-overlay-row.active .bm-overlay-radio::after { display: block; }
 			.bm-divider { border: none; border-top: 1px solid #eee; margin: 6px 0; }
 
-			/* ── Elevation & Aspect Explorer Panels ─────────────────────────── */
-			#elev-panel, #aspect-panel {
-				position: absolute; z-index: 10;
-				background: rgba(255,255,255,0.96); border-radius: 10px;
-				padding: 12px 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.18);
-				font-family: sans-serif; font-size: 13px;
-				min-width:120px; max-width: calc(42vw);
-			}
-			#elev-panel   { top: 65px; right: 12px; max-height: calc(73vh); }
-			#aspect-panel { top: 113px; right: 12px; max-height: calc(65vh); }
-
-			#elev-ranges, #aspect-ranges { max-height: calc(60vh - 100px); overflow-y: auto; }
-
-			.explorer-panel-header {
-				display: flex; align-items: center; justify-content: space-between;
-				user-select: none; gap: 6px;
-			}
-			.explorer-panel-header h4 {
-				margin: 0; font-size: 12px; font-weight: 800; color: #333; white-space: nowrap;
-				text-transform: uppercase; letter-spacing: 0.04em; flex: 1; cursor: pointer;
-			}
-			.explorer-panel-header .exp-toggle-btn {
-				background: none; border: none; cursor: pointer; font-size: 14px;
-				color: #888; padding: 0; line-height: 1;
-			}
+			/* ── Elevation & Aspect Explorer Panels (embedded in tree-panel) ── */
+			#elev-ranges, #aspect-ranges { max-height: calc(50vh - 100px); overflow-y: auto; }
 			.exp-master-toggle {
 				display: flex; align-items: center; gap: 5px; font-size: 11px; color: #555;
 				cursor: pointer; user-select: none; white-space: nowrap;
@@ -692,13 +671,15 @@
 			<div class="popup-settings-section" style="margin:10px 0 0 0">
 				<div class="section-label">🔍 Popup</div>
 				<div class="popup-mode-group">
-					<button id="popup-mode-off"      onclick="setPopupMode('off')"      class="active">Off</button>
-					<button id="popup-mode-draggable" onclick="setPopupMode('draggable')">Draggable</button>
-					<button id="popup-mode-follow"   onclick="setPopupMode('follow')">Follows mouse</button>
+					<button id="popup-mode-off"      onclick="setPopupMode('off')"      class="active" style="align-items:center">Off</button>
+					<button id="popup-mode-draggable" onclick="setPopupMode('draggable')" style="align-items:center">Draggable</button>
+					<button id="popup-mode-follow"   onclick="setPopupMode('follow')" style="align-items:center;min-width:40%;">Follows mouse</button>
 				</div>
 			</div>
 
-			<div class="section-label">Mushroom Presets</div>
+			<div class="section-label">Mushroom Presets
+				<a href="https://bobthefish1238.github.io/hrib-elev/HribHabitat.html"
+				   target="_blank" style="font-size:12px;margin:0 8px 0 8px;color:#4aa3ff;text-decoration:none;text-transform:none;">(HribHabitat)</a></div>
 			<select id="mushroom-preset" onchange="applyPreset(this.value)"
 				style="width:100%;padding:5px 6px;border:1px solid #ccc;border-radius:6px;font-size:13px;color:#444;background:#fafafa;cursor:pointer">
 				<option value="">— Select a preset —</option>
@@ -714,7 +695,7 @@
 
 			<div class="section-label">Soil Layers
 				<a href="https://maps.open-meteo.com/?domain=ncep_nam_conus&variable=soil_temperature_10_to_40cm"
-				   target="_blank" style="font-size:10px;margin:0 8px 0 8px;color:#4aa3ff;text-decoration:none">(Open-Meteo Map)</a>
+				   target="_blank" style="font-size:12px;margin:0 8px 0 8px;color:#4aa3ff;text-decoration:none;text-transform:none;">(Open-Meteo Map)</a>
 			</div>
 			<div class="layer-tabs-wrapper">
 				<div class="layer-tab-bar">
@@ -760,10 +741,10 @@
 						<button id="btn-c" onclick="setUnit('C')">°C</button>
 					</div>
 					<div class="control-row">
-						<label>Min</label><input type="number" id="input-min" value="41" step="1" /><span id="unit-label-min">°F</span>
+						<label>Min</label><input type="number" id="input-min" value="41" step="1" oninput="scheduleAutoApply()" /><span id="unit-label-min">°F</span>
 					</div>
 					<div class="control-row" style="margin-top:6px">
-						<label>Max</label><input type="number" id="input-max" value="50" step="1" /><span id="unit-label-max">°F</span>
+						<label>Max</label><input type="number" id="input-max" value="50" step="1" oninput="scheduleAutoApply()" /><span id="unit-label-max">°F</span>
 					</div>
 				</div>
 				<div class="control-row" style="margin-top:8px">
@@ -798,10 +779,10 @@
 				<div style="margin-top:8px">
 					<div class="section-label" style="font-size:10px;margin-bottom:4px">Range (m³/m³)</div>
 					<div class="control-row">
-						<label>Min</label><input type="number" id="input-moist-min" value="0.2" step="0.01" min="0" max="0.8" /><span>m³/m³</span>
+						<label>Min</label><input type="number" id="input-moist-min" value="0.2" step="0.01" min="0" max="0.8" oninput="scheduleAutoApply()" /><span>m³/m³</span>
 					</div>
 					<div class="control-row" style="margin-top:6px">
-						<label>Max</label><input type="number" id="input-moist-max" value="0.4" step="0.01" min="0" max="0.8" /><span>m³/m³</span>
+						<label>Max</label><input type="number" id="input-moist-max" value="0.4" step="0.01" min="0" max="0.8" oninput="scheduleAutoApply()" /><span>m³/m³</span>
 					</div>
 				</div>
 				<div class="control-row" style="margin-top:8px">
@@ -824,72 +805,22 @@
 
 			<hr class="divider" />
 		</div> <!-- end controls-scroll -->
-		<div id="controls-footer">
-			<button id="apply-btn" onclick="applySettings()">Apply</button>
-		</div>
-	</div>
-
-	<!-- Elevation Range Explorer Panel -->
-	<div id="elev-panel">
-		<div class="explorer-panel-header">
-			<h4 onclick="toggleElevPanel()">⛰️ Elevation</h4>
-			<button class="exp-toggle-btn" id="elev-panel-chevron" onclick="toggleElevPanel()">▼</button>
-		</div>
-		<div class="explorer-body" id="elev-panel-body" style="margin-top:5px;max-width:200px">
-			<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-				<div class="exp-unit-toggle">
-					<button id="elev-btn-ft" class="active" onclick="setElevUnit('ft')">ft</button>
-					<button id="elev-btn-m"  onclick="setElevUnit('m')">m</button>
-				</div>
-				<div class="exp-opacity-master" style="flex:1; width: 90%">
-					<label class="exp-master-toggle" title="Enable all elevation ranges">
-						<input type="checkbox" id="elev-master-check" onchange="onElevMasterToggle(this.checked)">
-					</label>
-					<label style="font-size:10px;color:#888;white-space:nowrap">Opacity</label>
-					<input type="range" style="max-width:45%" id="elev-master-opacity" min="0" max="1" step="0.05" value="0.75"
-						oninput="setElevMasterOpacity(this.value)" />
-					<span id="elev-opacity-val">75%</span>
-				</div>
-			</div>
-			<div id="elev-ranges"></div>
-			<button class="exp-add-btn" onclick="addElevRange()">+ Add Elevation Range</button>
-		</div>
-	</div>
-
-	<!-- Aspect Range Explorer Panel -->
-	<div id="aspect-panel">
-		<div class="explorer-panel-header">
-			<h4 onclick="toggleAspectPanel()">🧭 Aspect</h4>
-			<button class="exp-toggle-btn" id="aspect-panel-chevron" onclick="toggleAspectPanel()">▼</button>
-		</div>
-		<div class="explorer-body" id="aspect-panel-body" style="max-width: 200px">
-			<div class="exp-opacity-master" style="flex:1; max-width:190px">
-				<label class="exp-master-toggle" title="Enable all aspect ranges">
-					<input type="checkbox" id="aspect-master-check" onchange="onAspectMasterToggle(this.checked)">
-				</label>
-				<label style="font-size:10px;color:#888;white-space:nowrap">Opacity</label>
-				<input type="range" style="max-width:45%" id="aspect-master-opacity" min="0" max="1" step="0.05" value="0.75"
-					oninput="setAspectMasterOpacity(this.value)" />
-				<span id="aspect-opacity-val">75%</span>
-			</div>
-			<div id="aspect-ranges" style="max-width:100%"></div>
-			<button class="exp-add-btn" onclick="addAspectRange()">+ Add Aspect Range</button>
-		</div>
 	</div>
 
 		<!-- Right: Forest Layers Panel -->
 		<div id="tree-panel">
 			<h3 style="cursor:pointer;user-select:none;font-size:12px;font-weight:800" onclick="toggleTreePanel()">
-				🌲 Forest Layers
+				🌲 Terrain Layers
 				<button id="tree-minimize-btn"
 					style="background:none;border:none;cursor:pointer;font-size:16px;color:#888;padding:0;margin-left:10px;line-height:1;pointer-events:none">▲</button>
 			</h3>
 			<div id="tree-panel-body">
 
 				<!-- Forest Layer Tab Bar (vertical) -->
-				<div style="display:flex;flex-direction:column;border-radius:7px;overflow:hidden;border:1px solid #ccc;margin-bottom:4px">
+				<div style="display:flex;flex-direction:column;border-radius:7px;overflow:auto;border:1px solid #ccc;margin-bottom:4px">
 					<button id="ftab-species" class="active" onclick="handleForestTabClick('species')"
 						style="padding:6px 8px;border:none;background:#2563eb;color:#fff;cursor:pointer;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;border-bottom:1px solid #ccc;text-align:left">
+						<input type="checkbox" id="ftab-species-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('species')" style="accent-color:#2563eb;cursor:pointer;width:12px;height:12px;margin:0;flex-shrink:0" />
 						🌲 Species
 					</button>
 					<button id="ftab-fires" onclick="handleForestTabClick('fires')"
@@ -908,15 +839,25 @@
 						🗺 Landcover
 					</button>
 					<button id="ftab-riparian" onclick="handleForestTabClick('riparian')"
-						style="padding:6px 8px;border:none;background:#f0f0f0;color:#555;cursor:pointer;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;text-align:left">
+						style="padding:6px 8px;border:none;background:#f0f0f0;color:#555;cursor:pointer;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;border-bottom:1px solid #ccc;text-align:left">
 						<input type="checkbox" id="ftab-riparian-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('riparian')" style="accent-color:#2563eb;cursor:pointer;width:12px;height:12px;margin:0;flex-shrink:0" />
 						💧 Riparian
+					</button>
+					<button id="ftab-elev" onclick="handleForestTabClick('elev')"
+						style="padding:6px 8px;border:none;background:#f0f0f0;color:#555;cursor:pointer;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;border-bottom:1px solid #ccc;text-align:left">
+						<input type="checkbox" id="ftab-elev-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('elev')" style="accent-color:#2563eb;cursor:pointer;width:12px;height:12px;margin:0;flex-shrink:0" />
+						⛰️ Elevation
+					</button>
+					<button id="ftab-aspect" onclick="handleForestTabClick('aspect')"
+						style="padding:6px 8px;border:none;background:#f0f0f0;color:#555;cursor:pointer;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;text-align:left">
+						<input type="checkbox" id="ftab-aspect-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('aspect')" style="accent-color:#2563eb;cursor:pointer;width:12px;height:12px;margin:0;flex-shrink:0" />
+						🧭 Aspect
 					</button>
 				</div>
 
 				<!-- Tab: Tree Species -->
 				<div id="forest-tab-species">
-					<div class="section-label" style="font-size:10px;margin:0">
+					<div class="section-label" style="font-size:10px;margin:0;max-width:220px">
 					  <a href="https://imagery.geoplatform.gov/iipp/home/item.html?id=7659e518a3a74fcfb7d8a5878f1fa1c9" target="_blank" style="color:#1a73e8;text-decoration:underline;">
 						USFS Basal Area
 					  </a>
@@ -932,7 +873,7 @@
 				</div>
 
 				<!-- Tab: Fires -->
-				<div id="forest-tab-fires" style="display:none;flex-direction:column;gap:6px">
+				<div id="forest-tab-fires" style="display:none;flex-direction:column;gap:6px;max-width:220px">
 					<div class="section-label" style="font-size:10px;margin:0">
 						<a href="https://nifc.maps.arcgis.com/home/item.html?id=5e72b1699bf74eefb3f3aff6f4ba5511" target="_blank" style="color:#1a73e8;text-decoration:underline;">WFIGS Interagency Fire Perimeters</a></div>
 					<div style="display:flex;flex-direction:column;gap:4px">
@@ -969,7 +910,7 @@
 				</div>
 
 				<!-- Tab: Timber Harvests -->
-				<div id="forest-tab-timber" style="display:none;flex-direction:column;gap:6px">
+				<div id="forest-tab-timber" style="display:none;flex-direction:column;gap:6px;max-width:220px">
 					<div class="section-label" style="font-size:10px;margin:0">
 						<a href="https://data-usfs.hub.arcgis.com/datasets/usfs::timber-harvests-feature-layer/about" target="_blank" style="color:#1a73e8;text-decoration:underline;">USFS EDW Timber Harvest</a></div>
 					<div style="display:flex;flex-direction:column;gap:4px">
@@ -1006,19 +947,21 @@
 				</div>
 
 				<!-- Tab: Landcover -->
-				<div id="forest-tab-landcover" style="display:none;flex-direction:column;gap:6px">
+				<div id="forest-tab-landcover" style="display:none;flex-direction:column;gap:6px;max-width:220px">
 					<div class="section-label" style="font-size:10px;margin:0">
 						<a href="https://imagery.geoplatform.gov/iipp/rest/services/Vegetation/USFS_EDW_NLCD_Landcover_CONUS/ImageServer" target="_blank" style="color:#1a73e8;text-decoration:underline;">USFS NLCD Landcover CONUS</a></div>
-					<div style="display:flex;flex-direction:column;gap:4px">
-						<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
-							<label style="min-width:60px;font-weight:600">Start Date</label>
-							<input type="date" id="landcover-start-date" value="1985-01-01"
-								style="flex:1;padding:3px 5px;border:1px solid #ccc;border-radius:5px;font-size:11px;background:#fafafa;color:#333" onchange="refreshLandcoverLayer()" />
+					<div style="display:flex;flex-direction:column;gap:6px">
+						<div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#555">
+							<label style="font-weight:600">Year</label>
+							<span id="landcover-year-label" style="font-weight:700;color:#2563eb;font-size:13px">1985–1986</span>
 						</div>
-						<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
-							<label style="min-width:60px;font-weight:600">End Date</label>
-							<input type="date" id="landcover-end-date" value="1988-12-31"
-								style="flex:1;padding:3px 5px;border:1px solid #ccc;border-radius:5px;font-size:11px;background:#fafafa;color:#333" onchange="refreshLandcoverLayer()" />
+						<div style="position:relative;padding:2px 0 4px">
+							<input type="range" id="landcover-year-slider" min="1985" max="2023" step="1" value="1985"
+								style="width:100%;accent-color:#2563eb"
+								oninput="onLandcoverYearSlider(this.value)" />
+							<div style="display:flex;justify-content:space-between;font-size:9px;color:#aaa;margin-top:1px">
+								<span>1985</span><span>2000</span><span>2023</span>
+							</div>
 						</div>
 					</div>
 					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
@@ -1037,7 +980,7 @@
 				</div>
 
 				<!-- Tab: Riparian Areas -->
-				<div id="forest-tab-riparian" style="display:none;flex-direction:column;gap:6px">
+				<div id="forest-tab-riparian" style="display:none;flex-direction:column;gap:6px;max-width:220px">
 					<div class="section-label" style="font-size:10px;margin:0">
 						<a href="https://data-usfs.hub.arcgis.com/datasets/usfs::national-riparian-area-base-map/about" target="_blank" style="color:#1a73e8;text-decoration:underline;">USFS EDW Riparian Areas</a></div>
 					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
@@ -1059,6 +1002,42 @@
 							onchange="riparianZOrder=+this.value; reorderAllLayers()" />
 					</div>
 					<div id="riparian-status" style="font-size:10px;color:#888;text-align:center;padding:2px 0"></div>
+				</div>
+
+				<!-- Tab: Elevation Ranges -->
+				<div id="forest-tab-elev" style="display:none;flex-direction:column;gap:6px;max-width:220px">
+					<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+						<div class="exp-unit-toggle">
+							<button id="elev-btn-ft" class="active" onclick="setElevUnit('ft')">ft</button>
+							<button id="elev-btn-m"  onclick="setElevUnit('m')">m</button>
+						</div>
+						<div class="exp-opacity-master" style="flex:1; width: 90%">
+							<label class="exp-master-toggle" title="Enable all elevation ranges">
+								<input type="checkbox" id="elev-master-check" onchange="onElevMasterToggle(this.checked)">
+							</label>
+							<label style="font-size:10px;color:#888;white-space:nowrap">Opacity</label>
+							<input type="range" style="max-width:45%" id="elev-master-opacity" min="0" max="1" step="0.05" value="0.75"
+								oninput="setElevMasterOpacity(this.value)" />
+							<span id="elev-opacity-val">75%</span>
+						</div>
+					</div>
+					<div id="elev-ranges"></div>
+					<button class="exp-add-btn" id="elev-add-btn" onclick="addElevRange()">+ Add Elevation Range</button>
+				</div>
+
+				<!-- Tab: Aspect Ranges -->
+				<div id="forest-tab-aspect" style="display:none;flex-direction:column;gap:6px;max-width:220px">
+					<div class="exp-opacity-master" style="flex:1; max-width:190px">
+						<label class="exp-master-toggle" title="Enable all aspect ranges">
+							<input type="checkbox" id="aspect-master-check" onchange="onAspectMasterToggle(this.checked)">
+						</label>
+						<label style="font-size:10px;color:#888;white-space:nowrap">Opacity</label>
+						<input type="range" style="max-width:45%" id="aspect-master-opacity" min="0" max="1" step="0.05" value="0.75"
+							oninput="setAspectMasterOpacity(this.value)" />
+						<span id="aspect-opacity-val">75%</span>
+					</div>
+					<div id="aspect-ranges" style="max-width:100%"></div>
+					<button class="exp-add-btn" id="aspect-add-btn" onclick="addAspectRange()">+ Add Aspect Range</button>
 				</div>
 
 			</div>
@@ -1135,7 +1114,6 @@
 			btn.style.transform=minimized?'rotate(180deg)':'';
 			btn.style.transition='transform 0.2s';
 			document.getElementById('controls-scroll').style.display = minimized ? 'none' : '';
-			document.getElementById('controls-footer').style.display = minimized ? 'none' : '';
 			if(!minimized) syncLayerSectionVisibility();
 		}
 		(function(){
@@ -1144,7 +1122,6 @@
 			subtitle.style.display='none';
 			btn.style.transform='rotate(180deg)';
 			document.getElementById('controls-scroll').style.display='none';
-			document.getElementById('controls-footer').style.display='none';
 		})();
 		// Only update section visibility without touching map layers
 		function syncLayerSectionVisibility(){
@@ -1292,6 +1269,7 @@
 			document.querySelectorAll(`#${gid} button`).forEach(b=>b.classList.remove('active'));
 			btn.classList.add('active');
 			if(type==='temp') tempDepth=btn.dataset.depth; else moistDepth=btn.dataset.depth;
+			scheduleAutoApply();
 		}
 
 		function syncContourCheck(type){
@@ -1326,10 +1304,10 @@
 				const displayBp = (isTemp && currentUnit==='F') ? Math.round(toF(bp)*10)/10 : bp;
 				const lbl=document.createElement('span'); lbl.className='bp-label'; lbl.textContent=unit?`${displayBp}${unit}`:bp.toFixed(2);
 				const picker=document.createElement('input'); picker.type='color'; picker.value=rgbToHex(...colors[i]);
-				picker.addEventListener('input',e=>{const rgb=hexToRgb(e.target.value);if(isTemp)userTempColors[i]=rgb;else userMoistColors[i]=rgb;});
+				picker.addEventListener('input',e=>{const rgb=hexToRgb(e.target.value);if(isTemp)userTempColors[i]=rgb;else userMoistColors[i]=rgb; scheduleAutoApply();});
 				const slider=document.createElement('input'); slider.type='range'; slider.min=0;slider.max=1;slider.step=0.05;slider.value=ops[i];
 				const opVal=document.createElement('span'); opVal.className='opacity-val'; opVal.textContent=Math.round(ops[i]*100)+'%';
-				slider.addEventListener('input',e=>{const v=parseFloat(e.target.value);if(isTemp)userTempOpacity[i]=v;else userMoistOpacity[i]=v;opVal.textContent=Math.round(v*100)+'%';});
+				slider.addEventListener('input',e=>{const v=parseFloat(e.target.value);if(isTemp)userTempOpacity[i]=v;else userMoistOpacity[i]=v;opVal.textContent=Math.round(v*100)+'%'; scheduleAutoApply();});
 				row.appendChild(lbl);row.appendChild(picker);row.appendChild(slider);row.appendChild(opVal);
 				container.appendChild(row);
 			});
@@ -1337,7 +1315,7 @@
 			resetBtn.onclick=()=>{
 				if(isTemp){userTempColors=DEFAULT_TEMP_COLORS.map(c=>[...c]);userTempOpacity=DEFAULT_TEMP_BREAKPOINTS.map(()=>0.75);}
 				else{userMoistColors=DEFAULT_MOIST_COLORS.map(c=>[...c]);userMoistOpacity=DEFAULT_MOIST_BREAKPOINTS.map(()=>0.75);}
-				buildColorEditor(type);
+				buildColorEditor(type);scheduleAutoApply();
 			};
 			container.appendChild(resetBtn);
 		}
@@ -1375,10 +1353,34 @@
 
 		function addScrollInput(id,step){
 			const el=document.getElementById(id);
-			el.addEventListener('wheel',e=>{e.preventDefault();const d=step<0.1?3:1;el.value=parseFloat((parseFloat(el.value)+(e.deltaY<0?step:-step)).toFixed(d));},{passive:false});
+			el.addEventListener('wheel',e=>{
+				e.preventDefault();
+				const d=step<0.1?3:1;
+				el.value=parseFloat((parseFloat(el.value)+(e.deltaY<0?step:-step)).toFixed(d));
+				el.dispatchEvent(new Event('input',{bubbles:true}));  // ← this should trigger scheduleAutoApply
+			},{passive:false});
 		}
 		addScrollInput('input-min',1);addScrollInput('input-max',1);
 		addScrollInput('input-moist-min',0.01);addScrollInput('input-moist-max',0.01);
+
+		// Add wheel scroll to all Z-order number inputs
+		function addZOrderScrollInput(id) {
+			const el = document.getElementById(id);
+			if (!el) return;
+			el.addEventListener('wheel', e => {
+				e.preventDefault();
+				const cur = parseInt(el.value) || 1;
+				const next = e.deltaY < 0 ? Math.min(cur + 1, parseInt(el.max)||10) : Math.max(cur - 1, parseInt(el.min)||1);
+				el.value = next;
+				el.dispatchEvent(new Event('change', { bubbles: true }));
+			}, { passive: false });
+		}
+		addZOrderScrollInput('input-temp-z');
+		addZOrderScrollInput('input-moist-z');
+		addZOrderScrollInput('fires-z');
+		addZOrderScrollInput('timber-z');
+		addZOrderScrollInput('landcover-z');
+		addZOrderScrollInput('riparian-z');
 
 		function getInputsAsC(){
 			let min=parseFloat(document.getElementById('input-min').value);
@@ -1423,6 +1425,12 @@
 			// Visual display layers — toggled by "Show contours" checkbox
 			map.addLayer({id:'omMoistVectorDisplay',type:'line',source:'omMoistVectorSource','source-layer':'contours',layout:{visibility:moistContours?'visible':'none'},paint:{'line-color':'rgba(0,0,0,0.6)','line-width':1,'line-dasharray':[3,2]}},getInsertionLayer(true));
 			map.addLayer({id:'omMoistVectorLabels',type:'symbol',source:'omMoistVectorSource','source-layer':'contours',layout:{visibility:moistContours?'visible':'none','symbol-placement':'line-center','symbol-spacing':1,'text-font':['Noto Sans Regular'],'text-field':['to-string',['get','value']],'text-padding':1,'text-offset':[0,-0.6]}},getInsertionLayer(true));
+		}
+
+		let _autoApplyTimer = null;
+		function scheduleAutoApply() {
+			clearTimeout(_autoApplyTimer);
+			_autoApplyTimer = setTimeout(() => applySettings(), 600);
 		}
 
 		function applySettings(){
@@ -1940,6 +1948,16 @@
 			if (forestTabChecks.timber)    layers.push({ z: timberZOrder,    readd: () => addTimberLayer() });
 			if (forestTabChecks.landcover) layers.push({ z: landcoverZOrder, readd: () => addLandcoverLayer() });
 			if (forestTabChecks.riparian)  layers.push({ z: riparianZOrder,  readd: () => addRiparianLayer() });
+			// Elevation: use the minimum zOrder among active ranges (so all ranges render at the right position)
+			if (elevMasterEnabled && elevRanges.some(r => r.enabled)) {
+				const elevZ = Math.min(...elevRanges.filter(r => r.enabled).map(r => r.zOrder ?? 5));
+				layers.push({ z: elevZ, readd: () => refreshElevLayer() });
+			}
+			// Aspect: use the minimum zOrder among active ranges
+			if (aspectMasterEnabled && aspectRanges.some(r => r.enabled)) {
+				const aspectZ = Math.min(...aspectRanges.filter(r => r.enabled).map(r => r.zOrder ?? 6));
+				layers.push({ z: aspectZ, readd: () => refreshAspectLayer() });
+			}
 
 			// Remove all, then re-add in z-order (lowest first = drawn first = appears underneath)
 			if (tempActive)  removeLayers('omTemp');
@@ -1949,6 +1967,11 @@
 			if (forestTabChecks.timber)    removeTimberLayer();
 			if (forestTabChecks.landcover) removeLandcoverLayer();
 			if (forestTabChecks.riparian)  removeRiparianLayer();
+			// Remove elev/aspect layers before re-adding in sorted order
+			if (map.getLayer(ELEV_LYR))   { map.removeLayer(ELEV_LYR); }
+			if (map.getSource(ELEV_SRC))  { map.removeSource(ELEV_SRC); }
+			if (map.getLayer(ASPECT_LYR)) { map.removeLayer(ASPECT_LYR); }
+			if (map.getSource(ASPECT_SRC)){ map.removeSource(ASPECT_SRC); }
 
 			layers.sort((a, b) => a.z - b.z).forEach(l => l.readd());
 		}
@@ -2222,17 +2245,15 @@
 
 		// ── Forest Layers Tab State ───────────────────────────────────────────────
 		let activeForestTab = 'species';
-		const forestTabChecks = { species: false, fires: false, timber: false, landcover: false, riparian: false };
-		const FOREST_TABS = ['species','fires','timber','landcover','riparian'];
+		const forestTabChecks = { species: false, fires: false, timber: false, landcover: false, riparian: false, elev: false, aspect: false };
+		const FOREST_TABS = ['species','fires','timber','landcover','riparian','elev','aspect'];
 
 		function handleForestTabClick(tab) {
 			if (activeForestTab === tab) {
-				// species tab has no enable/disable checkbox — just keep selected
-				if (tab !== 'species') {
-					const checkbox = document.getElementById(`ftab-${tab}-check`);
-					checkbox.checked = !checkbox.checked;
-					onForestTabCheckChange(tab);
-				}
+				// toggle on re-click
+				const checkbox = document.getElementById(`ftab-${tab}-check`);
+				checkbox.checked = !checkbox.checked;
+				onForestTabCheckChange(tab);
 			} else {
 				selectForestTab(tab);
 			}
@@ -2263,10 +2284,24 @@
 			const isActive = activeForestTab === tab;
 			btn.style.background = isActive ? '#2563eb' : (checked ? '#dbeafe' : '#f0f0f0');
 			btn.style.color      = isActive ? '#fff'    : (checked ? '#1d4ed8' : '#555');
+			if (tab === 'species') {
+				activeSlices.forEach((_, id) => {
+					const lyrId = sliceLayerId(id);
+					if (map.getLayer(lyrId)) map.setLayoutProperty(lyrId, 'visibility', checked ? 'visible' : 'none');
+				});
+			}
 			if (tab === 'fires')     { checked ? addFiresLayer()     : removeFiresLayer(); }
 			if (tab === 'timber')    { checked ? addTimberLayer()    : removeTimberLayer(); }
 			if (tab === 'landcover') { checked ? addLandcoverLayer() : removeLandcoverLayer(); }
 			if (tab === 'riparian')  { checked ? addRiparianLayer()  : removeRiparianLayer(); }
+			if (tab === 'elev') {
+				onElevMasterToggle(checked);
+				document.getElementById('elev-master-check').checked = checked;
+			}
+			if (tab === 'aspect') {
+				onAspectMasterToggle(checked);
+				document.getElementById('aspect-master-check').checked = checked;
+			}
 		}
 
 		// ── ESRI Query-per-tile protocol helpers (GeoJSON, not PBF) ─────────────
@@ -2525,10 +2560,23 @@
 		};
 		let _landcoverRefreshTimer = null;
 
+		function onLandcoverYearSlider(val) {
+			const yr = parseInt(val);
+			document.getElementById('landcover-year-label').textContent = `${yr}–${yr+1}`;
+			refreshLandcoverLayer();
+		}
+
+		function getLandcoverYearRange() {
+			const slider = document.getElementById('landcover-year-slider');
+			const yr = slider ? parseInt(slider.value) : 1985;
+			return { startDate: `${yr}-01-01`, endDate: `${yr+1}-12-31` };
+		}
+
 		function dateToTimestamp(dateStr) { return new Date(dateStr).getTime(); }
 		function buildLandcoverTileUrl() {
-			const t1 = dateToTimestamp(document.getElementById('landcover-start-date').value);
-			const t2 = dateToTimestamp(document.getElementById('landcover-end-date').value);
+			const { startDate, endDate } = getLandcoverYearRange();
+			const t1 = dateToTimestamp(startDate);
+			const t2 = dateToTimestamp(endDate);
 			return `${NLCD_BASE}/exportImage`
 				+ `?f=image&bbox={bbox-epsg-3857}&bboxSR=102100&imageSR=102100&size=256,256&format=jpgpng`
 				+ `&mosaicRule=${encodeURIComponent(JSON.stringify({ascending:true,mosaicMethod:'esriMosaicNorthwest',mosaicOperation:'MT_FIRST'}))}`
@@ -2577,8 +2625,9 @@
 		}
 		async function identifyNLCD(lat, lng) {
 			const { x, y } = latLngToWebMercator(lat, lng);
-			const t1 = dateToTimestamp(document.getElementById('landcover-start-date').value);
-			const t2 = dateToTimestamp(document.getElementById('landcover-end-date').value);
+			const { startDate, endDate } = getLandcoverYearRange();
+			const t1 = dateToTimestamp(startDate);
+			const t2 = dateToTimestamp(endDate);
 			const params = new URLSearchParams({
 				f: 'json',
 				geometry: JSON.stringify({x, y, spatialReference:{latestWkid:3857, wkid:102100}}),
@@ -2694,11 +2743,6 @@
 			btn.style.transform = treePanelMinimized ? 'rotate(180deg)' : '';
 			btn.style.transition = 'transform 0.2s';
 			document.getElementById('tree-panel-body').style.display = treePanelMinimized ? 'none' : 'flex';
-			document.getElementById('elev-panel-body').classList.add('hidden');
-			document.getElementById('aspect-panel-body').classList.add('hidden');
-			elevPanelOpen = false, aspectPanelOpen = false;
-			document.getElementById('elev-panel').style.display = treePanelMinimized ? '' : 'none';
-			document.getElementById('aspect-panel').style.display = treePanelMinimized ? '' : 'none';
 		}
 		// Initialize tree panel as minimized on page load
 		(function(){
@@ -2932,7 +2976,8 @@
 						if (!isNaN(d)) discStr = ` · ${d.toISOString().split('T')[0]}`;
 					}
 					const detail = `${name}${type}${acresStr}${discStr}`;
-					rows.push(`<span class="popup-value-row"><span class="popup-swatch" style="background:#e53e3e;width:10px;height:10px;border-radius:2px;flex-shrink:0"></span>🔥 <span style="font-size:10px;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:wrap" title="${detail}">${detail}</span></span>`);
+					const firesSwatchColor = (document.getElementById('fires-color')?.value) || '#e53935';
+					rows.push(`<span class="popup-value-row"><span class="popup-swatch" style="background:${firesSwatchColor};width:10px;height:10px;border-radius:2px;flex-shrink:0"></span>🔥 <span style="font-size:10px;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:wrap" title="${detail}">${detail}</span></span>`);
 					if (seen.size >= 3) break;
 				}
 			}
@@ -2957,7 +3002,8 @@
 					const label = dateStr ? `${unit} · ${dateStr}` : unit;
 					if (seen.has(label)) continue;
 					seen.add(label);
-					rows.push(`<span class="popup-value-row"><span class="popup-swatch" style="background:#d69e2e;width:10px;height:10px;border-radius:2px;flex-shrink:0"></span>🪵 <span style="font-size:10px;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:wrap" title="${label}">${label}</span></span>`);
+					const timberSwatchColor = (document.getElementById('timber-color')?.value) || '#8d6e63';
+					rows.push(`<span class="popup-value-row"><span class="popup-swatch" style="background:${timberSwatchColor};width:10px;height:10px;border-radius:2px;flex-shrink:0"></span>🪵 <span style="font-size:10px;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:wrap" title="${label}">${label}</span></span>`);
 					if (seen.size >= 3) break;
 				}
 			}
@@ -2984,7 +3030,7 @@
 					// Riparian identify
 					if (forestTabChecks.riparian) {
 						const rip = await identifyRiparian(captureLngLat.lat, captureLngLat.lng);
-						if (rip) asyncRows.push(`<span class="popup-value-row"><span class="popup-swatch" style="background:#1565c0;width:10px;height:10px;border-radius:2px;flex-shrink:0"></span>💧 <span style="font-size:10px">${rip}</span></span>`);
+						if (rip) asyncRows.push(`<span class="popup-value-row"><span class="popup-swatch" style="background:${(document.getElementById('riparian-color')?.value)||'#1565c0'};width:10px;height:10px;border-radius:2px;flex-shrink:0"></span>💧 <span style="font-size:10px">${rip}</span></span>`);
 					}
 
 					// Tree species identify
@@ -3181,54 +3227,47 @@
 			return [Math.round(c1[0]+t*(c2[0]-c1[0])), Math.round(c1[1]+t*(c2[1]-c1[1])), Math.round(c1[2]+t*(c2[2]-c1[2]))];
 		}
 
-		// ── Panel collapse ──────────────────────────────────────────────────────────
+		// ── Panel collapse (now handled via forest tab system) ─────────────────────
 		let elevPanelOpen = false, aspectPanelOpen = false;
 
-		(function() {
-			document.getElementById('elev-panel-body').classList.add('hidden');
-			document.getElementById('aspect-panel-body').classList.add('hidden');
-		})();
-
 		function toggleElevPanel() {
-			elevPanelOpen = !elevPanelOpen;
-			document.getElementById('elev-panel-body').classList.toggle('hidden', !elevPanelOpen);
-			document.getElementById('elev-panel-chevron').textContent = elevPanelOpen ? '▲' : '▼';
-			
-			if (elevPanelOpen) {
-				// Hide entire aspect panel
-				document.getElementById('aspect-panel').style.display = 'none';
-				// Close aspect panel if it was open
-				if (aspectPanelOpen) {
-					aspectPanelOpen = false;
-					document.getElementById('aspect-panel-body').classList.add('hidden');
-					document.getElementById('aspect-panel-chevron').textContent = '▲';
-				}
-			} else {
-				// Show aspect panel again
-				document.getElementById('aspect-panel').style.display = '';
-			}
+			// no-op: elev is now a forest tab
 		}
-
 		function toggleAspectPanel() {
-			// Prevent opening aspect panel when elev is open
-			if (elevPanelOpen) return;
-			
-			aspectPanelOpen = !aspectPanelOpen;
-			document.getElementById('aspect-panel-body').classList.toggle('hidden', !aspectPanelOpen);
-			document.getElementById('aspect-panel-chevron').textContent = aspectPanelOpen ? '▲' : '▼';
+			// no-op: aspect is now a forest tab
 		}
 
 		// ── Master toggles ──────────────────────────────────────────────────────────
 		function onElevMasterToggle(checked) {
 			elevMasterEnabled = checked;
+			forestTabChecks['elev'] = checked;
 			elevRanges.forEach(r => r.enabled = checked);
+			// Sync ftab checkbox
+			const ftabCk = document.getElementById('ftab-elev-check');
+			if (ftabCk) ftabCk.checked = checked;
+			const ftabBtn = document.getElementById('ftab-elev');
+			if (ftabBtn) {
+				const isActive = activeForestTab === 'elev';
+				ftabBtn.style.background = isActive ? '#2563eb' : (checked ? '#dbeafe' : '#f0f0f0');
+				ftabBtn.style.color      = isActive ? '#fff'    : (checked ? '#1d4ed8' : '#555');
+			}
 			syncElevMasterLock();
 			renderElevRanges();
 			refreshElevLayer();
 		}
 		function onAspectMasterToggle(checked) {
 			aspectMasterEnabled = checked;
+			forestTabChecks['aspect'] = checked;
 			aspectRanges.forEach(r => r.enabled = checked);
+			// Sync ftab checkbox
+			const ftabCk = document.getElementById('ftab-aspect-check');
+			if (ftabCk) ftabCk.checked = checked;
+			const ftabBtn = document.getElementById('ftab-aspect');
+			if (ftabBtn) {
+				const isActive = activeForestTab === 'aspect';
+				ftabBtn.style.background = isActive ? '#2563eb' : (checked ? '#dbeafe' : '#f0f0f0');
+				ftabBtn.style.color      = isActive ? '#fff'    : (checked ? '#1d4ed8' : '#555');
+			}
 			syncAspectMasterLock();
 			renderAspectRanges();
 			refreshAspectLayer();
@@ -3260,7 +3299,7 @@
 				el.disabled = disabled;
 				el.style.opacity = disabled ? '0.4' : '';
 			});
-			const addBtn = document.querySelector('#elev-panel .exp-add-btn');
+			const addBtn = document.getElementById('elev-add-btn');
 			if (addBtn) { addBtn.disabled = disabled; addBtn.style.opacity = disabled ? '0.4' : ''; }
 		}
 		function syncAspectMasterLock() {
@@ -3272,7 +3311,7 @@
 				el.disabled = disabled;
 				el.style.opacity = disabled ? '0.4' : '';
 			});
-			const addBtn = document.querySelector('#aspect-panel .exp-add-btn');
+			const addBtn = document.getElementById('aspect-add-btn');
 			if (addBtn) { addBtn.disabled = disabled; addBtn.style.opacity = disabled ? '0.4' : ''; }
 		}
 
@@ -3612,7 +3651,14 @@
 					elevRanges.splice(i,1); syncElevMasterCheck(); renderElevRanges(); refreshElevLayer();
 				};
 
-				hdr.querySelector('.exp-z-input').onchange = e => { r.zOrder = +e.target.value; refreshElevLayer(); };
+				const elevZInp = hdr.querySelector('.exp-z-input');
+				elevZInp.onchange = e => { r.zOrder = +e.target.value; reorderAllLayers(); };
+				elevZInp.addEventListener('wheel', ev => {
+					ev.preventDefault();
+					const cur = parseInt(elevZInp.value)||1;
+					elevZInp.value = ev.deltaY < 0 ? Math.min(cur+1,10) : Math.max(cur-1,1);
+					elevZInp.dispatchEvent(new Event('change',{bubbles:true}));
+				}, {passive:false});
 				container.appendChild(div);
 			});
 			syncElevMasterLock();
@@ -4053,7 +4099,14 @@
 				a2i.oninput=e=>{ r.alpha2=+e.target.value; lowRow.querySelector('.exp-alpha-val').textContent=Math.round(r.alpha2*100)+'%'; scheduleAspectRefresh(); };
 
 				div.querySelector('.exp-remove-btn').onclick=()=>{ aspectRanges.splice(i,1); syncAspectMasterCheck(); renderAspectRanges(); refreshAspectLayer(); };
-				hdr.querySelector('.exp-z-input').onchange = e => { r.zOrder = +e.target.value; refreshAspectLayer(); };
+				const aspectZInp = hdr.querySelector('.exp-z-input');
+				aspectZInp.onchange = e => { r.zOrder = +e.target.value; reorderAllLayers(); };
+				aspectZInp.addEventListener('wheel', ev => {
+					ev.preventDefault();
+					const cur = parseInt(aspectZInp.value)||1;
+					aspectZInp.value = ev.deltaY < 0 ? Math.min(cur+1,10) : Math.max(cur-1,1);
+					aspectZInp.dispatchEvent(new Event('change',{bubbles:true}));
+				}, {passive:false});
 				container.appendChild(div);
 			});
 			syncAspectMasterLock();
