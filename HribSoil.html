@@ -105,7 +105,7 @@
 				position: absolute; top: 12px; right: 12px; z-index: 10;
 				background: rgba(255,255,255,0.96); border-radius: 10px;
 				padding: 14px 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.18);
-				font-family: sans-serif; font-size: 13px; max-width: 230px;
+				font-family: sans-serif; font-size: 13px; min-width:160px; max-width: calc(42vw);
 				max-height: calc(100vh - 80px); display: flex; flex-direction: column; gap: 8px;
 			}
 			#tree-panel h3 { margin: 0; font-size: 13px; font-weight: 700; color: #333; letter-spacing: 0.03em; text-transform: uppercase; display: flex; align-items: center; justify-content: space-between; }
@@ -415,6 +415,99 @@
 			}
 			.bm-overlay-row.active .bm-overlay-radio::after { display: block; }
 			.bm-divider { border: none; border-top: 1px solid #eee; margin: 6px 0; }
+
+			/* ── Elevation & Aspect Explorer Panels ─────────────────────────── */
+			#elev-panel, #aspect-panel {
+				position: absolute; z-index: 10;
+				background: rgba(255,255,255,0.96); border-radius: 10px;
+				padding: 12px 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+				font-family: sans-serif; font-size: 13px;
+				min-width:120px; max-width: calc(42vw);
+			}
+			#elev-panel   { top: 65px; right: 12px; max-height: calc(73vh); }
+			#aspect-panel { top: 113px; right: 12px; max-height: calc(65vh); }
+
+			#elev-ranges, #aspect-ranges { max-height: calc(60vh - 100px); overflow-y: auto; }
+
+			.explorer-panel-header {
+				display: flex; align-items: center; justify-content: space-between;
+				user-select: none; gap: 6px;
+			}
+			.explorer-panel-header h4 {
+				margin: 0; font-size: 12px; font-weight: 800; color: #333; white-space: nowrap;
+				text-transform: uppercase; letter-spacing: 0.04em; flex: 1; cursor: pointer;
+			}
+			.explorer-panel-header .exp-toggle-btn {
+				background: none; border: none; cursor: pointer; font-size: 14px;
+				color: #888; padding: 0; line-height: 1;
+			}
+			.exp-master-toggle {
+				display: flex; align-items: center; gap: 5px; font-size: 11px; color: #555;
+				cursor: pointer; user-select: none; white-space: nowrap;
+			}
+			.exp-master-toggle input[type="checkbox"] { accent-color: #2563eb; cursor: pointer; width: 13px; height: 13px; margin: 0; }
+
+			.explorer-body { display: flex; flex-direction: column; gap: 7px; }
+			.explorer-body.hidden { display: none; }
+
+			.exp-range-row {
+				background: #f8f8f8; border: 1px solid #e8e8e8; border-radius: 7px;
+				padding: 7px 9px; display: flex; flex-direction: column; gap: 5px;
+				position: relative; transition: opacity 0.15s;
+			}
+			.exp-range-row.disabled-range { opacity: 0.45; }
+			.exp-range-header { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; max-width: 100%;}
+
+			.exp-range-check { accent-color: #2563eb; cursor: pointer; width: 13px; height: 13px; margin: 0; flex-shrink: 0; }
+			.exp-range-label { flex: 1; font-size: 11px; font-weight: 600; color: #444; text-overflow: ellipsis; white-space: nowrap; }
+			.exp-remove-btn { background: none; border: none; color: #bbb; cursor: pointer; font-size: 13px; padding: 0 2px; flex-shrink: 0; line-height: 1; }
+			.exp-remove-btn:hover { color: #dc2626; }
+
+			.exp-color-row {
+				display: flex; align-items: center; justify-content: left;
+				gap: 5px; font-size: 11px; color: #555; width:100%;
+			}
+			.exp-color-row input[type="color"] {
+				width: 26px; height: 20px; padding: 1px 2px; border: 1px solid #ccc;
+				border-radius: 3px; cursor: pointer; background: none;
+			}
+			.exp-color-row input[type="range"] { accent-color: #2563eb; }
+			.exp-color-row .exp-alpha-val { font-size: 10px; color: #888; text-align: left; }
+			.exp-gradient-row { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #555; }
+			.exp-low-row { opacity: 1; }
+			.exp-low-row.disabled { opacity: 0.4; pointer-events: none; }
+
+			.exp-add-btn {
+				width: 100%; padding: 5px 0; border: 1px dashed #ccc; border-radius: 6px;
+				background: #fafafa; cursor: pointer; font-size: 12px; color: #888;
+				transition: background 0.12s, border-color 0.12s, color 0.12s;
+			}
+			.exp-add-btn:hover { background: #eff6ff; border-color: #93c5fd; color: #2563eb; }
+			.exp-opacity-master { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #555; flex-wrap:wrap;}
+			.exp-opacity-master input[type="range"] { flex: 1; accent-color: #2563eb; }
+			.exp-opacity-master span { font-size: 10px; color: #888; text-align: left; display: flex; align-items: center; justify-content: left;}
+			.exp-unit-toggle { display: flex; border-radius: 5px; overflow: hidden; border: 1px solid #ccc; width: fit-content; }
+			.exp-unit-toggle button { padding: 3px 9px; border: none; background: #f0f0f0; cursor: pointer; font-size: 11px; font-weight: 600; color: #555; transition: background 0.15s, color 0.15s; }
+			.exp-unit-toggle button:not(:last-child) { border-right: 1px solid #ccc; }
+			.exp-unit-toggle button.active { background: #2563eb; color: #fff; }
+
+			/* ── Vertical dual-handle elevation slider ── */
+			.elev-vslider-wrap { display: flex; gap: 8px; align-items: stretch; margin: 2px 0; }
+			.elev-vslider-track-area { position: relative; width: 24px; flex-shrink: 0; display: flex; justify-content: center; }
+			.elev-vslider-track { position: absolute; left: 50%; transform: translateX(-50%); width: 6px; top: 8px; bottom: 8px; background: #e0e0e0; border-radius: 3px; }
+			.elev-vslider-fill { position: absolute; left: 0; right: 0; background: #2563eb; border-radius: 3px; opacity: 0.35; }
+			.elev-vslider-handle { position: absolute; left: 50%; transform: translateX(-50%); width: 16px; height: 16px; background: #fff; border: 2px solid #2563eb; border-radius: 50%; cursor: ns-resize; box-shadow: 0 1px 4px rgba(0,0,0,0.18); margin-top: -8px; touch-action: none; transition: box-shadow 0.12s; z-index: 1; }
+			.elev-vslider-handle:hover, .elev-vslider-handle.dragging { box-shadow: 0 0 0 4px rgba(37,99,235,0.18); }
+			.elev-vslider-vals { display: flex; flex-direction: column; gap: 3px; flex: 1; justify-content: space-between; padding: 0; max-width:90%;}
+			.elev-vslider-val-row { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #555; }
+			.elev-vslider-val-row input[type="number"] { width: 60px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 11px; color: #333; background: #fff; text-align: right; }
+			.elev-vslider-val-row .ev-unit { font-size: 10px; color: #aaa; }
+
+			/* ── Aspect compass wheel ── */
+			.aspect-wheel-wrap { display: flex; justify-content: center; align-items: center; margin: 2px 0; }
+			.aspect-wheel-svg { cursor: default; display: block; touch-action: none; overflow: visible; }
+			.aspect-wheel-val-row { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #555; justify-content: center; flex-wrap: wrap; margin-top: 2px; }
+			.aspect-wheel-val-row input[type="number"] { width: 46px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 11px; color: #333; background: #fff; text-align: right; }
 		</style>
 	</head>
 	<body>
@@ -425,10 +518,7 @@
 
 		<!-- Basemap popup panel -->
 		<div id="bm-popup">
-			<div class="bm-popup-title">🗺 Map Style
-				<a href="https://maps.open-meteo.com/?domain=ncep_nam_conus&variable=soil_temperature_10_to_40cm"
-				   target="_blank" style="font-size:10px;margin:0 8px 0 8px;color:#4aa3ff;text-decoration:none">(Open-Meteo Map)</a>
-			</div>
+			<div class="bm-popup-title">🗺 Map Style</div>
 
 			<div class="bm-section-label">Light</div>
 			<div class="bm-grid">
@@ -593,12 +683,22 @@
 				<b><span style="color:#8B4513">Hrib</span><span style="color:#12167f">Soil</span></b>
 				<span id="subtitle" style="white-space:wrap;font-size:10px;display:flex; text-align:center;">&nbsp;- Soil Data Explorer</span>
 				<button id="minimize-btn"
-					style="background:none;border:none;cursor:pointer;font-size:16px;color:#888;padding:0;margin-left:10px;line-height:1;pointer-events:none">⌃</button>
+					style="background:none;border:none;cursor:pointer;font-size:16px;color:#888;padding:0;margin-left:10px;line-height:1;pointer-events:none">▲</button>
 			</h3>
 
 			<div id="controls-scroll">
 
-			<div class="section-label" style="margin:10px 0 0 0">Mushroom Presets</div>
+			<!-- Popup Settings -->
+			<div class="popup-settings-section" style="margin:10px 0 0 0">
+				<div class="section-label">🔍 Popup</div>
+				<div class="popup-mode-group">
+					<button id="popup-mode-off"      onclick="setPopupMode('off')"      class="active">Off</button>
+					<button id="popup-mode-draggable" onclick="setPopupMode('draggable')">Draggable</button>
+					<button id="popup-mode-follow"   onclick="setPopupMode('follow')">Follows mouse</button>
+				</div>
+			</div>
+
+			<div class="section-label">Mushroom Presets</div>
 			<select id="mushroom-preset" onchange="applyPreset(this.value)"
 				style="width:100%;padding:5px 6px;border:1px solid #ccc;border-radius:6px;font-size:13px;color:#444;background:#fafafa;cursor:pointer">
 				<option value="">— Select a preset —</option>
@@ -612,7 +712,10 @@
 			</select>
 			<hr class="divider" />
 
-			<div class="section-label">Soil Layers</div>
+			<div class="section-label">Soil Layers
+				<a href="https://maps.open-meteo.com/?domain=ncep_nam_conus&variable=soil_temperature_10_to_40cm"
+				   target="_blank" style="font-size:10px;margin:0 8px 0 8px;color:#4aa3ff;text-decoration:none">(Open-Meteo Map)</a>
+			</div>
 			<div class="layer-tabs-wrapper">
 				<div class="layer-tab-bar">
 					<button id="tab-temp" class="active layer-on" style="font-size:9px" onclick="handleLayerTabClick('temp')">
@@ -720,58 +823,105 @@
 			</div>
 
 			<hr class="divider" />
-
-			<!-- Popup Settings -->
-			<div class="popup-settings-section">
-				<div class="section-label">🔍 Popup</div>
-				<div class="popup-mode-group">
-					<button id="popup-mode-off"      onclick="setPopupMode('off')"      class="active">Off</button>
-					<button id="popup-mode-follow"   onclick="setPopupMode('follow')">Follows mouse</button>
-					<button id="popup-mode-draggable" onclick="setPopupMode('draggable')">Draggable</button>
-				</div>
-			</div>
 		</div> <!-- end controls-scroll -->
 		<div id="controls-footer">
 			<button id="apply-btn" onclick="applySettings()">Apply</button>
 		</div>
 	</div>
 
+	<!-- Elevation Range Explorer Panel -->
+	<div id="elev-panel">
+		<div class="explorer-panel-header">
+			<h4 onclick="toggleElevPanel()">⛰️ Elevation</h4>
+			<button class="exp-toggle-btn" id="elev-panel-chevron" onclick="toggleElevPanel()">▼</button>
+		</div>
+		<div class="explorer-body" id="elev-panel-body" style="margin-top:5px;max-width:200px">
+			<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+				<div class="exp-unit-toggle">
+					<button id="elev-btn-ft" class="active" onclick="setElevUnit('ft')">ft</button>
+					<button id="elev-btn-m"  onclick="setElevUnit('m')">m</button>
+				</div>
+				<div class="exp-opacity-master" style="flex:1; width: 90%">
+					<label class="exp-master-toggle" title="Enable all elevation ranges">
+						<input type="checkbox" id="elev-master-check" onchange="onElevMasterToggle(this.checked)">
+					</label>
+					<label style="font-size:10px;color:#888;white-space:nowrap">Opacity</label>
+					<input type="range" style="max-width:45%" id="elev-master-opacity" min="0" max="1" step="0.05" value="0.75"
+						oninput="setElevMasterOpacity(this.value)" />
+					<span id="elev-opacity-val">75%</span>
+				</div>
+			</div>
+			<div id="elev-ranges"></div>
+			<button class="exp-add-btn" onclick="addElevRange()">+ Add Elevation Range</button>
+		</div>
+	</div>
+
+	<!-- Aspect Range Explorer Panel -->
+	<div id="aspect-panel">
+		<div class="explorer-panel-header">
+			<h4 onclick="toggleAspectPanel()">🧭 Aspect</h4>
+			<button class="exp-toggle-btn" id="aspect-panel-chevron" onclick="toggleAspectPanel()">▼</button>
+		</div>
+		<div class="explorer-body" id="aspect-panel-body" style="max-width: 200px">
+			<div class="exp-opacity-master" style="flex:1; max-width:190px">
+				<label class="exp-master-toggle" title="Enable all aspect ranges">
+					<input type="checkbox" id="aspect-master-check" onchange="onAspectMasterToggle(this.checked)">
+				</label>
+				<label style="font-size:10px;color:#888;white-space:nowrap">Opacity</label>
+				<input type="range" style="max-width:45%" id="aspect-master-opacity" min="0" max="1" step="0.05" value="0.75"
+					oninput="setAspectMasterOpacity(this.value)" />
+				<span id="aspect-opacity-val">75%</span>
+			</div>
+			<div id="aspect-ranges" style="max-width:100%"></div>
+			<button class="exp-add-btn" onclick="addAspectRange()">+ Add Aspect Range</button>
+		</div>
+	</div>
+
 		<!-- Right: Forest Layers Panel -->
 		<div id="tree-panel">
-			<h3 style="cursor:pointer;user-select:none" onclick="toggleTreePanel()">
+			<h3 style="cursor:pointer;user-select:none;font-size:12px;font-weight:800" onclick="toggleTreePanel()">
 				🌲 Forest Layers
 				<button id="tree-minimize-btn"
-					style="background:none;border:none;cursor:pointer;font-size:16px;color:#888;padding:0;margin-left:10px;line-height:1;pointer-events:none">⌃</button>
+					style="background:none;border:none;cursor:pointer;font-size:16px;color:#888;padding:0;margin-left:10px;line-height:1;pointer-events:none">▲</button>
 			</h3>
 			<div id="tree-panel-body">
 
-				<!-- Forest Layer Tab Bar -->
-				<div style="display:flex;border-radius:7px;overflow:hidden;border:1px solid #ccc;margin-bottom:4px;overflow:auto">
+				<!-- Forest Layer Tab Bar (vertical) -->
+				<div style="display:flex;flex-direction:column;border-radius:7px;overflow:hidden;border:1px solid #ccc;margin-bottom:4px">
 					<button id="ftab-species" class="active" onclick="handleForestTabClick('species')"
-						style="flex:1;padding:5px 4px;border:none;background:#2563eb;color:#fff;cursor:pointer;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:3px;border-right:1px solid #ccc">
-						<input type="checkbox" id="ftab-species-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('species')" style="accent-color:#fff;cursor:pointer;width:11px;height:11px;margin:0" />
+						style="padding:6px 8px;border:none;background:#2563eb;color:#fff;cursor:pointer;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;border-bottom:1px solid #ccc;text-align:left">
 						🌲 Species
 					</button>
 					<button id="ftab-fires" onclick="handleForestTabClick('fires')"
-						style="flex:1;padding:5px 4px;border:none;background:#f0f0f0;color:#555;cursor:pointer;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:3px;border-right:1px solid #ccc">
-						<input type="checkbox" id="ftab-fires-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('fires')" style="accent-color:#2563eb;cursor:pointer;width:11px;height:11px;margin:0" />
+						style="padding:6px 8px;border:none;background:#f0f0f0;color:#555;cursor:pointer;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;border-bottom:1px solid #ccc;text-align:left">
+						<input type="checkbox" id="ftab-fires-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('fires')" style="accent-color:#2563eb;cursor:pointer;width:12px;height:12px;margin:0;flex-shrink:0" />
 						🔥 Fires
 					</button>
 					<button id="ftab-timber" onclick="handleForestTabClick('timber')"
-						style="flex:1;padding:5px 4px;border:none;background:#f0f0f0;color:#555;cursor:pointer;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:3px;border-right:1px solid #ccc">
-						<input type="checkbox" id="ftab-timber-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('timber')" style="accent-color:#2563eb;cursor:pointer;width:11px;height:11px;margin:0" />
+						style="padding:6px 8px;border:none;background:#f0f0f0;color:#555;cursor:pointer;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;border-bottom:1px solid #ccc;text-align:left">
+						<input type="checkbox" id="ftab-timber-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('timber')" style="accent-color:#2563eb;cursor:pointer;width:12px;height:12px;margin:0;flex-shrink:0" />
 						🪵 Timber
 					</button>
 					<button id="ftab-landcover" onclick="handleForestTabClick('landcover')"
-						style="flex:1;padding:5px 4px;border:none;background:#f0f0f0;color:#555;cursor:pointer;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:3px">
-						<input type="checkbox" id="ftab-landcover-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('landcover')" style="accent-color:#2563eb;cursor:pointer;width:11px;height:11px;margin:0" />
-						🗺 Cover
+						style="padding:6px 8px;border:none;background:#f0f0f0;color:#555;cursor:pointer;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;border-bottom:1px solid #ccc;text-align:left">
+						<input type="checkbox" id="ftab-landcover-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('landcover')" style="accent-color:#2563eb;cursor:pointer;width:12px;height:12px;margin:0;flex-shrink:0" />
+						🗺 Landcover
+					</button>
+					<button id="ftab-riparian" onclick="handleForestTabClick('riparian')"
+						style="padding:6px 8px;border:none;background:#f0f0f0;color:#555;cursor:pointer;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;text-align:left">
+						<input type="checkbox" id="ftab-riparian-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('riparian')" style="accent-color:#2563eb;cursor:pointer;width:12px;height:12px;margin:0;flex-shrink:0" />
+						💧 Riparian
 					</button>
 				</div>
 
 				<!-- Tab: Tree Species -->
 				<div id="forest-tab-species">
-					<div class="section-label" style="font-size:10px;margin:0">USFS Basal Area · Species + Year · <strong>max 3 active</strong></div>
+					<div class="section-label" style="font-size:10px;margin:0">
+					  <a href="https://imagery.geoplatform.gov/iipp/home/item.html?id=7659e518a3a74fcfb7d8a5878f1fa1c9" target="_blank" style="color:#1a73e8;text-decoration:underline;">
+						USFS Basal Area
+					  </a>
+					  · Species + Year · <strong>max 3 active</strong>
+					</div>
 					<input type="text" class="tree-search" id="tree-search" placeholder="Search species…" oninput="filterTreeList()" />
 					<div id="tree-layer-limit">⚠ Max 3 layers reached — remove one to add another</div>
 					<div id="tree-status">Loading species list…</div>
@@ -783,7 +933,8 @@
 
 				<!-- Tab: Fires -->
 				<div id="forest-tab-fires" style="display:none;flex-direction:column;gap:6px">
-					<div class="section-label" style="font-size:10px;margin:0">WFIGS Interagency Fire Perimeters</div>
+					<div class="section-label" style="font-size:10px;margin:0">
+						<a href="https://nifc.maps.arcgis.com/home/item.html?id=5e72b1699bf74eefb3f3aff6f4ba5511" target="_blank" style="color:#1a73e8;text-decoration:underline;">WFIGS Interagency Fire Perimeters</a></div>
 					<div style="display:flex;flex-direction:column;gap:4px">
 						<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
 							<label style="min-width:60px;font-weight:600">Start Date</label>
@@ -797,17 +948,30 @@
 						</div>
 					</div>
 					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
+						<label style="min-width:60px;font-weight:600">Color</label>
+						<input type="color" id="fires-color" value="#e53935"
+							style="width:40px;height:26px;padding:1px 2px;border:1px solid #ccc;border-radius:5px;cursor:pointer;background:none" onchange="refreshFiresLayer()" />
+						<span style="font-size:10px;color:#aaa">Fill color</span>
+					</div>
+					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
 						<label style="min-width:60px;font-weight:600">Opacity</label>
 						<input type="range" id="fires-opacity" min="0" max="1" step="0.05" value="0.7"
 							style="flex:1;accent-color:#2563eb;max-width:40%" oninput="setFiresOpacity(this.value)" />
 						<span id="fires-opacity-val" style="font-size:10px;color:#888;min-width:28px">70%</span>
+					</div>
+					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
+						<label style="min-width:60px;font-weight:600">Z Order</label>
+						<input type="number" id="fires-z" value="4" min="1" max="10" step="1"
+							style="width:52px;padding:3px 5px;border:1px solid #ccc;border-radius:5px;font-size:11px;background:#fafafa;color:#333"
+							onchange="firesZOrder=+this.value; reorderAllLayers()" />
 					</div>
 					<div id="fires-status" style="font-size:10px;color:#888;text-align:center;padding:2px 0"></div>
 				</div>
 
 				<!-- Tab: Timber Harvests -->
 				<div id="forest-tab-timber" style="display:none;flex-direction:column;gap:6px">
-					<div class="section-label" style="font-size:10px;margin:0">USFS EDW Timber Harvest</div>
+					<div class="section-label" style="font-size:10px;margin:0">
+						<a href="https://data-usfs.hub.arcgis.com/datasets/usfs::timber-harvests-feature-layer/about" target="_blank" style="color:#1a73e8;text-decoration:underline;">USFS EDW Timber Harvest</a></div>
 					<div style="display:flex;flex-direction:column;gap:4px">
 						<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
 							<label style="min-width:60px;font-weight:600">Start Date</label>
@@ -821,17 +985,30 @@
 						</div>
 					</div>
 					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
+						<label style="min-width:60px;font-weight:600">Color</label>
+						<input type="color" id="timber-color" value="#8d6e63"
+							style="width:40px;height:26px;padding:1px 2px;border:1px solid #ccc;border-radius:5px;cursor:pointer;background:none" onchange="refreshTimberLayer()" />
+						<span style="font-size:10px;color:#aaa">Fill color</span>
+					</div>
+					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
 						<label style="min-width:60px;font-weight:600">Opacity</label>
 						<input type="range" id="timber-opacity" min="0" max="1" step="0.05" value="0.7"
 							style="flex:1;accent-color:#2563eb;max-width:40%" oninput="setTimberOpacity(this.value)" />
 						<span id="timber-opacity-val" style="font-size:10px;color:#888;min-width:28px">70%</span>
+					</div>
+					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
+						<label style="min-width:60px;font-weight:600">Z Order</label>
+						<input type="number" id="timber-z" value="4" min="1" max="10" step="1"
+							style="width:52px;padding:3px 5px;border:1px solid #ccc;border-radius:5px;font-size:11px;background:#fafafa;color:#333"
+							onchange="timberZOrder=+this.value; reorderAllLayers()" />
 					</div>
 					<div id="timber-status" style="font-size:10px;color:#888;text-align:center;padding:2px 0"></div>
 				</div>
 
 				<!-- Tab: Landcover -->
 				<div id="forest-tab-landcover" style="display:none;flex-direction:column;gap:6px">
-					<div class="section-label" style="font-size:10px;margin:0">USFS NLCD Landcover CONUS</div>
+					<div class="section-label" style="font-size:10px;margin:0">
+						<a href="https://imagery.geoplatform.gov/iipp/rest/services/Vegetation/USFS_EDW_NLCD_Landcover_CONUS/ImageServer" target="_blank" style="color:#1a73e8;text-decoration:underline;">USFS NLCD Landcover CONUS</a></div>
 					<div style="display:flex;flex-direction:column;gap:4px">
 						<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
 							<label style="min-width:60px;font-weight:600">Start Date</label>
@@ -850,7 +1027,38 @@
 							style="flex:1;accent-color:#2563eb;max-width:40%" oninput="setLandcoverOpacity(this.value)" />
 						<span id="landcover-opacity-val" style="font-size:10px;color:#888;min-width:28px">80%</span>
 					</div>
+					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
+						<label style="min-width:60px;font-weight:600">Z Order</label>
+						<input type="number" id="landcover-z" value="4" min="1" max="10" step="1"
+							style="width:52px;padding:3px 5px;border:1px solid #ccc;border-radius:5px;font-size:11px;background:#fafafa;color:#333"
+							onchange="landcoverZOrder=+this.value; reorderAllLayers()" />
+					</div>
 					<div id="landcover-status" style="font-size:10px;color:#888;text-align:center;padding:2px 0"></div>
+				</div>
+
+				<!-- Tab: Riparian Areas -->
+				<div id="forest-tab-riparian" style="display:none;flex-direction:column;gap:6px">
+					<div class="section-label" style="font-size:10px;margin:0">
+						<a href="https://data-usfs.hub.arcgis.com/datasets/usfs::national-riparian-area-base-map/about" target="_blank" style="color:#1a73e8;text-decoration:underline;">USFS EDW Riparian Areas</a></div>
+					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
+						<label style="min-width:60px;font-weight:600">Color</label>
+						<input type="color" id="riparian-color" value="#1565c0"
+							style="width:40px;height:26px;padding:1px 2px;border:1px solid #ccc;border-radius:5px;cursor:pointer;background:none" onchange="refreshRiparianLayer()" />
+						<span style="font-size:10px;color:#aaa">Tint color</span>
+					</div>
+					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
+						<label style="min-width:60px;font-weight:600">Opacity</label>
+						<input type="range" id="riparian-opacity" min="0" max="1" step="0.05" value="0.75"
+							style="flex:1;accent-color:#2563eb;max-width:40%" oninput="setRiparianOpacity(this.value)" />
+						<span id="riparian-opacity-val" style="font-size:10px;color:#888;min-width:28px">75%</span>
+					</div>
+					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
+						<label style="min-width:60px;font-weight:600">Z Order</label>
+						<input type="number" id="riparian-z" value="4" min="1" max="10" step="1"
+							style="width:52px;padding:3px 5px;border:1px solid #ccc;border-radius:5px;font-size:11px;background:#fafafa;color:#333"
+							onchange="riparianZOrder=+this.value; reorderAllLayers()" />
+					</div>
+					<div id="riparian-status" style="font-size:10px;color:#888;text-align:center;padding:2px 0"></div>
 				</div>
 
 			</div>
@@ -879,7 +1087,7 @@
 		let currentUnit='F', tempDepth='10_to_40cm', moistDepth='10_to_40cm';
 		let tempActive=true, moistActive=false, tempContours=true, moistContours=false;
 		let rangeMinC=5, rangeMaxC=10, mapLoaded=false, tempOpacity=0.75, moistOpacity=0.75;
-		let tempZOrder=1, moistZOrder=2, treeZOrder=3;
+		let tempZOrder=1, moistZOrder=2, treeZOrder=3, firesZOrder=4, timberZOrder=4, landcoverZOrder=4, riparianZOrder=4;
 
 		let minimized=true;
 		let activeLayerTab='temp'; // 'temp' | 'moist'
@@ -1450,7 +1658,7 @@
 		}
 
 		const map = new maplibregl.Map({container:'map', style:BASEMAPS['liberty'], center:[-98.5,39.5], zoom:3.5, hash:true, preserveDrawingBuffer:true});
-		map.on('load', () => { mapLoaded=true; addTempLayers(buildTempUrl(rangeMinC,rangeMaxC)); });
+		map.on('load', () => { mapLoaded=true; addTempLayers(buildTempUrl(rangeMinC,rangeMaxC)); refreshElevLayer(); refreshAspectLayer(); });
 
 		function toggleBmPopup() {
 			const popup = document.getElementById('bm-popup');
@@ -1478,6 +1686,7 @@
 				));
 				readdAllRasterOverlays();
 				activeSlices.forEach((_, id) => addSliceLayer(id));
+				refreshElevLayer(); refreshAspectLayer();
 			});
 			toggleBmPopup();
 		}
@@ -1727,11 +1936,19 @@
 				parseFloat(document.getElementById('input-moist-max').value)
 			))});
 			activeSlices.forEach((info, id) => layers.push({ z: info.settings.zOrder ?? 3, readd: () => addSliceLayer(id) }));
+			if (forestTabChecks.fires)     layers.push({ z: firesZOrder,     readd: () => addFiresLayer() });
+			if (forestTabChecks.timber)    layers.push({ z: timberZOrder,    readd: () => addTimberLayer() });
+			if (forestTabChecks.landcover) layers.push({ z: landcoverZOrder, readd: () => addLandcoverLayer() });
+			if (forestTabChecks.riparian)  layers.push({ z: riparianZOrder,  readd: () => addRiparianLayer() });
 
 			// Remove all, then re-add in z-order (lowest first = drawn first = appears underneath)
 			if (tempActive)  removeLayers('omTemp');
 			if (moistActive) removeLayers('omMoist');
 			activeSlices.forEach((_, id) => removeSliceLayer(id));
+			if (forestTabChecks.fires)     removeFiresLayer();
+			if (forestTabChecks.timber)    removeTimberLayer();
+			if (forestTabChecks.landcover) removeLandcoverLayer();
+			if (forestTabChecks.riparian)  removeRiparianLayer();
 
 			layers.sort((a, b) => a.z - b.z).forEach(l => l.readd());
 		}
@@ -2005,14 +2222,17 @@
 
 		// ── Forest Layers Tab State ───────────────────────────────────────────────
 		let activeForestTab = 'species';
-		const forestTabChecks = { species: false, fires: false, timber: false, landcover: false };
+		const forestTabChecks = { species: false, fires: false, timber: false, landcover: false, riparian: false };
+		const FOREST_TABS = ['species','fires','timber','landcover','riparian'];
 
 		function handleForestTabClick(tab) {
 			if (activeForestTab === tab) {
-				// Toggle the checkbox when clicking active tab
-				const checkbox = document.getElementById(`ftab-${tab}-check`);
-				checkbox.checked = !checkbox.checked;
-				onForestTabCheckChange(tab);
+				// species tab has no enable/disable checkbox — just keep selected
+				if (tab !== 'species') {
+					const checkbox = document.getElementById(`ftab-${tab}-check`);
+					checkbox.checked = !checkbox.checked;
+					onForestTabCheckChange(tab);
+				}
 			} else {
 				selectForestTab(tab);
 			}
@@ -2020,14 +2240,17 @@
 
 		function selectForestTab(tab) {
 			activeForestTab = tab;
-			['species','fires','timber','landcover'].forEach(t => {
-				const btn = document.getElementById('ftab-' + t);
+			FOREST_TABS.forEach(t => {
+				const btn   = document.getElementById('ftab-' + t);
 				const panel = document.getElementById('forest-tab-' + t);
 				const isActive = t === tab;
-				const isOn = forestTabChecks[t];
+				const isOn     = forestTabChecks[t];
 				btn.style.background = isActive ? '#2563eb' : (isOn ? '#dbeafe' : '#f0f0f0');
-				btn.style.color = isActive ? '#fff' : (isOn ? '#1d4ed8' : '#555');
-				panel.style.display = isActive ? (t === 'species' ? 'flex' : 'flex') : 'none';
+				btn.style.color      = isActive ? '#fff'    : (isOn ? '#1d4ed8' : '#555');
+				// checkbox accent on active
+				const ck = document.getElementById('ftab-' + t + '-check');
+				if (ck) ck.style.accentColor = isActive ? '#fff' : '#2563eb';
+				panel.style.display = isActive ? 'flex' : 'none';
 				panel.style.flexDirection = 'column';
 			});
 		}
@@ -2035,16 +2258,15 @@
 		function onForestTabCheckChange(tab) {
 			const checked = document.getElementById('ftab-' + tab + '-check').checked;
 			forestTabChecks[tab] = checked;
-			// Switch to the tab whose checkbox was just turned on
 			if (checked) selectForestTab(tab);
-			// Update button highlight
 			const btn = document.getElementById('ftab-' + tab);
 			const isActive = activeForestTab === tab;
 			btn.style.background = isActive ? '#2563eb' : (checked ? '#dbeafe' : '#f0f0f0');
-			btn.style.color = isActive ? '#fff' : (checked ? '#1d4ed8' : '#555');
+			btn.style.color      = isActive ? '#fff'    : (checked ? '#1d4ed8' : '#555');
 			if (tab === 'fires')     { checked ? addFiresLayer()     : removeFiresLayer(); }
 			if (tab === 'timber')    { checked ? addTimberLayer()    : removeTimberLayer(); }
 			if (tab === 'landcover') { checked ? addLandcoverLayer() : removeLandcoverLayer(); }
+			if (tab === 'riparian')  { checked ? addRiparianLayer()  : removeRiparianLayer(); }
 		}
 
 		// ── ESRI Query-per-tile protocol helpers (GeoJSON, not PBF) ─────────────
@@ -2148,19 +2370,31 @@
 			if (!mapLoaded) return;
 			removeFiresLayer();
 			const opacity = parseFloat(document.getElementById('fires-opacity').value);
+			const colorEl = document.getElementById('fires-color');
+			const fillColor = colorEl ? colorEl.value : '#e53e3e';
+			const lineColor = fillColor;
 			map.addSource('firesSource', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
 			map.addLayer({
 				id: 'firesLayer-fill', type: 'fill', source: 'firesSource',
-				paint: { 'fill-color': '#e53e3e', 'fill-opacity': opacity * 0.45 }
+				paint: { 'fill-color': fillColor, 'fill-opacity': opacity * 0.45 }
 			}, getInsertionLayer(false));
 			map.addLayer({
 				id: 'firesLayer-line', type: 'line', source: 'firesSource',
-				paint: { 'line-color': '#c53030', 'line-width': 1.5, 'line-opacity': opacity }
+				paint: { 'line-color': lineColor, 'line-width': 1.5, 'line-opacity': opacity }
 			}, getInsertionLayer(false));
 			map.on('moveend', _onFiresMoveEnd);
-			fetchFiresGeoJson();
+			if (map.getZoom() >= 7) fetchFiresGeoJson();
 		}
-		function _onFiresMoveEnd() { if (forestTabChecks.fires) fetchFiresGeoJson(); }
+		function _onFiresMoveEnd() { 
+			if (forestTabChecks.fires && map.getZoom() >= 7) {
+				fetchFiresGeoJson();
+			} else if (map.getZoom() < 7 && forestTabChecks.fires) {
+				document.getElementById('fires-status').textContent = '🔍 Zoom in to see fires (≥ zoom 7)';
+				if (map.getSource('firesSource')) {
+					map.getSource('firesSource').setData({ type: 'FeatureCollection', features: [] });
+				}
+			}
+		}
 		function removeFiresLayer() {
 			map.off('moveend', _onFiresMoveEnd);
 			if (_firesAbort) { _firesAbort.abort(); _firesAbort = null; }
@@ -2170,6 +2404,10 @@
 			document.getElementById('fires-status').textContent = '';
 		}
 		function refreshFiresLayer() {
+			const colorEl = document.getElementById('fires-color');
+			const fillColor = colorEl ? colorEl.value : '#e53e3e';
+			if (map.getLayer('firesLayer-fill')) map.setPaintProperty('firesLayer-fill', 'fill-color', fillColor);
+			if (map.getLayer('firesLayer-line')) map.setPaintProperty('firesLayer-line', 'line-color', fillColor);
 			if (forestTabChecks.fires) fetchFiresGeoJson();
 		}
 		function setFiresOpacity(val) {
@@ -2230,19 +2468,31 @@
 			if (!mapLoaded) return;
 			removeTimberLayer();
 			const opacity = parseFloat(document.getElementById('timber-opacity').value);
+			const colorEl = document.getElementById('timber-color');
+			const fillColor = colorEl ? colorEl.value : '#d69e2e';
+			const lineColor = fillColor;
 			map.addSource('timberSource', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
 			map.addLayer({
 				id: 'timberLayer-fill', type: 'fill', source: 'timberSource',
-				paint: { 'fill-color': '#d69e2e', 'fill-opacity': opacity * 0.45 }
+				paint: { 'fill-color': fillColor, 'fill-opacity': opacity * 0.45 }
 			}, getInsertionLayer(false));
 			map.addLayer({
 				id: 'timberLayer-line', type: 'line', source: 'timberSource',
-				paint: { 'line-color': '#b7791f', 'line-width': 1, 'line-opacity': opacity }
+				paint: { 'line-color': lineColor, 'line-width': 1, 'line-opacity': opacity }
 			}, getInsertionLayer(false));
 			map.on('moveend', _onTimberMoveEnd);
-			fetchTimberGeoJson();
+			if (map.getZoom() >= 7) fetchTimberGeoJson();
 		}
-		function _onTimberMoveEnd() { if (forestTabChecks.timber) fetchTimberGeoJson(); }
+		function _onTimberMoveEnd() {
+			if (forestTabChecks.timber && map.getZoom() >= 7) {
+				fetchTimberGeoJson();
+			} else if (map.getZoom() < 7 && forestTabChecks.timber) {
+				document.getElementById('timber-status').textContent = '🔍 Zoom in to see timber harvests (≥ zoom 7)';
+				if (map.getSource('timberSource')) {
+					map.getSource('timberSource').setData({ type: 'FeatureCollection', features: [] });
+				}
+			}
+		}
 		function removeTimberLayer() {
 			map.off('moveend', _onTimberMoveEnd);
 			if (_timberAbort) { _timberAbort.abort(); _timberAbort = null; }
@@ -2252,6 +2502,10 @@
 			document.getElementById('timber-status').textContent = '';
 		}
 		function refreshTimberLayer() {
+			const colorEl = document.getElementById('timber-color');
+			const fillColor = colorEl ? colorEl.value : '#d69e2e';
+			if (map.getLayer('timberLayer-fill')) map.setPaintProperty('timberLayer-fill', 'fill-color', fillColor);
+			if (map.getLayer('timberLayer-line')) map.setPaintProperty('timberLayer-line', 'line-color', fillColor);
 			if (forestTabChecks.timber) fetchTimberGeoJson();
 		}
 		function setTimberOpacity(val) {
@@ -2261,11 +2515,21 @@
 		}
 
 		// ── Landcover Layer ───────────────────────────────────────────────────────
+		const NLCD_BASE = 'https://imagery.geoplatform.gov/iipp/rest/services/Vegetation/USFS_EDW_NLCD_Landcover_CONUS/ImageServer';
+		const nlcdClasses = {
+			11:'Open Water',21:'Developed, Open Space',22:'Developed, Low Intensity',
+			23:'Developed, Medium Intensity',24:'Developed, High Intensity',31:'Barren Land',
+			41:'Deciduous Forest',42:'Evergreen Forest',43:'Mixed Forest',52:'Shrub/Scrub',
+			71:'Grassland/Herbaceous',81:'Pasture/Hay',82:'Cultivated Crops',
+			90:'Woody Wetlands',95:'Emergent Herbaceous Wetlands'
+		};
+		let _landcoverRefreshTimer = null;
+
 		function dateToTimestamp(dateStr) { return new Date(dateStr).getTime(); }
 		function buildLandcoverTileUrl() {
 			const t1 = dateToTimestamp(document.getElementById('landcover-start-date').value);
 			const t2 = dateToTimestamp(document.getElementById('landcover-end-date').value);
-			return `https://imagery.geoplatform.gov/iipp/rest/services/Vegetation/USFS_EDW_NLCD_Landcover_CONUS/ImageServer/exportImage`
+			return `${NLCD_BASE}/exportImage`
 				+ `?f=image&bbox={bbox-epsg-3857}&bboxSR=102100&imageSR=102100&size=256,256&format=jpgpng`
 				+ `&mosaicRule=${encodeURIComponent(JSON.stringify({ascending:true,mosaicMethod:'esriMosaicNorthwest',mosaicOperation:'MT_FIRST'}))}`
 				+ `&renderingRule=${encodeURIComponent(JSON.stringify({rasterFunction:'NLCDLC_AttTbl1'}))}`
@@ -2296,16 +2560,130 @@
 			}
 		}
 		function removeLandcoverLayer() {
-			if (map.getLayer('landcoverLayer'))    map.removeLayer('landcoverLayer');
-			if (map.getSource('landcoverSource'))  map.removeSource('landcoverSource');
+			if (map.getLayer('landcoverLayer'))   map.removeLayer('landcoverLayer');
+			if (map.getSource('landcoverSource')) map.removeSource('landcoverSource');
 			document.getElementById('landcover-status').textContent = '';
 		}
 		function refreshLandcoverLayer() {
-			if (forestTabChecks.landcover) { removeLandcoverLayer(); addLandcoverLayer(); }
+			// Debounce to avoid triggering new requests before old ones finish (NS_BINDING_ABORTED)
+			clearTimeout(_landcoverRefreshTimer);
+			_landcoverRefreshTimer = setTimeout(() => {
+				if (forestTabChecks.landcover) { removeLandcoverLayer(); addLandcoverLayer(); }
+			}, 600);
 		}
 		function setLandcoverOpacity(val) {
 			document.getElementById('landcover-opacity-val').textContent = Math.round(val * 100) + '%';
 			if (map.getLayer('landcoverLayer')) map.setPaintProperty('landcoverLayer', 'raster-opacity', parseFloat(val));
+		}
+		async function identifyNLCD(lat, lng) {
+			const { x, y } = latLngToWebMercator(lat, lng);
+			const t1 = dateToTimestamp(document.getElementById('landcover-start-date').value);
+			const t2 = dateToTimestamp(document.getElementById('landcover-end-date').value);
+			const params = new URLSearchParams({
+				f: 'json',
+				geometry: JSON.stringify({x, y, spatialReference:{latestWkid:3857, wkid:102100}}),
+				geometryType: 'esriGeometryPoint',
+				mosaicRule: JSON.stringify({ascending:true, mosaicMethod:'esriMosaicNorthwest', mosaicOperation:'MT_FIRST'}),
+				renderingRules: JSON.stringify([{rasterFunction:'NLCDLC_AttTbl1'}]),
+				pixelSize: JSON.stringify({spatialReference:{latestWkid:3857,wkid:102100}, x:9.554628535634155, y:9.554628535634155}),
+				returnGeometry: 'true',
+				returnCatalogItems: 'true',
+				returnPixelValues: 'true',
+				maxItemCount: '1',
+				time: `${t1},${t2}`,
+				processAsMultidimensional: 'false',
+			});
+			try {
+				const res  = await fetch(`${NLCD_BASE}/identify?${params}`);
+				const json = await res.json();
+				// The service returns pixel values in catalogItems or value; prefer catalogItems[0]
+				const raw = json?.catalogItems?.features?.[0]?.attributes?.Value
+					?? json?.value;
+				if (raw == null || raw === 'NoData' || raw === '') return null;
+				const code = parseInt(raw, 10);
+				return nlcdClasses[code] || `Class ${code}`;
+			} catch(e) { return null; }
+		}
+
+		// ── Riparian Areas Layer ──────────────────────────────────────────────────
+		const RIPARIAN_BASE = 'https://imagery.geoplatform.gov/iipp/rest/services/Ecosystems/USFS_EDW_Riparian_Areas/ImageServer';
+
+		function buildRiparianTileUrl() {
+			// Derive two tint colors from the user's chosen color:
+			//   pixel 1 (riparian zone) → chosen color
+			//   pixel 2 (riparian buffer) → lighter/more-cyan blend of chosen color
+			const hex = (document.getElementById('riparian-color')?.value || '#1565c0').replace('#','');
+			const r = parseInt(hex.slice(0,2),16), g = parseInt(hex.slice(2,4),16), b = parseInt(hex.slice(4,6),16);
+			// Pixel 2: blend 50% toward cyan (0,200,255)
+			const r2 = Math.round(r*0.5), g2 = Math.round(g*0.5 + 200*0.5), b2 = Math.round(b*0.5 + 255*0.5);
+			const renderingRule = JSON.stringify({
+				rasterFunction: 'Colormap',
+				rasterFunctionArguments: {
+					Colormap: [[0,0,0,0],[1,r,g,b],[2,r2,g2,b2]],
+					Raster: { rasterFunction: 'Riparian' }
+				}
+			});
+			return `${RIPARIAN_BASE}/exportImage`
+				+ `?f=image&bbox={bbox-epsg-3857}&bboxSR=102100&imageSR=102100&size=256,256&format=jpgpng`
+				+ `&mosaicRule=${encodeURIComponent(JSON.stringify({ascending:true,mosaicMethod:'esriMosaicNorthwest',mosaicOperation:'MT_FIRST'}))}`
+				+ `&renderingRule=${encodeURIComponent(renderingRule)}`;
+		}
+		function addRiparianLayer() {
+			if (!mapLoaded) return;
+			removeRiparianLayer();
+			const opacity = parseFloat(document.getElementById('riparian-opacity').value);
+			try {
+				map.addSource('riparianSource', {
+					type: 'raster',
+					tiles: [buildRiparianTileUrl()],
+					tileSize: 256,
+					maxzoom: 14,
+					attribution: '© USFS EDW Riparian Areas'
+				});
+				map.addLayer({
+					id: 'riparianLayer',
+					type: 'raster',
+					source: 'riparianSource',
+					paint: { 'raster-opacity': opacity }
+				}, getInsertionLayer(false));
+				document.getElementById('riparian-status').textContent = '💧 Riparian layer loaded';
+			} catch(e) {
+				console.error('Riparian layer error:', e);
+				document.getElementById('riparian-status').textContent = '⚠ Failed to load riparian layer';
+			}
+		}
+		function removeRiparianLayer() {
+			if (map.getLayer('riparianLayer'))   map.removeLayer('riparianLayer');
+			if (map.getSource('riparianSource')) map.removeSource('riparianSource');
+			document.getElementById('riparian-status').textContent = '';
+		}
+		function refreshRiparianLayer() {
+			if (forestTabChecks.riparian) { removeRiparianLayer(); addRiparianLayer(); }
+		}
+		function setRiparianOpacity(val) {
+			document.getElementById('riparian-opacity-val').textContent = Math.round(val * 100) + '%';
+			if (map.getLayer('riparianLayer')) map.setPaintProperty('riparianLayer', 'raster-opacity', parseFloat(val));
+		}
+		
+		async function identifyRiparian(lat, lng) {
+			const { x, y } = latLngToWebMercator(lat, lng);
+			const params = new URLSearchParams({
+				f: 'json',
+				geometry: JSON.stringify({x, y, spatialReference:{wkid:3857}}),
+				geometryType: 'esriGeometryPoint',
+				inSR: '3857',
+				pixelSize: '30,30',
+				returnGeometry: 'false',
+				returnCatalogItems: 'false',
+				returnAllPixelValues: 'false',
+			});
+			try {
+				const res  = await fetch(`${RIPARIAN_BASE}/identify?${params}`);
+				const json = await res.json();
+				const raw  = json?.value;
+				if (raw == null || raw === 'NoData' || raw === '') return null;
+				return raw === '1' || raw === 1 ? 'Riparian Zone' : null;
+			} catch(e) { return null; }
 		}
 
 		// ── Toggle panel minimize ─────────────────────────────────────────────────
@@ -2316,6 +2694,11 @@
 			btn.style.transform = treePanelMinimized ? 'rotate(180deg)' : '';
 			btn.style.transition = 'transform 0.2s';
 			document.getElementById('tree-panel-body').style.display = treePanelMinimized ? 'none' : 'flex';
+			document.getElementById('elev-panel-body').classList.add('hidden');
+			document.getElementById('aspect-panel-body').classList.add('hidden');
+			elevPanelOpen = false, aspectPanelOpen = false;
+			document.getElementById('elev-panel').style.display = treePanelMinimized ? '' : 'none';
+			document.getElementById('aspect-panel').style.display = treePanelMinimized ? '' : 'none';
 		}
 		// Initialize tree panel as minimized on page load
 		(function(){
@@ -2331,6 +2714,7 @@
 			if (forestTabChecks.fires)     addFiresLayer();
 			if (forestTabChecks.timber)    addTimberLayer();
 			if (forestTabChecks.landcover) addLandcoverLayer();
+			if (forestTabChecks.riparian)  addRiparianLayer();
 		});
 
 		loadTreeSlices();
@@ -2351,6 +2735,7 @@
 		popupEl.innerHTML = `
 			<div class="popup-wrapper">
 				<div class="popup-content" id="popup-content">–</div>
+				<div class="popup-elevation" id="popup-elevation" style="font-size: 10px; color: #666; padding: 0 .4rem 0; text-align: center;"></div>
 				<div class="popup-coords" id="popup-coords"></div>
 			</div>
 			<div class="popup-stem"><div class="popup-dot"></div></div>
@@ -2415,17 +2800,62 @@
 			} catch(e) { return null; }
 		}
 
+		async function getElevationAt(lngLat) {
+			const zoom = Math.floor(map.getZoom());
+			const { x, y } = latLngToWebMercator(lngLat.lat, lngLat.lng);
+			
+			// Calculate tile coordinates
+			const tileSize = 256;
+			const tilesPerSide = Math.pow(2, zoom);
+			const tileWidth = 20037508.3427892 * 2 / tilesPerSide;
+			
+			const tileX = Math.floor((x + 20037508.3427892) / tileWidth);
+			const tileY = Math.floor((20037508.3427892 - y) / tileWidth);
+			
+			// Calculate pixel coordinates within tile
+			const tileXOffset = (x + 20037508.3427892) % tileWidth;
+			const tileYOffset = (20037508.3427892 - y) % tileWidth;
+			const px = Math.floor(tileXOffset / tileWidth * tileSize);
+			const py = Math.floor(tileYOffset / tileWidth * tileSize);
+			
+			if (px < 0 || px >= tileSize || py < 0 || py >= tileSize) return null;
+			
+			return new Promise((resolve) => {
+				const img = new Image();
+				img.crossOrigin = 'anonymous';
+				img.onload = () => {
+					const canvas = document.createElement('canvas');
+					canvas.width = canvas.height = tileSize;
+					const ctx = canvas.getContext('2d');
+					ctx.drawImage(img, 0, 0);
+					const data = ctx.getImageData(px, py, 1, 1).data;
+					const elev = (data[0] * 256 + data[1] + data[2] / 256) - 32768;
+					resolve(elev);
+				};
+				img.onerror = () => resolve(null);
+				img.src = `https://s3.amazonaws.com/elevation-tiles-prod/terrarium/${zoom}/${tileX}/${tileY}.png`;
+			});
+		}
+
 		// ── Async render: soil via OMWeatherMapLayer + tree via ESRI identify ──────
 		async function updatePopupAt(screenPt, lngLat) {
 			const contentEl = document.getElementById('popup-content');
-			const coordsEl  = document.getElementById('popup-coords');
+			const elevEl = document.getElementById('popup-elevation');
+			const coordsEl = document.getElementById('popup-coords');
 
 			coordsEl.textContent = fmtCoords(lngLat);
+			const elev = await getElevationAt(lngLat);
+			if (elev !== null && isFinite(elev) && elev > -1000 && elev < 10000) {
+				const elevFt = elev * 3.28084;
+				elevEl.textContent = `${elevFt.toFixed(0)} ft (${elev.toFixed(0)} m)`;
+			} else {
+				elevEl.textContent = '';
+			}
 			positionPopup(screenPt);
 			popupEl.style.display = 'block';
 			popupVisible = true;
 
-			const hasAnything = tempActive || moistActive || (activeSlices && activeSlices.size > 0) || forestTabChecks.fires || forestTabChecks.timber;
+			const hasAnything = tempActive || moistActive || (activeSlices && activeSlices.size > 0) || forestTabChecks.fires || forestTabChecks.timber || forestTabChecks.landcover || forestTabChecks.riparian;
 			if (!hasAnything) {
 				contentEl.innerHTML = '<span style="color:#888;font-size:11px">No layer</span>';
 				return;
@@ -2491,12 +2921,10 @@
 					const key  = name + type;
 					if (seen.has(key)) continue;
 					seen.add(key);
-					// Acres
 					let acresStr = '';
 					if (p.poly_GISAcres != null && isFinite(+p.poly_GISAcres)) {
 						acresStr = ` · ${(+p.poly_GISAcres).toLocaleString(undefined, {maximumFractionDigits:0})} ac`;
 					}
-					// Discovery date — may be ms timestamp or ISO string
 					let discStr = '';
 					if (p.attr_FireDiscoveryDateTime != null) {
 						const raw = p.attr_FireDiscoveryDateTime;
@@ -2509,7 +2937,7 @@
 				}
 			}
 
-		// ── Timber: query rendered GeoJSON features at point ─────────────────────
+			// ── Timber: query rendered GeoJSON features at point ─────────────────────
 			if (forestTabChecks.timber && map.getLayer('timberLayer-fill')) {
 				const queryPoint = map.project(lngLat);
 				const timberFeatures = map.queryRenderedFeatures(queryPoint, { layers: ['timberLayer-fill'] });
@@ -2517,7 +2945,6 @@
 				for (const f of timberFeatures) {
 					const p    = f.properties || {};
 					const unit = p.AU_NAME || p.ADMIN_FOREST_NAME || 'Unknown Unit';
-					// DATE_AWARDED may be a Unix ms timestamp (number) or an ISO string
 					let dateStr = '';
 					if (p.DATE_AWARDED != null) {
 						const raw = p.DATE_AWARDED;
@@ -2535,47 +2962,60 @@
 				}
 			}
 
-			// ── Tree layers: ESRI ImageServer identify debounced — only fetch after mouse stops moving ────────────────────────────
-			if (activeSlices && activeSlices.size > 0) {
-				clearTimeout(_treeDebounceTimer);
-				const captureLngLat = { lat: lngLat.lat, lng: lngLat.lng };
-				_treeDebounceTimer = setTimeout(async () => {
-					const treePromises = [];
-					activeSlices.forEach((info) => {
-						treePromises.push(
-							identifyTreeSlice(captureLngLat.lat, captureLngLat.lng, info.varName, info.year)
-								.then(result => ({ info, result }))
-						);
-					});
-					const treeResults = await Promise.all(treePromises);
-					const treeRows = [];
-					for (const { info, result } of treeResults) {
-						if (!result) continue;
-						const typeInfo    = getTreeTypeInfo(info.varName);
-						const rampCss     = getRampCss(info.settings);
-						const swatchStyle = `background:${rampCss};width:22px;height:10px;border-radius:2px;border:1px solid rgba(0,0,0,0.18);flex-shrink:0`;
-						const label       = info.varName.replace(/_/g, ' ');
-						const valStr = `${result.value.toFixed(1)} ${result.unit}`;
-						treeRows.push(`<span class="popup-value-row"><span class="popup-swatch" style="${swatchStyle}"></span>${typeInfo.icon} <span style="font-size:10px;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:wrap" title="${label} (${info.year})">${label}</span>&nbsp;<span style="color:#666;font-size:10px">${valStr}</span></span>`);
-					}
-					// Append tree rows to whatever is already displayed
-					const contentEl = document.getElementById('popup-content');
-					if (contentEl) {
-						const existing = contentEl.innerHTML
-							.replace(/<span[^>]*>🌲[^<]*<\/span><br[^>]*>/gi, '')
-							.replace(/<span[^>]*>🌲[^<]*<\/span>/gi, '');
-						if (treeRows.length) {
-							contentEl.innerHTML = (existing ? existing + '<br style="margin:1px 0">' : '') + treeRows.join('<br style="margin:1px 0">');
-						} else {
-							contentEl.innerHTML = existing || '<span style="color:#888;font-size:11px">No data</span>';
-						}
-					}
-				}, 400); // 400ms after mouse stops
-			}
-
+			// Show synchronous rows now, then append async identify results
 			contentEl.innerHTML = rows.length
 				? rows.join('<br style="margin:1px 0">')
 				: '<span style="color:#888;font-size:11px">No data</span>';
+
+			// ── Async identifies: NLCD + Riparian + Tree (debounced) ─────────────────
+			const needsAsync = forestTabChecks.landcover || forestTabChecks.riparian || (activeSlices && activeSlices.size > 0);
+			if (needsAsync) {
+				clearTimeout(_treeDebounceTimer);
+				const captureLngLat = { lat: lngLat.lat, lng: lngLat.lng };
+				_treeDebounceTimer = setTimeout(async () => {
+					const asyncRows = [];
+
+					// NLCD Landcover identify
+					if (forestTabChecks.landcover) {
+						const cls = await identifyNLCD(captureLngLat.lat, captureLngLat.lng);
+						if (cls) asyncRows.push(`<span class="popup-value-row"><span class="popup-swatch" style="background:#5a8a3c;width:10px;height:10px;border-radius:2px;flex-shrink:0"></span>🗺 <span style="font-size:10px">${cls}</span></span>`);
+					}
+
+					// Riparian identify
+					if (forestTabChecks.riparian) {
+						const rip = await identifyRiparian(captureLngLat.lat, captureLngLat.lng);
+						if (rip) asyncRows.push(`<span class="popup-value-row"><span class="popup-swatch" style="background:#1565c0;width:10px;height:10px;border-radius:2px;flex-shrink:0"></span>💧 <span style="font-size:10px">${rip}</span></span>`);
+					}
+
+					// Tree species identify
+					if (activeSlices && activeSlices.size > 0) {
+						const treePromises = [];
+						activeSlices.forEach((info) => {
+							treePromises.push(
+								identifyTreeSlice(captureLngLat.lat, captureLngLat.lng, info.varName, info.year)
+									.then(result => ({ info, result }))
+							);
+						});
+						const treeResults = await Promise.all(treePromises);
+						for (const { info, result } of treeResults) {
+							if (!result) continue;
+							const typeInfo    = getTreeTypeInfo(info.varName);
+							const rampCss     = getRampCss(info.settings);
+							const swatchStyle = `background:${rampCss};width:22px;height:10px;border-radius:2px;border:1px solid rgba(0,0,0,0.18);flex-shrink:0`;
+							const label       = info.varName.replace(/_/g, ' ');
+							const valStr = `${result.value.toFixed(1)} ${result.unit}`;
+							asyncRows.push(`<span class="popup-value-row"><span class="popup-swatch" style="${swatchStyle}"></span>${typeInfo.icon} <span style="font-size:10px;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:wrap" title="${label} (${info.year})">${label}</span>&nbsp;<span style="color:#666;font-size:10px">${valStr}</span></span>`);
+						}
+					}
+
+					// Append async rows
+					const el = document.getElementById('popup-content');
+					if (el && asyncRows.length) {
+						const existing = el.innerHTML === '<span style="color:#888;font-size:11px">No data</span>' ? '' : el.innerHTML;
+						el.innerHTML = (existing ? existing + '<br style="margin:1px 0">' : '') + asyncRows.join('<br style="margin:1px 0">');
+					}
+				}, 400);
+			}
 		}
 
 		// ── Hide popup ────────────────────────────────────────────────────────────
@@ -2590,35 +3030,59 @@
 		let _dragOffsetX = 0;
 		let _dragOffsetY = 0;
 
-		popupEl.addEventListener('mousedown', e => {
+		// Replace the existing popup drag event listeners with this
+		function startDrag(e) {
 			if (popupMode !== 'draggable') return;
 			e.preventDefault();
 			e.stopPropagation();
 			_isDraggingPopup = true;
+			
+			// Get client coordinates from touch or mouse
+			const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+			const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+			
 			const rect = map.getContainer().getBoundingClientRect();
 			const curX = parseFloat(popupEl.style.left);
 			const curY = parseFloat(popupEl.style.top);
-			_dragOffsetX = e.clientX - rect.left - curX;
-			_dragOffsetY = e.clientY - rect.top  - curY;
+			_dragOffsetX = clientX - rect.left - curX;
+			_dragOffsetY = clientY - rect.top - curY;
 			popupEl.style.cursor = 'grabbing';
 			map.dragPan.disable();
-		});
+		}
 
-		document.addEventListener('mousemove', e => {
+		function onDragMove(e) {
 			if (!_isDraggingPopup) return;
+			e.preventDefault();
+			
+			// Get client coordinates from touch or mouse
+			const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+			const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+			
 			const rect = map.getContainer().getBoundingClientRect();
-			const newX = e.clientX - rect.left - _dragOffsetX;
-			const newY = e.clientY - rect.top  - _dragOffsetY;
+			const newX = clientX - rect.left - _dragOffsetX;
+			const newY = clientY - rect.top - _dragOffsetY;
 			dragPopupLngLat = map.unproject([newX, newY]);
 			updatePopupAt({ x: newX, y: newY }, dragPopupLngLat);
-		});
+		}
 
-		document.addEventListener('mouseup', e => {
+		function endDrag() {
 			if (!_isDraggingPopup) return;
 			_isDraggingPopup = false;
 			popupEl.style.cursor = 'grab';
 			map.dragPan.enable();
-		});
+		}
+
+		// Remove old event listeners and add new ones
+		popupEl.removeEventListener('mousedown', startDrag);
+		popupEl.addEventListener('mousedown', startDrag);
+		popupEl.addEventListener('touchstart', startDrag, { passive: false });
+
+		document.removeEventListener('mousemove', onDragMove);
+		document.removeEventListener('mouseup', endDrag);
+		document.addEventListener('mousemove', onDragMove);
+		document.addEventListener('touchmove', onDragMove, { passive: false });
+		document.addEventListener('mouseup', endDrag);
+		document.addEventListener('touchend', endDrag);
 
 		// ── Mode switching ────────────────────────────────────────────────────────
 		function setPopupMode(mode) {
@@ -2680,6 +3144,937 @@
 				updatePopupAt(map.project(dragPopupLngLat), dragPopupLngLat);
 			}
 		});
+
+		// ═══════════════════════════════════════════════════════════════════════════
+		// ELEVATION & ASPECT RANGE EXPLORERS
+		// ═══════════════════════════════════════════════════════════════════════════
+
+		const TERRARIUM_URL = 'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png';
+		const ELEV_SRC  = 'elevRangeSrc';
+		const ELEV_LYR  = 'elevRangeLayer';
+		const ASPECT_SRC = 'aspectRangeSrc';
+		const ASPECT_LYR = 'aspectRangeLayer';
+
+		// Global enabled flags
+		let elevMasterEnabled  = false;
+		let aspectMasterEnabled = false;
+		let elevUnit = 'ft';
+		let elevMasterOpacity  = 0.75;
+		let aspectMasterOpacity = 0.75;
+		const FT_TO_M = 0.3048;
+		const ELEV_MIN_FT = -1000, ELEV_MAX_FT = 15000;
+		const toM  = v => elevUnit === 'ft' ? v * FT_TO_M : v;
+
+		// Ranges — enabled:false by default
+		let elevRanges = [
+			{ min: 0, max: 3000, c1: '#4fc3f7', a1: 0.7, c2: '#0d47a1', a2: 0.7, gradient: false, enabled: false }
+		];
+		let aspectRanges = [
+			{ minDeg: 315, maxDeg: 45,  color: '#1565c0', alpha: 0.7, label: 'N', enabled: false }
+		];
+
+		function hexToRgbArr(hex) {
+			const n = parseInt(hex.slice(1), 16);
+			return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+		}
+		function lerpColor(c1, c2, t) {
+			return [Math.round(c1[0]+t*(c2[0]-c1[0])), Math.round(c1[1]+t*(c2[1]-c1[1])), Math.round(c1[2]+t*(c2[2]-c1[2]))];
+		}
+
+		// ── Panel collapse ──────────────────────────────────────────────────────────
+		let elevPanelOpen = false, aspectPanelOpen = false;
+
+		(function() {
+			document.getElementById('elev-panel-body').classList.add('hidden');
+			document.getElementById('aspect-panel-body').classList.add('hidden');
+		})();
+
+		function toggleElevPanel() {
+			elevPanelOpen = !elevPanelOpen;
+			document.getElementById('elev-panel-body').classList.toggle('hidden', !elevPanelOpen);
+			document.getElementById('elev-panel-chevron').textContent = elevPanelOpen ? '▲' : '▼';
+			
+			if (elevPanelOpen) {
+				// Hide entire aspect panel
+				document.getElementById('aspect-panel').style.display = 'none';
+				// Close aspect panel if it was open
+				if (aspectPanelOpen) {
+					aspectPanelOpen = false;
+					document.getElementById('aspect-panel-body').classList.add('hidden');
+					document.getElementById('aspect-panel-chevron').textContent = '▲';
+				}
+			} else {
+				// Show aspect panel again
+				document.getElementById('aspect-panel').style.display = '';
+			}
+		}
+
+		function toggleAspectPanel() {
+			// Prevent opening aspect panel when elev is open
+			if (elevPanelOpen) return;
+			
+			aspectPanelOpen = !aspectPanelOpen;
+			document.getElementById('aspect-panel-body').classList.toggle('hidden', !aspectPanelOpen);
+			document.getElementById('aspect-panel-chevron').textContent = aspectPanelOpen ? '▲' : '▼';
+		}
+
+		// ── Master toggles ──────────────────────────────────────────────────────────
+		function onElevMasterToggle(checked) {
+			elevMasterEnabled = checked;
+			elevRanges.forEach(r => r.enabled = checked);
+			syncElevMasterLock();
+			renderElevRanges();
+			refreshElevLayer();
+		}
+		function onAspectMasterToggle(checked) {
+			aspectMasterEnabled = checked;
+			aspectRanges.forEach(r => r.enabled = checked);
+			syncAspectMasterLock();
+			renderAspectRanges();
+			refreshAspectLayer();
+		}
+		function syncElevMasterCheck() {
+			const allOn = elevRanges.length > 0 && elevRanges.every(r => r.enabled);
+			const masterCheck = document.getElementById('elev-master-check');
+			if (masterCheck) {
+				masterCheck.checked = allOn;
+				elevMasterEnabled = allOn;
+			}
+			syncElevMasterLock();
+		}
+		function syncAspectMasterCheck() {
+			const allOn = aspectRanges.length > 0 && aspectRanges.every(r => r.enabled);
+			const masterCheck = document.getElementById('aspect-master-check');
+			if (masterCheck) {
+				masterCheck.checked = allOn;
+				aspectMasterEnabled = allOn;
+			}
+			syncAspectMasterLock();
+		}
+		function syncElevMasterLock() {
+			const disabled = !elevMasterEnabled;
+			const opEl = document.getElementById('elev-master-opacity');
+			opEl.disabled = disabled;
+			opEl.style.opacity = disabled ? '0.4' : '';
+			document.getElementById('elev-ranges').querySelectorAll('input,button,select').forEach(el => {
+				el.disabled = disabled;
+				el.style.opacity = disabled ? '0.4' : '';
+			});
+			const addBtn = document.querySelector('#elev-panel .exp-add-btn');
+			if (addBtn) { addBtn.disabled = disabled; addBtn.style.opacity = disabled ? '0.4' : ''; }
+		}
+		function syncAspectMasterLock() {
+			const disabled = !aspectMasterEnabled;
+			const opEl = document.getElementById('aspect-master-opacity');
+			opEl.disabled = disabled;
+			opEl.style.opacity = disabled ? '0.4' : '';
+			document.getElementById('aspect-ranges').querySelectorAll('input,button,select').forEach(el => {
+				el.disabled = disabled;
+				el.style.opacity = disabled ? '0.4' : '';
+			});
+			const addBtn = document.querySelector('#aspect-panel .exp-add-btn');
+			if (addBtn) { addBtn.disabled = disabled; addBtn.style.opacity = disabled ? '0.4' : ''; }
+		}
+
+		// ── Opacity ─────────────────────────────────────────────────────────────────
+		function setElevMasterOpacity(v) {
+			elevMasterOpacity = parseFloat(v);
+			document.getElementById('elev-opacity-val').textContent = Math.round(elevMasterOpacity*100)+'%';
+			if (map.getLayer(ELEV_LYR)) map.setPaintProperty(ELEV_LYR,'raster-opacity',elevMasterOpacity);
+		}
+		function setAspectMasterOpacity(v) {
+			aspectMasterOpacity = parseFloat(v);
+			document.getElementById('aspect-opacity-val').textContent = Math.round(aspectMasterOpacity*100)+'%';
+			if (map.getLayer(ASPECT_LYR)) map.setPaintProperty(ASPECT_LYR,'raster-opacity',aspectMasterOpacity);
+		}
+
+		// ── Unit toggle ─────────────────────────────────────────────────────────────
+		function setElevUnit(u) {
+			if (u === elevUnit) return;
+			elevRanges.forEach(r => {
+				if (u === 'm') { r.min = Math.round(r.min*FT_TO_M); r.max = Math.round(r.max*FT_TO_M); }
+				else           { r.min = Math.round(r.min/FT_TO_M); r.max = Math.round(r.max/FT_TO_M); }
+			});
+			elevUnit = u;
+			document.getElementById('elev-btn-ft').classList.toggle('active', u==='ft');
+			document.getElementById('elev-btn-m').classList.toggle('active',  u==='m');
+			renderElevRanges();
+			refreshElevLayer();
+		}
+
+		// ══════════════════════════════════════════════════════════════════════════════
+		// ELEVATION: vertical dual-handle slider
+		// ══════════════════════════════════════════════════════════════════════════════
+
+		// Slider bounds in current unit
+		function elevSliderMin() { return elevUnit==='ft' ? ELEV_MIN_FT : Math.round(ELEV_MIN_FT*FT_TO_M); }
+		function elevSliderMax() { return elevUnit==='ft' ? ELEV_MAX_FT : Math.round(ELEV_MAX_FT*FT_TO_M); }
+
+		// Convert value → fractional position (0=bottom,1=top) within slider bounds
+		function elevValToFrac(v) {
+			const lo = elevSliderMin(), hi = elevSliderMax();
+			return Math.max(0, Math.min(1, (v - lo) / (hi - lo)));
+		}
+		// Convert fractional position → snapped value
+		function elevFracToVal(f) {
+			const lo = elevSliderMin(), hi = elevSliderMax();
+			const step = elevUnit==='ft' ? 50 : 15;
+			return Math.round((lo + f*(hi-lo)) / step) * step;
+		}
+
+		function makeElevSlider(r, onChangeCallback, middleContent) {
+			const HEIGHT = 140; // px of track area
+			const unitLabel = elevUnit==='ft' ? 'ft' : 'm';
+
+			const wrap = document.createElement('div');
+			wrap.className = 'elev-vslider-wrap';
+
+			// Track column
+			const trackArea = document.createElement('div');
+			trackArea.className = 'elev-vslider-track-area';
+			trackArea.style.height = HEIGHT + 'px';
+
+			const track = document.createElement('div');
+			track.className = 'elev-vslider-track';
+
+			const fill = document.createElement('div');
+			fill.className = 'elev-vslider-fill';
+
+			const handleTop = document.createElement('div');    // max handle (top = high elev)
+			handleTop.className = 'elev-vslider-handle';
+			const handleBot = document.createElement('div');    // min handle (bottom = low elev)
+			handleBot.className = 'elev-vslider-handle';
+
+			track.appendChild(fill);
+			trackArea.appendChild(track);
+			trackArea.appendChild(handleTop);
+			trackArea.appendChild(handleBot);
+
+			// Value display column
+			const valsCol = document.createElement('div');
+			valsCol.className = 'elev-vslider-vals';
+
+			const rowTop = document.createElement('div');
+			rowTop.className = 'elev-vslider-val-row';
+			rowTop.innerHTML = `<input type="number" style="text-align: left;" value="${r.max}"><span class="ev-unit">${unitLabel}</span>`;
+
+			const rowBot = document.createElement('div');
+			rowBot.className = 'elev-vslider-val-row';
+			rowBot.innerHTML = `<input type="number" style="text-align: left;" value="${r.min}"><span class="ev-unit">${unitLabel}</span>`;
+
+			valsCol.appendChild(rowTop);
+
+			if (middleContent) {
+				middleContent.forEach(el => valsCol.appendChild(el));
+			}
+
+			valsCol.appendChild(rowBot);
+
+			wrap.appendChild(trackArea);
+			wrap.appendChild(valsCol);
+
+			const maxInp = rowTop.querySelector('input');
+			const minInp = rowBot.querySelector('input');
+
+			function positionHandles() {
+				const fracMax = elevValToFrac(r.max);
+				const fracMin = elevValToFrac(r.min);
+				// top of track area = high elevation (frac=1), bottom = low (frac=0)
+				const topPx  = (1 - fracMax) * HEIGHT;
+				const botPx  = (1 - fracMin) * HEIGHT;
+				handleTop.style.top = topPx + 'px';
+				handleBot.style.top = botPx + 'px';
+				fill.style.top    = topPx + 'px';
+				fill.style.height = (botPx - topPx) + 'px';
+				maxInp.value = r.max;
+				minInp.value = r.min;
+			}
+			positionHandles();
+
+			function makeDrag(handle, isMax) {
+				handle.addEventListener('pointerdown', e => {
+					e.preventDefault();
+					e.stopPropagation();
+					handle.classList.add('dragging');
+					handle.setPointerCapture(e.pointerId);
+					const rect = trackArea.getBoundingClientRect();
+					const onMove = ev => {
+						const relY = ev.clientY - rect.top;
+						const frac = Math.max(0, Math.min(1, 1 - relY / HEIGHT));
+						const val  = elevFracToVal(frac);
+						if (isMax) {
+							r.max = Math.max(r.min + (elevUnit==='ft'?50:15), val);
+						} else {
+							r.min = Math.min(r.max - (elevUnit==='ft'?50:15), val);
+						}
+						positionHandles();
+						onChangeCallback();
+					};
+					const onUp = () => {
+						handle.classList.remove('dragging');
+						handle.removeEventListener('pointermove', onMove);
+						handle.removeEventListener('pointerup', onUp);
+					};
+					handle.addEventListener('pointermove', onMove);
+					handle.addEventListener('pointerup', onUp);
+				});
+			}
+			makeDrag(handleTop, true);
+			makeDrag(handleBot, false);
+
+			maxInp.oninput = e => { r.max = +e.target.value; positionHandles(); onChangeCallback(); };
+			minInp.oninput = e => { r.min = +e.target.value; positionHandles(); onChangeCallback(); };
+			maxInp.addEventListener('wheel', e => { e.preventDefault(); r.max += e.deltaY<0?(elevUnit==='ft'?10:3):-(elevUnit==='ft'?10:3); positionHandles(); onChangeCallback(); }, {passive:false});
+			minInp.addEventListener('wheel', e => { e.preventDefault(); r.min += e.deltaY<0?(elevUnit==='ft'?10:3):-(elevUnit==='ft'?100:3); positionHandles(); onChangeCallback(); }, {passive:false});
+
+			return wrap;
+		}
+
+		// ── Elevation protocol ───────────────────────────────────────────────────────
+		function registerElevProtocol() {
+			try { maplibregl.removeProtocol('elevrange'); } catch(e) {}
+			maplibregl.addProtocol('elevrange', (params) => {
+				const clean = params.url.replace(/^elevrange:\/\//, '').split('?')[0];
+				const parts = clean.split('/');
+				const z = parseInt(parts[0],10), x = parseInt(parts[1],10), y = parseInt(parts[2],10);
+				const tileUrl = TERRARIUM_URL.replace('{z}',z).replace('{x}',x).replace('{y}',y);
+				return new Promise((resolve, reject) => {
+					const img = new Image(); img.crossOrigin = 'anonymous';
+					img.onload = () => {
+						const sz = 256;
+						const canvas = document.createElement('canvas'); canvas.width = canvas.height = sz;
+						const ctx = canvas.getContext('2d'); ctx.drawImage(img,0,0,sz,sz);
+						const src = ctx.getImageData(0,0,sz,sz);
+						const out = ctx.createImageData(sz,sz);
+						const activeRanges = elevRanges.filter(r => r.enabled);
+						for (let i = 0; i < sz*sz; i++) {
+							const r2=src.data[i*4], g=src.data[i*4+1], b=src.data[i*4+2];
+							const elevM = (r2*256+g+b/256)-32768;
+							let matched=false;
+							for (const rng of activeRanges) {
+								const minM=toM(rng.min), maxM=toM(rng.max);
+								if (elevM>=minM && elevM<=maxM) {
+									let rc,gc2,bc2,ac;
+									if (rng.gradient) {
+										const t=maxM>minM?(elevM-minM)/(maxM-minM):0;
+										// gradient: c1=high color, c2=low color → lerp high→low
+										const col=lerpColor(hexToRgbArr(rng.c1),hexToRgbArr(rng.c2),1-t);
+										const alp=rng.a1+(1-t)*(rng.a2-rng.a1);
+										[rc,gc2,bc2,ac]=[col[0],col[1],col[2],alp];
+									} else {
+										const col=hexToRgbArr(rng.c1);
+										[rc,gc2,bc2,ac]=[col[0],col[1],col[2],rng.a1];
+									}
+									out.data[i*4]=rc; out.data[i*4+1]=gc2; out.data[i*4+2]=bc2;
+									out.data[i*4+3]=Math.round(ac*255);
+									matched=true; break;
+								}
+							}
+							if (!matched) out.data[i*4+3]=0;
+						}
+						ctx.putImageData(out,0,0);
+						canvas.toBlob(blob=>{ blob.arrayBuffer().then(buf=>resolve({data:buf})); },'image/png');
+					};
+					img.onerror=()=>reject(new Error('tile fail'));
+					img.src=tileUrl;
+				});
+			});
+		}
+
+		function refreshElevLayer() {
+			if (!mapLoaded) return;
+			registerElevProtocol();
+			if (map.getLayer(ELEV_LYR)) map.removeLayer(ELEV_LYR);
+			if (map.getSource(ELEV_SRC)) map.removeSource(ELEV_SRC);
+			if (!elevMasterEnabled || elevRanges.filter(r=>r.enabled).length===0) return;
+			const token = Date.now();
+			map.addSource(ELEV_SRC,{type:'raster',tiles:[`elevrange://{z}/{x}/{y}?t=${token}`],tileSize:256,maxzoom:14,attribution:'Elevation: Tilezen Terrarium'});
+			map.addLayer({id:ELEV_LYR,type:'raster',source:ELEV_SRC,paint:{'raster-opacity':elevMasterOpacity,'raster-resampling':'nearest'}},getInsertionLayer(false));
+		}
+
+		// ── Elevation UI ─────────────────────────────────────────────────────────────
+		function renderElevRanges() {
+			const container = document.getElementById('elev-ranges');
+			container.innerHTML = '';
+			elevRanges.forEach((r, i) => {
+				const div = document.createElement('div');
+				div.className = 'exp-range-row' + (r.enabled ? '' : ' disabled-range');
+
+				const hdr = document.createElement('div');
+				hdr.className = 'exp-range-header';
+				hdr.innerHTML = `
+					<input type="checkbox" class="exp-range-check" ${r.enabled?'checked':''} title="Enable this range">
+					<span class="exp-range-label">${r.min} – ${r.max} ${elevUnit==='ft'?'ft':'m'}</span>
+					<label style="font-size:10px;color:#888;display:flex;align-items:center;gap:3px;margin-left:auto">Z<input type="number" class="exp-z-input" value="${r.zOrder??5}" min="1" max="10" step="1" style="width:34px;padding:1px 3px;border:1px solid #ccc;border-radius:4px;font-size:10px" title="Z Order"></label>
+					<button class="exp-remove-btn" title="Remove">✕</button>
+				`;
+				div.appendChild(hdr);
+
+				// Main color row
+				const colorRow = document.createElement('div');
+				colorRow.className = 'exp-color-row';
+				colorRow.innerHTML = `
+					<input type="color" value="${r.c1}" title="Range color">
+					<input type="range" style="max-width:40%" min="0" max="1" step="0.01" value="${r.a1}">
+					<span class="exp-alpha-val">${Math.round(r.a1*100)}%</span>
+				`;
+
+				// Gradient toggle
+				const gradRow = document.createElement('div');
+				gradRow.className = 'exp-gradient-row';
+				gradRow.innerHTML = `<label style="display:flex;align-items:center;gap:4px;font-size:11px;color:#555;cursor:pointer"><input type="checkbox" ${r.gradient?'checked':''}> Gradient</label>`;
+
+				// Low color row
+				const lowRow = document.createElement('div');
+				lowRow.className = 'exp-color-row exp-low-row' + (r.gradient ? '' : ' disabled');
+				lowRow.innerHTML = `
+					<input type="color" value="${r.c2}" ${r.gradient?'':'disabled'} title="Low elevation color">
+					<input type="range" style="max-width:40%" min="0" max="1" step="0.01" value="${r.a2}" ${r.gradient?'':'disabled'}>
+					<span class="exp-alpha-val">${Math.round(r.a2*100)}%</span>
+				`;
+
+				// Vertical slider
+				const slider = makeElevSlider(r, () => {
+					hdr.querySelector('.exp-range-label').textContent = `${r.min} – ${r.max} ${elevUnit==='ft'?'ft':'m'}`;
+					scheduleElevRefresh();
+				},[colorRow, gradRow, lowRow]);
+				div.appendChild(slider);
+
+				// Wire up per-range enable checkbox
+				const ck = hdr.querySelector('.exp-range-check');
+				function syncElevRangeDisabled() {
+					const disabled = !r.enabled;
+					// Disable color inputs
+					colorRow.querySelectorAll('input').forEach(el => el.disabled = disabled);
+					// Disable gradient checkbox
+					gradRow.querySelectorAll('input').forEach(el => el.disabled = disabled);
+					// Disable low color row inputs
+					lowRow.querySelectorAll('input').forEach(el => {
+						if (disabled) el.disabled = true;
+						else el.disabled = !r.gradient;
+					});
+					// Disable vertical slider number inputs
+					const sliderInputs = slider.querySelectorAll('input[type="number"]');
+					sliderInputs.forEach(el => el.disabled = disabled);
+					// Disable vertical slider handles (pointer events)
+					const handles = slider.querySelectorAll('.elev-vslider-handle');
+					handles.forEach(handle => {
+						handle.style.pointerEvents = disabled ? 'none' : 'auto';
+						handle.style.opacity = disabled ? '0.5' : '1';
+					});
+					// Disable mouse wheel scroll on number inputs
+					sliderInputs.forEach(inp => {
+						inp.style.pointerEvents = disabled ? 'none' : 'auto';
+					});
+					// Style for disabled rows
+					[colorRow, gradRow, lowRow].forEach(el => {
+						el.style.opacity = disabled ? '0.4' : '';
+						el.style.pointerEvents = disabled ? 'none' : '';
+					});
+					// Disable the range header checkbox itself (don't let it get disabled by master)
+					const rangeCheck = hdr.querySelector('.exp-range-check');
+					if (rangeCheck && !elevMasterEnabled) {
+						rangeCheck.disabled = true;
+						rangeCheck.style.opacity = '0.5';
+					} else if (rangeCheck) {
+						rangeCheck.disabled = false;
+						rangeCheck.style.opacity = '';
+					}
+				}
+				syncElevRangeDisabled();
+				ck.onchange = e => {
+					r.enabled = e.target.checked;
+					div.classList.toggle('disabled-range', !r.enabled);
+					syncElevRangeDisabled();
+					//syncElevMasterCheck();
+					refreshElevLayer();
+				};
+
+				// Color / alpha
+				const c1i = colorRow.querySelector('input[type="color"]');
+				const a1i = colorRow.querySelector('input[type="range"]');
+				c1i.oninput = e => { r.c1=e.target.value; scheduleElevRefresh(); };
+				a1i.oninput = e => { r.a1=+e.target.value; colorRow.querySelector('.exp-alpha-val').textContent=Math.round(r.a1*100)+'%'; scheduleElevRefresh(); };
+
+				gradRow.querySelector('input[type="checkbox"]').onchange = e => {
+					r.gradient = e.target.checked;
+					lowRow.classList.toggle('disabled', !r.gradient);
+					lowRow.querySelectorAll('input').forEach(inp => inp.disabled = !r.gradient);
+					scheduleElevRefresh();
+				};
+
+				const c2i = lowRow.querySelector('input[type="color"]');
+				const a2i = lowRow.querySelector('input[type="range"]');
+				c2i.oninput = e => { r.c2=e.target.value; scheduleElevRefresh(); };
+				a2i.oninput = e => { r.a2=+e.target.value; lowRow.querySelector('.exp-alpha-val').textContent=Math.round(r.a2*100)+'%'; scheduleElevRefresh(); };
+
+				div.querySelector('.exp-remove-btn').onclick = () => {
+					elevRanges.splice(i,1); syncElevMasterCheck(); renderElevRanges(); refreshElevLayer();
+				};
+
+				hdr.querySelector('.exp-z-input').onchange = e => { r.zOrder = +e.target.value; refreshElevLayer(); };
+				container.appendChild(div);
+			});
+			syncElevMasterLock();
+		}
+
+		let _elevRefreshTimer = null;
+		function scheduleElevRefresh() {
+			clearTimeout(_elevRefreshTimer);
+			_elevRefreshTimer = setTimeout(()=>refreshElevLayer(), 400);
+		}
+
+		function addElevRange() {
+			const step = elevUnit==='ft' ? 1000 : 300;
+			const last = elevRanges[elevRanges.length-1];
+			const newMin = last ? last.max : 0;
+			const palette = ['#4fc3f7','#81c784','#ffb74d','#f06292','#ba68c8','#4dd0e1','#aed581'];
+			elevRanges.push({min:newMin, max:newMin+step, c1:palette[elevRanges.length%palette.length], a1:0.7, c2:'#ffffff', a2:0.3, gradient:false, enabled:elevMasterEnabled, zOrder:5});
+			syncElevMasterCheck();
+			renderElevRanges();
+			refreshElevLayer();
+		}
+
+		renderElevRanges();
+		syncElevMasterLock();
+
+
+		// ══════════════════════════════════════════════════════════════════════════════
+		// ASPECT RANGE EXPLORER — compass wheel input
+		// ══════════════════════════════════════════════════════════════════════════════
+
+		const ASPECT_PRESETS = {
+			'N':  {minDeg:315,maxDeg:45,  color:'#1565c0'},
+			'NE': {minDeg:0, maxDeg:90,  color:'#0288d1'},
+			'E':  {minDeg:45, maxDeg:135, color:'#2e7d32'},
+			'SE': {minDeg:90,maxDeg:180, color:'#558b2f'},
+			'S':  {minDeg:135,maxDeg:225, color:'#f57f17'},
+			'SW': {minDeg:180,maxDeg:270, color:'#e65100'},
+			'W':  {minDeg:225,maxDeg:315, color:'#6a1b9a'},
+			'NW': {minDeg:270,maxDeg:360, color:'#880e4f'},
+		};
+
+		// ── Aspect compass wheel widget ──────────────────────────────────────────────
+		// Degrees: 0=N (top), clockwise. SVG angles: 0=right, so offset by -90.
+		function degToSvgAngle(d) { return d - 90; } // svg angle in degrees
+		function svgAngleToRad(a) { return a * Math.PI / 180; }
+		function degToRad(d) { return (d-90)*Math.PI/180; } // convert bearing→SVG rad
+
+		function makeAspectWheel(r, onChangeCallback) {
+			const R = 72, CX=80, CY=80, INNER=44, OUTER=R;
+			const svgNS = 'http://www.w3.org/2000/svg';
+			const size = 160;
+
+			const wrap = document.createElement('div');
+			wrap.className = 'aspect-wheel-wrap';
+
+			const svg = document.createElementNS(svgNS,'svg');
+			svg.setAttribute('viewBox',`0 0 ${size} ${size}`);
+			svg.setAttribute('width', size); svg.setAttribute('height', size);
+			svg.className = 'aspect-wheel-svg';
+
+			// Background ring (full circle, gray)
+			const bgRing = document.createElementNS(svgNS,'circle');
+			bgRing.setAttribute('cx',CX); bgRing.setAttribute('cy',CY);
+			bgRing.setAttribute('r',(INNER+OUTER)/2);
+			bgRing.setAttribute('fill','none');
+			bgRing.setAttribute('stroke','#e0e0e0');
+			bgRing.setAttribute('stroke-width', OUTER-INNER);
+			svg.appendChild(bgRing);
+
+			// Colored arc (the range)
+			const arcPath = document.createElementNS(svgNS,'path');
+			arcPath.setAttribute('fill', r.color);
+			arcPath.setAttribute('opacity', r.alpha);
+			svg.appendChild(arcPath);
+
+			// Cardinal labels
+			const cardinals = [{l:'N',d:0},{l:'E',d:90},{l:'S',d:180},{l:'W',d:270}];
+			cardinals.forEach(({l,d}) => {
+				const rad = degToRad(d);
+				const lx = CX + (OUTER+10)*Math.cos(rad), ly = CY + (OUTER+10)*Math.sin(rad);
+				const t = document.createElementNS(svgNS,'text');
+				t.setAttribute('x',lx); t.setAttribute('y',ly);
+				t.setAttribute('text-anchor','middle'); t.setAttribute('dominant-baseline','central');
+				t.setAttribute('font-size','9'); t.setAttribute('fill','#999'); t.setAttribute('font-family','sans-serif');
+				t.textContent = l;
+				svg.appendChild(t);
+			});
+
+			// Handles
+			const hStart = document.createElementNS(svgNS,'circle');
+			hStart.setAttribute('r',7); hStart.setAttribute('fill','#fff');
+			hStart.setAttribute('stroke','#2563eb'); hStart.setAttribute('stroke-width',2);
+			hStart.style.cursor='grab'; hStart.style.filter='drop-shadow(0 1px 3px rgba(0,0,0,0.25))';
+			svg.appendChild(hStart);
+
+			const hEnd = document.createElementNS(svgNS,'circle');
+			hEnd.setAttribute('r',7); hEnd.setAttribute('fill','#fff');
+			hEnd.setAttribute('stroke','#2563eb'); hEnd.setAttribute('stroke-width',2);
+			hEnd.style.cursor='grab'; hEnd.style.filter='drop-shadow(0 1px 3px rgba(0,0,0,0.25))';
+			svg.appendChild(hEnd);
+
+			const midR = (INNER+OUTER)/2;
+
+			function buildArcPath(startDeg, endDeg) {
+				const s = degToRad(startDeg), e2 = degToRad(endDeg);
+				let sweep = endDeg - startDeg; if (sweep <= 0) sweep += 360;
+				const largeArc = sweep > 180 ? 1 : 0;
+				const eRad = degToRad(startDeg + sweep);
+				const ox1=CX+OUTER*Math.cos(s),   oy1=CY+OUTER*Math.sin(s);
+				const ox2=CX+OUTER*Math.cos(eRad), oy2=CY+OUTER*Math.sin(eRad);
+				const ix1=CX+INNER*Math.cos(eRad), iy1=CY+INNER*Math.sin(eRad);
+				const ix2=CX+INNER*Math.cos(s),    iy2=CY+INNER*Math.sin(s);
+				return `M${ox1},${oy1} A${OUTER},${OUTER},0,${largeArc},1,${ox2},${oy2} L${ix1},${iy1} A${INNER},${INNER},0,${largeArc},0,${ix2},${iy2} Z`;
+			}
+
+			function updateWheel() {
+				arcPath.setAttribute('d', buildArcPath(r.minDeg, r.maxDeg));
+				arcPath.setAttribute('fill', r.color);
+				arcPath.setAttribute('opacity', r.alpha);
+				const sr=degToRad(r.minDeg), er=degToRad(r.maxDeg);
+				hStart.setAttribute('cx', CX+midR*Math.cos(sr)); hStart.setAttribute('cy', CY+midR*Math.sin(sr));
+				hEnd.setAttribute('cx',   CX+midR*Math.cos(er)); hEnd.setAttribute('cy',   CY+midR*Math.sin(er));
+			}
+
+			function svgPointerToDeg(ev) {
+				const rect = svg.getBoundingClientRect();
+				const px = ev.clientX - rect.left - CX*(rect.width/size);
+				const py = ev.clientY - rect.top  - CY*(rect.height/size);
+				let deg = Math.atan2(py, px) * 180/Math.PI + 90;
+				if (deg < 0) deg += 360; if (deg >= 360) deg -= 360;
+				return Math.round(deg);
+			}
+
+			function makeDrag(handle, isStart) {
+				handle.addEventListener('pointerdown', e => {
+					e.preventDefault(); e.stopPropagation();
+					handle.style.cursor='grabbing';
+					svg.setPointerCapture(e.pointerId);
+					const onMove = ev => {
+						const deg = svgPointerToDeg(ev);
+						if (isStart) r.minDeg=deg; else r.maxDeg=deg;
+						updateWheel(); onChangeCallback();
+					};
+					const onUp = () => {
+						handle.style.cursor='grab';
+						svg.removeEventListener('pointermove', onMove);
+						svg.removeEventListener('pointerup', onUp);
+					};
+					svg.addEventListener('pointermove', onMove);
+					svg.addEventListener('pointerup', onUp);
+				});
+			}
+			makeDrag(hStart, true);
+			makeDrag(hEnd, false);
+
+			wrap.appendChild(svg);
+			updateWheel();
+			
+			// Return both the wheel and the value row container
+			return { wheel: wrap, valueRow: null };
+		}
+
+		// ── Aspect protocol ──────────────────────────────────────────────────────────
+		function registerAspectProtocol() {
+			try { maplibregl.removeProtocol('aspectrange'); } catch(e) {}
+			maplibregl.addProtocol('aspectrange', (params) => {
+				const clean = params.url.replace(/^aspectrange:\/\//, '').split('?')[0];
+				const parts = clean.split('/');
+				const z=parseInt(parts[0],10), x=parseInt(parts[1],10), y=parseInt(parts[2],10);
+				const neighbors=[];
+				for (let dy=-1;dy<=1;dy++) for (let dx=-1;dx<=1;dx++) neighbors.push({dx,dy,nx:x+dx,ny:y+dy});
+				return new Promise((resolve,reject) => {
+					let loadedCount=0; const imgMap={}; const total=neighbors.length;
+					const done = () => {
+						const sz=256;
+						const bc=document.createElement('canvas'); bc.width=bc.height=sz*3;
+						const bctx=bc.getContext('2d');
+						neighbors.forEach(({dx,dy,nx,ny})=>{ const img=imgMap[`${dx},${dy}`]; if(img&&img.complete&&img.naturalWidth) bctx.drawImage(img,(dx+1)*sz,(dy+1)*sz,sz,sz); });
+						const bd=bctx.getImageData(0,0,sz*3,sz*3).data;
+						function getElev(px,py){ px=Math.max(0,Math.min(sz*3-1,px));py=Math.max(0,Math.min(sz*3-1,py));const idx=(py*sz*3+px)*4;return(bd[idx]*256+bd[idx+1]+bd[idx+2]/256)-32768; }
+						const oc=document.createElement('canvas'); oc.width=oc.height=sz;
+						const octx=oc.getContext('2d');
+						const out=octx.createImageData(sz,sz);
+						const res=(2*Math.PI*6378137)/(sz*Math.pow(2,z));
+						const dp=2*res;
+						const activeRanges=aspectRanges.filter(rng=>rng.enabled);
+						for(let py=0;py<sz;py++){
+							for(let px=0;px<sz;px++){
+								const bx=px+sz,by=py+sz;
+								const dzdx=(getElev(bx+1,by)-getElev(bx-1,by))/dp;
+								const dzdy=(getElev(bx,by+1)-getElev(bx,by-1))/dp;
+								const slope=Math.sqrt(dzdx*dzdx+dzdy*dzdy);
+								if(slope<0.005){out.data[(py*sz+px)*4+3]=0;continue;}
+								let aspectDeg=Math.atan2(dzdx,dzdy)*(180/Math.PI)+180;
+								if(aspectDeg<0)aspectDeg+=360; if(aspectDeg>=360)aspectDeg-=360;
+								let matched=false;
+								for(const rng of activeRanges){
+									let{minDeg,maxDeg,color,alpha}=rng;
+									minDeg=((minDeg%360)+360)%360; maxDeg=((maxDeg%360)+360)%360;
+									const inRange=minDeg<=maxDeg?(aspectDeg>=minDeg&&aspectDeg<maxDeg):(aspectDeg>=minDeg||aspectDeg<maxDeg);
+									if(inRange){
+										let rc2,gc3,bc3,ac;
+										if(rng.gradient){
+											let sweep=maxDeg-minDeg; if(sweep<=0)sweep+=360;
+											let offset=aspectDeg-minDeg; if(offset<0)offset+=360;
+											const t=sweep>0?offset/sweep:0;
+											const col=lerpColor(hexToRgbArr(rng.color),hexToRgbArr(rng.color2||'#ffffff'),t);
+											const alp=(rng.alpha)+(t)*((rng.alpha2||rng.alpha)-rng.alpha);
+											[rc2,gc3,bc3,ac]=[col[0],col[1],col[2],alp];
+										} else {
+											const [r2c,g2c,b2c]=hexToRgbArr(rng.color);
+											[rc2,gc3,bc3,ac]=[r2c,g2c,b2c,rng.alpha];
+										}
+										const i4=(py*sz+px)*4;
+										out.data[i4]=rc2;out.data[i4+1]=gc3;out.data[i4+2]=bc3;out.data[i4+3]=Math.round(ac*255);
+										matched=true;break;
+									}
+								}
+								if(!matched)out.data[(py*sz+px)*4+3]=0;
+							}
+						}
+						octx.putImageData(out,0,0);
+						oc.toBlob(blob=>{blob.arrayBuffer().then(buf=>resolve({data:buf}));},'image/png');
+					};
+					neighbors.forEach(({dx,dy,nx,ny})=>{
+						const url=TERRARIUM_URL.replace('{z}',z).replace('{x}',nx).replace('{y}',ny);
+						const img=new Image(); img.crossOrigin='anonymous'; imgMap[`${dx},${dy}`]=img;
+						img.onload=()=>{if(++loadedCount===total)done();}; img.onerror=()=>{if(++loadedCount===total)done();};
+						img.src=url;
+					});
+				});
+			});
+		}
+
+		function refreshAspectLayer() {
+			if (!mapLoaded) return;
+			registerAspectProtocol();
+			if (map.getLayer(ASPECT_LYR)) map.removeLayer(ASPECT_LYR);
+			if (map.getSource(ASPECT_SRC)) map.removeSource(ASPECT_SRC);
+			if (!aspectMasterEnabled || aspectRanges.filter(r=>r.enabled).length===0) return;
+			const token=Date.now();
+			map.addSource(ASPECT_SRC,{type:'raster',tiles:[`aspectrange://{z}/{x}/{y}?t=${token}`],tileSize:256,maxzoom:12,attribution:'Elevation: Tilezen Terrarium'});
+			map.addLayer({id:ASPECT_LYR,type:'raster',source:ASPECT_SRC,paint:{'raster-opacity':aspectMasterOpacity,'raster-resampling':'nearest'}},getInsertionLayer(false));
+		}
+
+		// ── Aspect UI ────────────────────────────────────────────────────────────────
+		function renderAspectRanges() {
+			const container = document.getElementById('aspect-ranges');
+			container.innerHTML = '';
+			aspectRanges.forEach((r,i) => {
+				const div = document.createElement('div');
+				div.className = 'exp-range-row' + (r.enabled ? '' : ' disabled-range');
+
+				const hdr = document.createElement('div');
+				hdr.className = 'exp-range-header';
+				hdr.innerHTML = `
+					<input type="checkbox" class="exp-range-check" ${r.enabled?'checked':''} title="Enable this range">
+					<span class="exp-range-label">${r.minDeg}°–${r.maxDeg}°</span>
+					<select class="aspect-preset-sel" title="Direction preset" style="padding:2px 3px;border:1px solid #ccc;border-radius:4px;font-size:10px;background:#fff;color:#333;max-width:42px">
+						<option value="">–</option>
+						${Object.keys(ASPECT_PRESETS).map(k=>`<option value="${k}"${r.label===k?' selected':''}>${k}</option>`).join('')}
+					</select>
+					<label style="font-size:10px;color:#888;display:flex;align-items:center;gap:3px;margin-left:auto">Z<input type="number" class="exp-z-input" value="${r.zOrder??6}" min="1" max="10" step="1" style="width:34px;padding:1px 3px;border:1px solid #ccc;border-radius:4px;font-size:10px" title="Z Order"></label>
+					<button class="exp-remove-btn" title="Remove">✕</button>
+				`;
+				div.appendChild(hdr);
+
+				// Compass wheel and values
+				const { wheel, valueRow } = makeAspectWheel(r, () => {
+					hdr.querySelector('.exp-range-label').textContent = r.minDeg+'°–'+r.maxDeg+'°';
+					scheduleAspectRefresh();
+				});
+				div.appendChild(wheel);
+
+				// Create and append value row separately
+				const valRow = document.createElement('div');
+				valRow.className = 'aspect-wheel-val-row';
+				valRow.innerHTML = `
+					<span style="font-size:10px;color:#888">From</span>
+					<input type="number" min="0" max="359" value="${r.minDeg}" title="Start °">
+					<span style="font-size:10px;color:#888">°→</span>
+					<input type="number" min="0" max="359" value="${r.maxDeg}" title="End °">
+					<span style="font-size:10px;color:#888">°</span>
+				`;
+				div.appendChild(valRow);
+
+				// Set up number inputs
+				const [minNumInp, maxNumInp] = valRow.querySelectorAll('input');
+				minNumInp.oninput = e => { r.minDeg=((+e.target.value)%360+360)%360; scheduleAspectRefresh(); };
+				maxNumInp.oninput = e => { r.maxDeg=((+e.target.value)%360+360)%360; scheduleAspectRefresh(); };
+
+				// Color + alpha
+				const colorRow = document.createElement('div');
+				colorRow.className = 'exp-color-row';
+				colorRow.innerHTML = `
+					<input type="color" value="${r.color}">
+					<input type="range" style="max-width:50%" min="0" max="1" step="0.01" value="${r.alpha}">
+					<span class="exp-alpha-val">${Math.round(r.alpha*100)}%</span>
+				`;
+				div.appendChild(colorRow);
+
+				// Gradient toggle
+				const gradRow = document.createElement('div');
+				gradRow.className = 'exp-gradient-row';
+				gradRow.innerHTML = `<label style="display:flex;align-items:center;gap:4px;font-size:11px;color:#555;cursor:pointer"><input type="checkbox" ${r.gradient?'checked':''}> Gradient to end color</label>`;
+				div.appendChild(gradRow);
+
+				// Low color row (gradient end)
+				const lowRow = document.createElement('div');
+				lowRow.className = 'exp-color-row exp-low-row' + (r.gradient ? '' : ' disabled');
+				lowRow.innerHTML = `
+					<input type="color" value="${r.color2||'#ffffff'}" ${r.gradient?'':'disabled'} title="End color">
+					<input type="range" style="max-width:50%" min="0" max="1" step="0.01" value="${r.alpha2!==undefined?r.alpha2:r.alpha}" ${r.gradient?'':'disabled'}>
+					<span class="exp-alpha-val">${Math.round((r.alpha2!==undefined?r.alpha2:r.alpha)*100)}%</span>
+				`;
+				div.appendChild(lowRow);
+
+				// Wire up
+				const ck = hdr.querySelector('.exp-range-check');
+				const allRangeInputs = [
+					...colorRow.querySelectorAll('input'),
+					...gradRow.querySelectorAll('input'),
+					...lowRow.querySelectorAll('input'),
+					...div.querySelectorAll('.aspect-wheel-svg circle[r="7"]'),
+				];
+				function syncRangeDisabled() {
+					const disabled = !r.enabled;
+					// Disable color inputs
+					colorRow.querySelectorAll('input').forEach(el => el.disabled = disabled);
+					// Disable gradient checkbox
+					gradRow.querySelectorAll('input').forEach(el => el.disabled = disabled);
+					// Disable low color row inputs
+					lowRow.querySelectorAll('input').forEach(el => {
+						if (disabled) el.disabled = true;
+						else el.disabled = !r.gradient;
+					});
+					// Disable the number inputs in value row
+					const numberInputs = valRow.querySelectorAll('input[type="number"]');
+					numberInputs.forEach(inp => {
+						inp.disabled = disabled;
+						inp.style.opacity = disabled ? '0.5' : '1';
+					});
+					// Disable wheel scrolling on number inputs
+					numberInputs.forEach(inp => {
+						if (!disabled) {
+							if (!inp._wheelHandler) {
+								inp._wheelHandler = (e) => {
+									e.preventDefault();
+
+									const step = 1;
+
+									if (e.deltaY < 0) {
+										inp.value = Math.min(parseFloat(inp.value) + step, 359);
+									} else {
+										inp.value = Math.max(parseFloat(inp.value) - step, 0);
+									}
+
+									inp.dispatchEvent(new Event('input', { bubbles: true }));
+								};
+
+								inp.addEventListener('wheel', inp._wheelHandler, { passive: false });
+							}
+						} else if (inp._wheelHandler) {
+							inp.removeEventListener('wheel', inp._wheelHandler);
+							inp._wheelHandler = null; // ← important cleanup
+						}
+					});
+					// Disable the wheel handles (the draggable circles)
+					const wheelHandles = wheel.querySelectorAll('circle[r="7"]');
+					wheelHandles.forEach(handle => {
+						handle.style.pointerEvents = disabled ? 'none' : 'auto';
+						handle.style.opacity = disabled ? '0.5' : '1';
+					});
+					// Disable the entire SVG pointer events when disabled
+					const wheelSvg = wheel.querySelector('svg');
+					if (wheelSvg) {
+						wheelSvg.style.pointerEvents = disabled ? 'none' : 'auto';
+					}
+					// Style for disabled rows
+					colorRow.style.opacity = lowRow.style.opacity = gradRow.style.opacity = disabled ? '0.4' : '';
+					colorRow.style.pointerEvents = gradRow.style.pointerEvents = disabled ? 'none' : '';
+					lowRow.style.pointerEvents = disabled ? 'none' : '';
+					valRow.style.opacity = disabled ? '0.4' : '';
+					// Disable the range header checkbox itself (don't let it get disabled by master)
+					const rangeCheck = hdr.querySelector('.exp-range-check');
+					if (rangeCheck && !aspectMasterEnabled) {
+						rangeCheck.disabled = true;
+						rangeCheck.style.opacity = '0.5';
+					} else if (rangeCheck) {
+						rangeCheck.disabled = false;
+						rangeCheck.style.opacity = '';
+					}
+				}
+				syncRangeDisabled();
+				ck.onchange = e => {
+					r.enabled = e.target.checked;
+					div.classList.toggle('disabled-range', !r.enabled);
+					syncRangeDisabled();
+					//syncAspectMasterCheck();
+					refreshAspectLayer();
+				};
+
+				hdr.querySelector('.aspect-preset-sel').onchange = e => {
+					const p=ASPECT_PRESETS[e.target.value]; if(!p)return;
+					r.minDeg=p.minDeg; r.maxDeg=p.maxDeg; r.color=p.color; r.label=e.target.value;
+					renderAspectRanges(); scheduleAspectRefresh();
+				};
+
+				const ci=colorRow.querySelector('input[type="color"]');
+				const ai=colorRow.querySelector('input[type="range"]');
+				ci.oninput=e=>{ r.color=e.target.value; wheel.querySelector('.aspect-wheel-svg path').setAttribute('fill',r.color); scheduleAspectRefresh(); };
+				ai.oninput = e => { 
+					r.alpha = +e.target.value; 
+					colorRow.querySelector('.exp-alpha-val').textContent = Math.round(r.alpha * 100) + '%'; 
+					const arcPath = wheel.querySelector('svg path');
+					if (arcPath) arcPath.setAttribute('opacity', r.alpha);
+					scheduleAspectRefresh(); 
+				};
+
+				gradRow.querySelector('input[type="checkbox"]').onchange = e => {
+					r.gradient = e.target.checked;
+					lowRow.classList.toggle('disabled', !r.gradient);
+					lowRow.querySelectorAll('input').forEach(inp => inp.disabled = !r.gradient);
+					// Also update the gradient styling
+					const arcPath = wheel.querySelector('svg path');
+					if (arcPath && r.gradient) {
+						// Remove opacity from the arc path when gradient is enabled
+						arcPath.removeAttribute('opacity');
+					} else if (arcPath && !r.gradient) {
+						arcPath.setAttribute('opacity', r.alpha);
+					}
+					scheduleAspectRefresh();
+				};
+
+				const c2i = lowRow.querySelector('input[type="color"]');
+				const a2i = lowRow.querySelector('input[type="range"]');
+				c2i.oninput=e=>{ r.color2=e.target.value; scheduleAspectRefresh(); };
+				a2i.oninput=e=>{ r.alpha2=+e.target.value; lowRow.querySelector('.exp-alpha-val').textContent=Math.round(r.alpha2*100)+'%'; scheduleAspectRefresh(); };
+
+				div.querySelector('.exp-remove-btn').onclick=()=>{ aspectRanges.splice(i,1); syncAspectMasterCheck(); renderAspectRanges(); refreshAspectLayer(); };
+				hdr.querySelector('.exp-z-input').onchange = e => { r.zOrder = +e.target.value; refreshAspectLayer(); };
+				container.appendChild(div);
+			});
+			syncAspectMasterLock();
+		}
+
+		let _aspectRefreshTimer=null;
+		function scheduleAspectRefresh() {
+			clearTimeout(_aspectRefreshTimer);
+			_aspectRefreshTimer=setTimeout(()=>refreshAspectLayer(),500);
+		}
+
+		function addAspectRange() {
+			const palette=['#1565c0','#2e7d32','#f57f17','#6a1b9a','#b71c1c','#00695c','#e65100','#0288d1'];
+			aspectRanges.push({minDeg:0,maxDeg:90,color:palette[aspectRanges.length%palette.length],alpha:0.7,label:'',enabled:aspectMasterEnabled,zOrder:6});
+			syncAspectMasterCheck(); renderAspectRanges(); scheduleAspectRefresh();
+		}
+
+		renderAspectRanges();
+		syncAspectMasterLock();
+
+
 
 		</script>
 	</body>
