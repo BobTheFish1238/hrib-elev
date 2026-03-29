@@ -4,14 +4,10 @@ Maps and links for mushroom foraging (PNW / US)
 
 ## ⭐ Core Tools
 
-<details><summary>Expand</summary>
-
 | Info | Link |
 | :--- | :--- |
 | ⭐HribSoil| [https://bobthefish1238.github.io/hrib-elev/HribSoil.html](https://bobthefish1238.github.io/hrib-elev/HribSoil.html) |
 | ⭐HribHabitat | [https://bobthefish1238.github.io/hrib-elev/HribHabitat.html](https://bobthefish1238.github.io/hrib-elev/HribHabitat.html) |
-
-</details>
 
 ## 🗺️ Maps & Navigation
 
