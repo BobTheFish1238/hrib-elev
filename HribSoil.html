@@ -475,7 +475,7 @@
 			.elev-vslider-track-area { position: relative; width: 24px; flex-shrink: 0; display: flex; justify-content: center; }
 			.elev-vslider-track { position: absolute; left: 50%; transform: translateX(-50%); width: 6px; top: 8px; bottom: 8px; background: #e0e0e0; border-radius: 3px; }
 			.elev-vslider-fill { position: absolute; left: 0; right: 0; background: #2563eb; border-radius: 3px; opacity: 0.35; }
-			.elev-vslider-handle { position: absolute; left: 50%; transform: translateX(-50%); width: 16px; height: 16px; background: #fff; border: 2px solid #2563eb; border-radius: 50%; cursor: ns-resize; box-shadow: 0 1px 4px rgba(0,0,0,0.18); margin-top: -8px; touch-action: none; transition: box-shadow 0.12s; z-index: 1; }
+			.elev-vslider-handle { position: absolute; left: 50%; transform: translateX(-50%); width: 8px; height: 8px; background: #fff; border: 2px solid #2563eb; border-radius: 50%; cursor: ns-resize; box-shadow: 0 1px 4px rgba(0,0,0,0.18); touch-action: none; transition: box-shadow 0.12s; z-index: 1; }
 			.elev-vslider-handle:hover, .elev-vslider-handle.dragging { box-shadow: 0 0 0 4px rgba(37,99,235,0.18); }
 			.elev-vslider-vals { display: flex; flex-direction: column; gap: 3px; flex: 1; justify-content: space-between; padding: 0; max-width:90%;}
 			.elev-vslider-val-row { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #555; }
@@ -3231,7 +3231,7 @@
 
 		// Ranges — enabled:false by default
 		let elevRanges = [
-			{ min: 0, max: 3000, c1: '#4fc3f7', a1: 0.7, c2: '#0d47a1', a2: 0.7, gradient: false, enabled: false }
+			{ min: 0, max: 3000, c1: '#32CD32', a1: 0.7, c2: '#A020F0', a2: 0.7, gradient: false, enabled: false }
 		];
 		let aspectRanges = [
 			{ minDeg: 315, maxDeg: 45,  color: '#1565c0', alpha: 0.7, label: 'N', enabled: false }
@@ -3692,8 +3692,8 @@
 			const step = elevUnit==='ft' ? 1000 : 300;
 			const last = elevRanges[elevRanges.length-1];
 			const newMin = last ? last.max : 0;
-			const palette = ['#4fc3f7','#81c784','#ffb74d','#f06292','#ba68c8','#4dd0e1','#aed581'];
-			elevRanges.push({min:newMin, max:newMin+step, c1:palette[elevRanges.length%palette.length], a1:0.7, c2:'#ffffff', a2:0.3, gradient:false, enabled:elevMasterEnabled, zOrder:5});
+			const palette = ['#32CD32','#81c784','#ffb74d','#f06292','#ba68c8','#4dd0e1','#aed581'];
+			elevRanges.push({min:newMin, max:newMin+step, c1:palette[elevRanges.length%palette.length], a1:0.7, c2:'#FF0000', a2:0.3, gradient:false, enabled:elevMasterEnabled, zOrder:5});
 			syncElevMasterCheck();
 			renderElevRanges();
 			refreshElevLayer();
@@ -3883,7 +3883,7 @@
 											let sweep=maxDeg-minDeg; if(sweep<=0)sweep+=360;
 											let offset=aspectDeg-minDeg; if(offset<0)offset+=360;
 											const t=sweep>0?offset/sweep:0;
-											const col=lerpColor(hexToRgbArr(rng.color),hexToRgbArr(rng.color2||'#ffffff'),t);
+											const col=lerpColor(hexToRgbArr(rng.color),hexToRgbArr(rng.color2||'#000000'),t);
 											const alp=(rng.alpha)+(t)*((rng.alpha2||rng.alpha)-rng.alpha);
 											[rc2,gc3,bc3,ac]=[col[0],col[1],col[2],alp];
 										} else {
@@ -3981,14 +3981,14 @@
 				// Gradient toggle
 				const gradRow = document.createElement('div');
 				gradRow.className = 'exp-gradient-row';
-				gradRow.innerHTML = `<label style="display:flex;align-items:center;gap:4px;font-size:11px;color:#555;cursor:pointer"><input type="checkbox" ${r.gradient?'checked':''}> Gradient to end color</label>`;
+				gradRow.innerHTML = `<label style="display:flex;align-items:center;gap:4px;font-size:11px;color:#555;cursor:pointer"><input type="checkbox" ${r.gradient?'checked':''}> Gradient</label>`;
 				div.appendChild(gradRow);
 
 				// Low color row (gradient end)
 				const lowRow = document.createElement('div');
 				lowRow.className = 'exp-color-row exp-low-row' + (r.gradient ? '' : ' disabled');
 				lowRow.innerHTML = `
-					<input type="color" value="${r.color2||'#ffffff'}" ${r.gradient?'':'disabled'} title="End color">
+					<input type="color" value="${r.color2||'#000000'}" ${r.gradient?'':'disabled'} title="End color">
 					<input type="range" style="max-width:50%" min="0" max="1" step="0.01" value="${r.alpha2!==undefined?r.alpha2:r.alpha}" ${r.gradient?'':'disabled'}>
 					<span class="exp-alpha-val">${Math.round((r.alpha2!==undefined?r.alpha2:r.alpha)*100)}%</span>
 				`;
