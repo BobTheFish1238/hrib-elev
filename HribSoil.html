@@ -1981,16 +1981,34 @@
 				activeSlices.delete(sliceId);
 				removeSliceLayer(sliceId);
 				if (openDrawerSliceId === sliceId) openDrawerSliceId = null;
+				
+				// If no active slices left, optionally uncheck the species tab
+				if (activeSlices.size === 0 && forestTabChecks.species) {
+					const speciesCheck = document.getElementById('ftab-species-check');
+					if (speciesCheck && speciesCheck.checked) {
+						speciesCheck.checked = false;
+						onForestTabCheckChange('species');
+					}
+				}
 			} else {
-				if (activeSlices.size >= 3) return; // hard cap — badge already shown
-				const slot = activeSlices.size; // use current count, not a monotonic counter
+				if (activeSlices.size >= 3) return;
+				const slot = activeSlices.size;
 				const settings = DEFAULT_LAYER_SETTINGS(slot);
 				settings.rampIdx = COLOR_RAMPS.length ? (slot % COLOR_RAMPS.length) : slot;
 				activeSlices.set(sliceId, {varName, year, settings});
 				addSliceLayer(sliceId);
+				
+				if (!forestTabChecks.species) {
+					const speciesCheck = document.getElementById('ftab-species-check');
+					if (speciesCheck && !speciesCheck.checked) {
+						speciesCheck.checked = true;
+						onForestTabCheckChange('species');
+					}
+				}
 			}
 			updateLimitBadge();
-			renderTreeList(); updateSelectionSummary();
+			renderTreeList(); 
+			updateSelectionSummary();
 		}
 		function clearAllTreeLayers(){
 			activeSlices.forEach((_,id) => removeSliceLayer(id));
@@ -3014,7 +3032,7 @@
 				: '<span style="color:#888;font-size:11px">No data</span>';
 
 			// ── Async identifies: NLCD + Riparian + Tree (debounced) ─────────────────
-			const needsAsync = forestTabChecks.landcover || forestTabChecks.riparian || (activeSlices && activeSlices.size > 0);
+			const needsAsync = forestTabChecks.landcover || forestTabChecks.riparian || (forestTabChecks.species && activeSlices && activeSlices.size > 0);
 			if (needsAsync) {
 				clearTimeout(_treeDebounceTimer);
 				const captureLngLat = { lat: lngLat.lat, lng: lngLat.lng };
@@ -3034,7 +3052,7 @@
 					}
 
 					// Tree species identify
-					if (activeSlices && activeSlices.size > 0) {
+					if (forestTabChecks.species && activeSlices && activeSlices.size > 0) {
 						const treePromises = [];
 						activeSlices.forEach((info) => {
 							treePromises.push(
