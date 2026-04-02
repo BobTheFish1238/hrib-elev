@@ -133,6 +133,7 @@
 			.year-pill { padding: 3px 9px; border-radius: 12px; border: 1px solid #ccc; background: #f8f8f8; font-size: 11px; color: #444; cursor: pointer; transition: background 0.12s, border-color 0.12s, color 0.12s; user-select: none; }
 			.year-pill:hover { background: #e8f0ff; border-color: #93c5fd; }
 			.year-pill.active { background: #2563eb; border-color: #2563eb; color: #fff; font-weight: 600; }
+			.month-pill.active { background: #2563eb; border-color: #2563eb; color: #fff; }
 			#tree-selection-summary { display: none; flex-direction: column; gap: 4px; font-size: 11px; color: #444; background: #f0f7ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 6px 8px; max-height: calc(100vh - 120px); overflow-y: auto; flex-shrink: 0;}
 			#tree-selection-summary.visible { display: flex; }
 			.summary-row { display: flex; align-items: center; justify-content: space-between; gap: 4px; flex-wrap: wrap; }
@@ -482,6 +483,32 @@
 			.elev-vslider-val-row input[type="number"] { width: 60px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 11px; color: #333; background: #fff; text-align: right; }
 			.elev-vslider-val-row .ev-unit { font-size: 10px; color: #aaa; }
 
+			/* ── iNaturalist Observation Popup ── */
+			#inat-obs-popup {
+				position: absolute; z-index: 40;
+				background: rgba(255,255,255,0.97); border-radius: 10px;
+				box-shadow: 0 4px 20px rgba(0,0,0,0.28); padding: 12px 14px;
+				font-family: sans-serif; font-size: 12px; color: #222;
+				max-width: 280px; min-width: 200px;
+				display: none; flex-direction: column; gap: 6px;
+				pointer-events: auto;
+			}
+			#inat-obs-popup.visible { display: flex; }
+			#inat-obs-popup img { width: 100%; border-radius: 6px; max-height: 140px; object-fit: cover; }
+			#inat-obs-popup .inat-obs-title { font-weight: 700; font-size: 13px; color: #3a6600; }
+			#inat-obs-popup .inat-obs-sciname { font-style: italic; font-size: 11px; color: #888; }
+			#inat-obs-popup .inat-obs-row { display: flex; gap: 4px; align-items: flex-start; font-size: 11px; color: #555; flex-wrap: wrap; }
+			#inat-obs-popup .inat-obs-label { font-weight: 600; flex-shrink: 0; }
+			#inat-obs-popup .inat-obs-link { color: #2563eb; text-decoration: none; font-weight: 700; }
+			#inat-obs-popup .inat-obs-link:hover { text-decoration: underline; }
+			#inat-obs-popup .inat-obs-close { position: absolute; top: 6px; right: 8px; cursor: pointer; font-size: 16px; color: #aaa; line-height: 1; padding: 2px 4px; border-radius: 4px; }
+			#inat-obs-popup .inat-obs-close:hover { color: #dc2626; background: #fee2e2; }
+			#inat-obs-popup .inat-obs-grade { display: inline-block; padding: 1px 6px; border-radius: 8px; font-size: 10px; font-weight: 700; }
+			#inat-obs-popup .inat-obs-grade.research { background: #dcfce7; color: #16a34a; }
+			#inat-obs-popup .inat-obs-grade.needs_id { background: #fef9c3; color: #92400e; }
+			#inat-obs-popup .inat-obs-grade.casual { background: #f3f4f6; color: #6b7280; }
+			#inat-obs-popup .inat-obs-count { font-size: 10px; color: #888; font-style: italic; }
+
 			/* ── Aspect compass wheel ── */
 			.aspect-wheel-wrap { display: flex; justify-content: center; align-items: center; margin: 2px 0; }
 			.aspect-wheel-svg { cursor: default; display: block; touch-action: none; overflow: visible; }
@@ -818,20 +845,25 @@
 
 				<!-- Forest Layer Tab Bar (vertical) -->
 				<div style="display:flex;flex-direction:column;border-radius:7px;overflow:auto;border:1px solid #ccc;margin-bottom:4px">
-					<button id="ftab-species" class="active" onclick="handleForestTabClick('species')"
-						style="padding:6px 8px;border:none;background:#2563eb;color:#fff;cursor:pointer;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;border-bottom:1px solid #ccc;text-align:left">
+					<button id="ftab-inat" onclick="handleForestTabClick('inat')"
+						style="padding:6px 8px;border:none;background:#f0f0f0;color:#555;cursor:pointer;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;border-bottom:1px solid #ccc;text-align:left">
+						<input type="checkbox" id="ftab-inat-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('inat')" style="accent-color:#2563eb;cursor:pointer;width:12px;height:12px;margin:0;flex-shrink:0" />
+						🍀 iNaturalist
+					</button>
+					<button id="ftab-species" onclick="handleForestTabClick('species')"
+						style="padding:6px 8px;border:none;background:#f0f0f0;color:#555;cursor:pointer;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;border-bottom:1px solid #ccc;text-align:left">
 						<input type="checkbox" id="ftab-species-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('species')" style="accent-color:#2563eb;cursor:pointer;width:12px;height:12px;margin:0;flex-shrink:0" />
-						🌲 Species
+						🌲 Tree Species
 					</button>
 					<button id="ftab-fires" onclick="handleForestTabClick('fires')"
 						style="padding:6px 8px;border:none;background:#f0f0f0;color:#555;cursor:pointer;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;border-bottom:1px solid #ccc;text-align:left">
 						<input type="checkbox" id="ftab-fires-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('fires')" style="accent-color:#2563eb;cursor:pointer;width:12px;height:12px;margin:0;flex-shrink:0" />
-						🔥 Fires
+						🔥 Fire Perimeters
 					</button>
 					<button id="ftab-timber" onclick="handleForestTabClick('timber')"
 						style="padding:6px 8px;border:none;background:#f0f0f0;color:#555;cursor:pointer;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;border-bottom:1px solid #ccc;text-align:left">
 						<input type="checkbox" id="ftab-timber-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('timber')" style="accent-color:#2563eb;cursor:pointer;width:12px;height:12px;margin:0;flex-shrink:0" />
-						🪵 Timber
+						🪵 Timber Harvests
 					</button>
 					<button id="ftab-landcover" onclick="handleForestTabClick('landcover')"
 						style="padding:6px 8px;border:none;background:#f0f0f0;color:#555;cursor:pointer;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;border-bottom:1px solid #ccc;text-align:left">
@@ -843,6 +875,11 @@
 						<input type="checkbox" id="ftab-riparian-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('riparian')" style="accent-color:#2563eb;cursor:pointer;width:12px;height:12px;margin:0;flex-shrink:0" />
 						💧 Riparian
 					</button>
+					<button id="ftab-padus" onclick="handleForestTabClick('padus')"
+						style="padding:6px 8px;border:none;background:#f0f0f0;color:#555;cursor:pointer;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;border-bottom:1px solid #ccc;text-align:left">
+						<input type="checkbox" id="ftab-padus-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('padus')" style="accent-color:#2563eb;cursor:pointer;width:12px;height:12px;margin:0;flex-shrink:0" />
+						🏛 Public Access
+					</button>
 					<button id="ftab-elev" onclick="handleForestTabClick('elev')"
 						style="padding:6px 8px;border:none;background:#f0f0f0;color:#555;cursor:pointer;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;border-bottom:1px solid #ccc;text-align:left">
 						<input type="checkbox" id="ftab-elev-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('elev')" style="accent-color:#2563eb;cursor:pointer;width:12px;height:12px;margin:0;flex-shrink:0" />
@@ -853,6 +890,179 @@
 						<input type="checkbox" id="ftab-aspect-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('aspect')" style="accent-color:#2563eb;cursor:pointer;width:12px;height:12px;margin:0;flex-shrink:0" />
 						🧭 Aspect
 					</button>
+				</div>
+
+				<!-- Tab: iNaturalist -->
+				<div id="forest-tab-inat" style="display:none;flex-direction:column;gap:5px;max-width:240px">
+					<div class="section-label" style="font-size:10px;margin:0">
+						<a href="https://www.inaturalist.org" target="_blank" style="color:#74ac00;text-decoration:underline;font-weight:700">iNaturalist</a>
+						· Observations</div>
+
+					<!-- Species/Taxon autocomplete search -->
+					<div style="position:relative">
+						<div style="display:flex;gap:4px">
+							<div style="flex:1;position:relative">
+								<input type="text" id="inat-search" placeholder="🔬 Search species or taxon…"
+									style="width:100%;box-sizing:border-box;padding:5px 7px;border:1px solid #b0c4a0;border-radius:6px;font-size:11px;color:#333;background:#f9fdf5"
+									autocomplete="off"
+									oninput="onInatTaxonInput(this.value)"
+									onkeydown="onInatSearchKeydown(event)"
+									onfocus="showInatTaxonDropdown()"
+									onblur="setTimeout(()=>hideInatDropdown('inat-taxon-dropdown'),200)" />
+								<div id="inat-taxon-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:200;background:#fff;border:1px solid #b0c4a0;border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,0.13);max-height:180px;overflow-y:auto;margin-top:2px"></div>
+							</div>
+							<button onclick="applyInatAndRefresh()"
+								style="padding:5px 9px;border:none;border-radius:6px;background:#74ac00;color:#fff;font-size:11px;cursor:pointer;font-weight:700;flex-shrink:0">Go</button>
+						</div>
+					</div>
+
+					<!-- Selected taxon chip -->
+					<div id="inat-taxon-chip" style="display:none;align-items:center;gap:4px;background:#e8f5d0;border:1px solid #b0c4a0;border-radius:12px;padding:2px 8px;font-size:10px;color:#3a6600;font-weight:600">
+						<span id="inat-taxon-chip-label"></span>
+						<span onclick="clearInatTaxon()" style="cursor:pointer;color:#888;font-size:12px;margin-left:2px">✕</span>
+					</div>
+
+					<div style="display:flex;flex-direction:column;gap:3px">
+						<!-- Iconic taxon filter -->
+						<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#555">
+							<label style="min-width:52px;font-weight:600">Group</label>
+							<select id="inat-iconic-taxon" style="flex:1;padding:3px 4px;border:1px solid #ccc;border-radius:5px;font-size:11px;background:#fafafa;color:#333" onchange="applyInatAndRefresh()">
+								<option value="">All taxa</option>
+								<option value="Plantae">🌿 Plants</option>
+								<option value="Fungi">🍄 Fungi</option>
+								<option value="Animalia">🐾 Animals</option>
+								<option value="Mammalia">🦊 Mammals</option>
+								<option value="Aves">🐦 Birds</option>
+								<option value="Reptilia">🦎 Reptiles</option>
+								<option value="Amphibia">🐸 Amphibians</option>
+								<option value="Actinopterygii">🐟 Fish</option>
+								<option value="Insecta">🦋 Insects</option>
+								<option value="Arachnida">🕷 Arachnids</option>
+								<option value="Mollusca">🐚 Mollusks</option>
+							</select>
+						</div>
+						<!-- Quality grade -->
+						<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#555">
+							<label style="min-width:52px;font-weight:600">Grade</label>
+							<select id="inat-quality" style="flex:1;padding:3px 4px;border:1px solid #ccc;border-radius:5px;font-size:11px;background:#fafafa;color:#333" onchange="applyInatAndRefresh()">
+								<option value="">Any grade</option>
+								<option value="research">✅ Research</option>
+								<option value="needs_id">❓ Needs ID</option>
+								<option value="casual">💬 Casual</option>
+							</select>
+						</div>
+						<!-- Map style -->
+						<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#555">
+							<label style="min-width:52px;font-weight:600">Style</label>
+							<select id="inat-map-style" style="flex:1;padding:3px 4px;border:1px solid #ccc;border-radius:5px;font-size:11px;background:#fafafa;color:#333" onchange="applyInatAndRefresh()">
+								<option value="obs">📍 Observations</option>
+								<option value="heatmap">🔥 Heatmap</option>
+								<option value="points">⚫ Points only</option>
+								<option value="grid">🟩 Grid only</option>
+							</select>
+						</div>
+						<!-- Date range + Months -->
+						<div style="display:flex;flex-direction:column;gap:4px;margin-top:2px">
+							<div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#555">
+								<label style="min-width:52px;font-weight:600">Date</label>
+								<input type="date" id="inat-date-start"
+									style="flex:1;padding:3px 1px;border:1px solid #ccc;border-radius:5px;font-size:8px;background:#fafafa;color:#333" onchange="applyInatAndRefresh()" />
+								<span style="color:#aaa;font-size:10px">–</span>
+								<input type="date" id="inat-date-end"
+									style="flex:1;padding:3px 1px;border:1px solid #ccc;border-radius:5px;font-size:8px;background:#fafafa;color:#333" onchange="applyInatAndRefresh()" />
+							</div>
+							<div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#555;padding:5px 0">
+								<label style="min-width:52px;font-weight:600">Months</label>
+								<div style="display:flex;flex-wrap:wrap;gap:3px;flex:1">
+									<button class="month-pill" data-month="1" onclick="toggleMonthFilter(1)" style="padding:2px 6px;border:1px solid #ccc;border-radius:10px;background:#f8f8f8;font-size:10px;cursor:pointer">Jan</button>
+									<button class="month-pill" data-month="2" onclick="toggleMonthFilter(2)" style="padding:2px 6px;border:1px solid #ccc;border-radius:10px;background:#f8f8f8;font-size:10px;cursor:pointer">Feb</button>
+									<button class="month-pill" data-month="3" onclick="toggleMonthFilter(3)" style="padding:2px 6px;border:1px solid #ccc;border-radius:10px;background:#f8f8f8;font-size:10px;cursor:pointer">Mar</button>
+									<button class="month-pill" data-month="4" onclick="toggleMonthFilter(4)" style="padding:2px 6px;border:1px solid #ccc;border-radius:10px;background:#f8f8f8;font-size:10px;cursor:pointer">Apr</button>
+									<button class="month-pill" data-month="5" onclick="toggleMonthFilter(5)" style="padding:2px 6px;border:1px solid #ccc;border-radius:10px;background:#f8f8f8;font-size:10px;cursor:pointer">May</button>
+									<button class="month-pill" data-month="6" onclick="toggleMonthFilter(6)" style="padding:2px 6px;border:1px solid #ccc;border-radius:10px;background:#f8f8f8;font-size:10px;cursor:pointer">Jun</button>
+									<button class="month-pill" data-month="7" onclick="toggleMonthFilter(7)" style="padding:2px 6px;border:1px solid #ccc;border-radius:10px;background:#f8f8f8;font-size:10px;cursor:pointer">Jul</button>
+									<button class="month-pill" data-month="8" onclick="toggleMonthFilter(8)" style="padding:2px 6px;border:1px solid #ccc;border-radius:10px;background:#f8f8f8;font-size:10px;cursor:pointer">Aug</button>
+									<button class="month-pill" data-month="9" onclick="toggleMonthFilter(9)" style="padding:2px 6px;border:1px solid #ccc;border-radius:10px;background:#f8f8f8;font-size:10px;cursor:pointer">Sep</button>
+									<button class="month-pill" data-month="10" onclick="toggleMonthFilter(10)" style="padding:2px 6px;border:1px solid #ccc;border-radius:10px;background:#f8f8f8;font-size:10px;cursor:pointer">Oct</button>
+									<button class="month-pill" data-month="11" onclick="toggleMonthFilter(11)" style="padding:2px 6px;border:1px solid #ccc;border-radius:10px;background:#f8f8f8;font-size:10px;cursor:pointer">Nov</button>
+									<button class="month-pill" data-month="12" onclick="toggleMonthFilter(12)" style="padding:2px 6px;border:1px solid #ccc;border-radius:10px;background:#f8f8f8;font-size:10px;cursor:pointer">Dec</button>
+								</div>
+							</div>
+						</div>
+						<!-- Location mode -->
+						<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#555">
+							<label style="min-width:52px;font-weight:600">Location</label>
+							<select id="inat-location-mode" style="flex:1;padding:3px 4px;border:1px solid #ccc;border-radius:5px;font-size:11px;background:#fafafa;color:#333" onchange="onInatLocationModeChange()">
+								<option value="map">🗺 Map view</option>
+								<option value="radius">📍 Radius (km)</option>
+								<option value="place">🏙 Place</option>
+							</select>
+						</div>
+						<!-- Radius row -->
+						<div id="inat-radius-row" style="display:none;align-items:center;gap:5px;font-size:11px;color:#555">
+							<label style="min-width:52px;font-weight:600">Radius km</label>
+							<input type="number" id="inat-radius" value="50" min="1" max="500" step="1"
+								style="flex:1;padding:3px 4px;border:1px solid #ccc;border-radius:5px;font-size:11px;background:#fafafa;color:#333" onchange="applyInatAndRefresh()" />
+						</div>
+						<!-- Place search with autocomplete -->
+						<div id="inat-place-row" style="display:none;flex-direction:column;gap:3px">
+							<div style="position:relative">
+								<input type="text" id="inat-place" placeholder="🏙 Search place…"
+									style="width:100%;box-sizing:border-box;padding:5px 7px;border:1px solid #b0c4a0;border-radius:6px;font-size:11px;color:#333;background:#f9fdf5"
+									autocomplete="off"
+									oninput="onInatPlaceInput(this.value)"
+									onkeydown="onInatPlaceKeydown(event)"
+									onblur="setTimeout(()=>hideInatDropdown('inat-place-dropdown'),200)" />
+								<div id="inat-place-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:200;background:#fff;border:1px solid #b0c4a0;border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,0.13);max-height:160px;overflow-y:auto;margin-top:2px"></div>
+							</div>
+							<div id="inat-place-chip" style="display:none;align-items:center;gap:4px;background:#e8f5d0;border:1px solid #b0c4a0;border-radius:12px;padding:2px 8px;font-size:10px;color:#3a6600;font-weight:600">
+								<span id="inat-place-chip-label"></span>
+								<span onclick="clearInatPlace()" style="cursor:pointer;color:#888;font-size:12px;margin-left:2px">✕</span>
+							</div>
+						</div>
+
+						<!-- Geoprivacy filter -->
+						<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#555">
+							<label style="min-width:52px;font-weight:600">Privacy</label>
+							<select id="inat-geoprivacy" style="flex:1;padding:3px 4px;border:1px solid #ccc;border-radius:5px;font-size:11px;background:#fafafa;color:#333" onchange="applyInatAndRefresh()">
+								<option value="open">🔓 Open only</option>
+								<option value="any">🌐 Any privacy</option>
+							</select>
+						</div>
+
+						<!-- Opacity -->
+						<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#555">
+							<label style="min-width:52px;font-weight:600">Opacity</label>
+							<input type="range" id="inat-opacity" min="0" max="1" step="0.05" value="0.9"
+								style="flex:1;accent-color:#74ac00;max-width:44%" oninput="setInatOpacity(this.value)" />
+							<span id="inat-opacity-val" style="font-size:10px;color:#888;min-width:28px">90%</span>
+						</div>
+
+						<!-- Z Order -->
+						<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#555">
+							<label style="min-width:52px;font-weight:600">Z Order</label>
+							<input type="number" id="inat-z" value="5" min="1" max="10" step="1"
+								style="width:52px;padding:3px 4px;border:1px solid #ccc;border-radius:5px;font-size:11px;background:#fafafa;color:#333"
+								onchange="inatZOrder=+this.value; reorderAllLayers()" />
+						</div>
+
+						<!-- Extra filters -->
+						<div style="display:flex;flex-wrap:wrap;gap:4px;font-size:10px;color:#555;padding-top:1px">
+							<label style="display:flex;align-items:center;gap:3px;cursor:pointer;background:#f4f4f4;border-radius:10px;padding:2px 7px;border:1px solid #ddd">
+								<input type="checkbox" id="inat-captive-filter" onchange="applyInatAndRefresh()" style="accent-color:#74ac00" />
+								Wild only
+							</label>
+							<label style="display:flex;align-items:center;gap:3px;cursor:pointer;background:#f4f4f4;border-radius:10px;padding:2px 7px;border:1px solid #ddd">
+								<input type="checkbox" id="inat-endemic-filter" onchange="applyInatAndRefresh()" style="accent-color:#74ac00" />
+								Endemic
+							</label>
+							<label style="display:flex;align-items:center;gap:3px;cursor:pointer;background:#f4f4f4;border-radius:10px;padding:2px 7px;border:1px solid #ddd">
+								<input type="checkbox" id="inat-threatened-filter" onchange="applyInatAndRefresh()" style="accent-color:#74ac00" />
+								Threatened
+							</label>
+						</div>
+					</div>
+					<div id="inat-status" style="font-size:10px;color:#74ac00;text-align:center;padding:2px 0;font-weight:600"></div>
 				</div>
 
 				<!-- Tab: Tree Species -->
@@ -1004,6 +1214,57 @@
 					<div id="riparian-status" style="font-size:10px;color:#888;text-align:center;padding:2px 0"></div>
 				</div>
 
+				<!-- Tab: Public Access (PADUS) -->
+				<div id="forest-tab-padus" style="display:none;flex-direction:column;gap:6px;max-width:220px">
+					<div class="section-label" style="font-size:10px;margin:0">
+						<a href="https://services.arcgis.com/v01gqwM5QqNysAAi/ArcGIS/rest/services/PADUS_Public_Access/FeatureServer/0" target="_blank" style="color:#1a73e8;text-decoration:underline;">PAD-US Public Access</a></div>
+					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
+						<label style="min-width:60px;font-weight:600">Open</label>
+						<input type="color" id="padus-color-open" value="#2e7d32"
+							style="width:40px;height:26px;padding:1px 2px;border:1px solid #ccc;border-radius:5px;cursor:pointer;background:none" onchange="refreshPadusLayer()" />
+						<span style="font-size:10px;color:#aaa">Open access</span>
+					</div>
+					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
+						<label style="min-width:60px;font-weight:600">Restricted</label>
+						<input type="color" id="padus-color-restricted" value="#f57f17"
+							style="width:40px;height:26px;padding:1px 2px;border:1px solid #ccc;border-radius:5px;cursor:pointer;background:none" onchange="refreshPadusLayer()" />
+						<span style="font-size:10px;color:#aaa">Restricted</span>
+					</div>
+					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
+						<label style="min-width:60px;font-weight:600">Closed</label>
+						<input type="color" id="padus-color-closed" value="#c62828"
+							style="width:40px;height:26px;padding:1px 2px;border:1px solid #ccc;border-radius:5px;cursor:pointer;background:none" onchange="refreshPadusLayer()" />
+						<span style="font-size:10px;color:#aaa">Closed</span>
+					</div>
+					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
+						<label style="min-width:60px;font-weight:600">Opacity</label>
+						<input type="range" id="padus-opacity" min="0" max="1" step="0.05" value="0.7"
+							style="flex:1;accent-color:#2563eb;max-width:40%" oninput="setPadusOpacity(this.value)" />
+						<span id="padus-opacity-val" style="font-size:10px;color:#888;min-width:28px">70%</span>
+					</div>
+					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
+						<label style="min-width:60px;font-weight:600">Z Order</label>
+						<input type="number" id="padus-z" value="4" min="1" max="10" step="1"
+							style="width:52px;padding:3px 5px;border:1px solid #ccc;border-radius:5px;font-size:11px;background:#fafafa;color:#333"
+							onchange="padusZOrder=+this.value; reorderAllLayers()" />
+					</div>
+					<div style="display:flex;flex-direction:column;gap:2px;font-size:10px;color:#666;margin-top:2px">
+						<div style="display:flex;align-items:center;gap:4px">
+							<span id="padus-legend-open" style="width:10px;height:10px;border-radius:2px;background:#2e7d32;display:inline-block"></span> 
+							Open
+						</div>
+						<div style="display:flex;align-items:center;gap:4px">
+							<span id="padus-legend-restricted" style="width:10px;height:10px;border-radius:2px;background:#f57f17;display:inline-block"></span> 
+							Restricted
+						</div>
+						<div style="display:flex;align-items:center;gap:4px">
+							<span id="padus-legend-closed" style="width:10px;height:10px;border-radius:2px;background:#c62828;display:inline-block"></span> 
+							Closed
+						</div>
+					</div>
+					<div id="padus-status" style="font-size:10px;color:#888;text-align:center;padding:2px 0"></div>
+				</div>
+
 				<!-- Tab: Elevation Ranges -->
 				<div id="forest-tab-elev" style="display:none;flex-direction:column;gap:6px;max-width:220px">
 					<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
@@ -1066,7 +1327,7 @@
 		let currentUnit='F', tempDepth='10_to_40cm', moistDepth='10_to_40cm';
 		let tempActive=true, moistActive=false, tempContours=true, moistContours=false;
 		let rangeMinC=5, rangeMaxC=10, mapLoaded=false, tempOpacity=0.75, moistOpacity=0.75;
-		let tempZOrder=1, moistZOrder=2, treeZOrder=3, firesZOrder=4, timberZOrder=4, landcoverZOrder=4, riparianZOrder=4;
+		let tempZOrder=1, moistZOrder=2, treeZOrder=3, inatZOrder=5, firesZOrder=4, timberZOrder=4, landcoverZOrder=4, riparianZOrder=4, padusZOrder=4;
 
 		let minimized=true;
 		let activeLayerTab='temp'; // 'temp' | 'moist'
@@ -1239,6 +1500,7 @@
 				if(!moistActive) removeLayers('omMoist');
 				else { const minV=parseFloat(document.getElementById('input-moist-min').value),maxV=parseFloat(document.getElementById('input-moist-max').value); registerProtocol(rangeMinC,rangeMaxC,minV,maxV); addMoistLayers(buildMoistUrl(minV,maxV)); }
 			}
+			reorderAllLayers();
 		}
 
 		function setMasterOpacity(type,value){
@@ -1381,6 +1643,7 @@
 		addZOrderScrollInput('timber-z');
 		addZOrderScrollInput('landcover-z');
 		addZOrderScrollInput('riparian-z');
+		addZOrderScrollInput('padus-z');
 
 		function getInputsAsC(){
 			let min=parseFloat(document.getElementById('input-min').value);
@@ -1944,10 +2207,12 @@
 				parseFloat(document.getElementById('input-moist-max').value)
 			))});
 			activeSlices.forEach((info, id) => layers.push({ z: info.settings.zOrder ?? 3, readd: () => addSliceLayer(id) }));
+			if (forestTabChecks.inat)      layers.push({ z: inatZOrder,      readd: () => addInatLayer() });
 			if (forestTabChecks.fires)     layers.push({ z: firesZOrder,     readd: () => addFiresLayer() });
 			if (forestTabChecks.timber)    layers.push({ z: timberZOrder,    readd: () => addTimberLayer() });
 			if (forestTabChecks.landcover) layers.push({ z: landcoverZOrder, readd: () => addLandcoverLayer() });
 			if (forestTabChecks.riparian)  layers.push({ z: riparianZOrder,  readd: () => addRiparianLayer() });
+			if (forestTabChecks.padus)     layers.push({ z: padusZOrder,     readd: () => addPadusLayer() });
 			// Elevation: use the minimum zOrder among active ranges (so all ranges render at the right position)
 			if (elevMasterEnabled && elevRanges.some(r => r.enabled)) {
 				const elevZ = Math.min(...elevRanges.filter(r => r.enabled).map(r => r.zOrder ?? 5));
@@ -1963,10 +2228,12 @@
 			if (tempActive)  removeLayers('omTemp');
 			if (moistActive) removeLayers('omMoist');
 			activeSlices.forEach((_, id) => removeSliceLayer(id));
+			if (forestTabChecks.inat)      removeInatLayer();
 			if (forestTabChecks.fires)     removeFiresLayer();
 			if (forestTabChecks.timber)    removeTimberLayer();
 			if (forestTabChecks.landcover) removeLandcoverLayer();
 			if (forestTabChecks.riparian)  removeRiparianLayer();
+			if (forestTabChecks.padus)     removePadusLayer();
 			// Remove elev/aspect layers before re-adding in sorted order
 			if (map.getLayer(ELEV_LYR))   { map.removeLayer(ELEV_LYR); }
 			if (map.getSource(ELEV_SRC))  { map.removeSource(ELEV_SRC); }
@@ -2263,8 +2530,8 @@
 
 		// ── Forest Layers Tab State ───────────────────────────────────────────────
 		let activeForestTab = 'species';
-		const forestTabChecks = { species: false, fires: false, timber: false, landcover: false, riparian: false, elev: false, aspect: false };
-		const FOREST_TABS = ['species','fires','timber','landcover','riparian','elev','aspect'];
+		const forestTabChecks = { inat: false, species: false, fires: false, timber: false, landcover: false, riparian: false, padus: false, elev: false, aspect: false };
+		const FOREST_TABS = ['inat','species','fires','timber','landcover','riparian','padus','elev','aspect'];
 
 		function handleForestTabClick(tab) {
 			if (activeForestTab === tab) {
@@ -2308,10 +2575,12 @@
 					if (map.getLayer(lyrId)) map.setLayoutProperty(lyrId, 'visibility', checked ? 'visible' : 'none');
 				});
 			}
+			if (tab === 'inat')     { checked ? addInatLayer()     : (removeInatLayer(), window._hideInatObsPopup && window._hideInatObsPopup()); }
 			if (tab === 'fires')     { checked ? addFiresLayer()     : removeFiresLayer(); }
 			if (tab === 'timber')    { checked ? addTimberLayer()    : removeTimberLayer(); }
 			if (tab === 'landcover') { checked ? addLandcoverLayer() : removeLandcoverLayer(); }
 			if (tab === 'riparian')  { checked ? addRiparianLayer()  : removeRiparianLayer(); }
+			if (tab === 'padus')     { checked ? addPadusLayer()     : removePadusLayer(); }
 			if (tab === 'elev') {
 				onElevMasterToggle(checked);
 				document.getElementById('elev-master-check').checked = checked;
@@ -2320,6 +2589,7 @@
 				onAspectMasterToggle(checked);
 				document.getElementById('aspect-master-check').checked = checked;
 			}
+			reorderAllLayers();
 		}
 
 		// ── ESRI Query-per-tile protocol helpers (GeoJSON, not PBF) ─────────────
@@ -2753,6 +3023,603 @@
 			} catch(e) { return null; }
 		}
 
+		// ── PAD-US Public Access Layer ────────────────────────────────────────────
+		const PADUS_SVC = 'https://services.arcgis.com/v01gqwM5QqNysAAi/ArcGIS/rest/services/PADUS_Public_Access/FeatureServer/0/query';
+		let _padusAbort = null;
+
+		function buildPadusFillExpr() {
+			return ['match', ['get','Pub_Access'],
+				'OA', document.getElementById('padus-color-open')?.value   || '#2e7d32',
+				'RA', document.getElementById('padus-color-restricted')?.value || '#f57f17',
+				document.getElementById('padus-color-closed')?.value || '#c62828'
+			];
+		}
+
+		async function fetchPadusGeoJson() {
+			if (_padusAbort) _padusAbort.abort();
+			_padusAbort = new AbortController();
+			const bounds = map.getBounds();
+			function lngToWM(lng) { return lng * 20037508.3427892 / 180; }
+			function latToWM(lat) {
+				let y = Math.log(Math.tan((90 + lat) * Math.PI / 360)) / (Math.PI / 180);
+				return y * 20037508.3427892 / 180;
+			}
+			const bbox = {
+				xmin: lngToWM(bounds.getWest()),
+				ymin: latToWM(bounds.getSouth()),
+				xmax: lngToWM(bounds.getEast()),
+				ymax: latToWM(bounds.getNorth())
+			};
+			
+			const params = new URLSearchParams({
+				f: 'geojson',
+				geometry: `${bbox.xmin},${bbox.ymin},${bbox.xmax},${bbox.ymax}`,
+				geometryType: 'esriGeometryEnvelope',
+				inSR: '102100',
+				spatialRel: 'esriSpatialRelIntersects',
+				outSR: '4326',
+				where: '1=1',
+				outFields: 'OBJECTID,Pub_Access,Unit_Nm',
+				returnGeometry: 'true',
+				resultRecordCount: '2000'
+			});
+			
+			const url = `${PADUS_SVC}?${params.toString()}`;
+			const statusEl = document.getElementById('padus-status');
+			if (statusEl) statusEl.textContent = '🏛 Loading…';
+			try {
+				const res = await fetch(url, { signal: _padusAbort.signal });
+				if (!res.ok) throw new Error(`HTTP ${res.status}`);
+				const gj = await res.json();
+				if (map.getSource('padusSource')) {
+					map.getSource('padusSource').setData(gj);
+					const n = (gj.features || []).length;
+					if (statusEl) statusEl.textContent = n > 0 ? `🏛 ${n} areas` : '🏛 No areas in view';
+					refreshPadusLayerColors();
+				}
+			} catch(e) {
+				if (e.name === 'AbortError') return;
+				console.error('PADUS fetch error:', e);
+				if (statusEl) statusEl.textContent = '⚠ Failed to load';
+			}
+		}
+
+		function updatePadusLegendColors() {
+			const openColor = document.getElementById('padus-color-open')?.value || '#2e7d32';
+			const restrictedColor = document.getElementById('padus-color-restricted')?.value || '#f57f17';
+			const closedColor = document.getElementById('padus-color-closed')?.value || '#c62828';
+			
+			const openLegend = document.getElementById('padus-legend-open');
+			const restrictedLegend = document.getElementById('padus-legend-restricted');
+			const closedLegend = document.getElementById('padus-legend-closed');
+			
+			if (openLegend) openLegend.style.background = openColor;
+			if (restrictedLegend) restrictedLegend.style.background = restrictedColor;
+			if (closedLegend) closedLegend.style.background = closedColor;
+		}
+
+		function refreshPadusLayerColors() {
+			const opacity = parseFloat(document.getElementById('padus-opacity')?.value || 0.7);
+			const fillExpr = buildPadusFillExpr();
+			if (map.getLayer('padusLayer-fill')) {
+				map.setPaintProperty('padusLayer-fill', 'fill-color', fillExpr);
+				map.setPaintProperty('padusLayer-fill', 'fill-opacity', opacity * 0.5);
+			}
+			if (map.getLayer('padusLayer-line')) {
+				map.setPaintProperty('padusLayer-line', 'line-color', fillExpr);
+				map.setPaintProperty('padusLayer-line', 'line-opacity', opacity);
+			}
+		}
+
+		function addPadusLayer() {
+			if (!mapLoaded) return;
+			removePadusLayer();
+			const opacity = parseFloat(document.getElementById('padus-opacity')?.value || 0.7);
+			const fillExpr = buildPadusFillExpr();
+			map.addSource('padusSource', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+			map.addLayer({
+				id: 'padusLayer-fill', type: 'fill', source: 'padusSource',
+				paint: { 'fill-color': fillExpr, 'fill-opacity': opacity * 0.5 }
+			}, getInsertionLayer(false));
+			map.addLayer({
+				id: 'padusLayer-line', type: 'line', source: 'padusSource',
+				paint: { 'line-color': fillExpr, 'line-width': 1, 'line-opacity': opacity }
+			}, getInsertionLayer(false));
+			map.on('moveend', _onPadusMoveEnd);
+			// Check zoom before fetching
+			if (map.getZoom() >= 7) {
+				fetchPadusGeoJson();
+			} else {
+				const s = document.getElementById('padus-status');
+				if(s) s.textContent = '🔍 Zoom in to see (≥ zoom 7)';
+			}
+		}
+		function _onPadusMoveEnd() {
+			if (!forestTabChecks.padus) return;
+			if (map.getZoom() >= 7) { fetchPadusGeoJson(); }
+			else {
+				const s = document.getElementById('padus-status'); if(s) s.textContent = '🔍 Zoom in to see (≥ zoom 7)';
+				if (map.getSource('padusSource')) map.getSource('padusSource').setData({ type: 'FeatureCollection', features: [] });
+			}
+		}
+		function removePadusLayer() {
+			map.off('moveend', _onPadusMoveEnd);
+			if (_padusAbort) { _padusAbort.abort(); _padusAbort = null; }
+			if (map.getLayer('padusLayer-fill')) map.removeLayer('padusLayer-fill');
+			if (map.getLayer('padusLayer-line')) map.removeLayer('padusLayer-line');
+			if (map.getSource('padusSource'))   map.removeSource('padusSource');
+			const el = document.getElementById('padus-status'); if (el) el.textContent = '';
+		}
+		function refreshPadusLayer() { refreshPadusLayerColors(); updatePadusLegendColors(); if (forestTabChecks.padus) fetchPadusGeoJson(); }
+		function setPadusOpacity(val) {
+			document.getElementById('padus-opacity-val').textContent = Math.round(val * 100) + '%';
+			refreshPadusLayerColors();
+		}
+
+		// ── iNaturalist Layer (iNat tile API — same as iNaturalist.org map) ────────
+		const INAT_TILE_BASE = 'https://api.inaturalist.org/v1/';
+		const INAT_API_BASE  = 'https://api.inaturalist.org/v1/';
+		let inatOpacity = 0.9;
+
+		// State for selected taxon/place
+		let inatSelectedTaxonId = null;
+		let inatSelectedTaxonName = '';
+		let inatSelectedPlaceId = null;
+		let inatSelectedPlaceName = '';
+		let _inatTaxonAcAbort = null;
+		let _inatPlaceAcAbort = null;
+		let _inatTaxonAcTimer = null;
+		let _inatPlaceAcTimer = null;
+		let inatTaxonAcIdx = -1;
+		let inatPlaceAcIdx = -1;
+
+		// ── Build iNat URL params from current UI state ──────────────────────────
+		function buildInatParams() {
+			const params = new URLSearchParams();
+			const geoprivacy = document.getElementById('inat-geoprivacy')?.value || 'open';
+			if (geoprivacy === 'open') {
+				params.set('geoprivacy', 'open');
+				params.set('taxon_geoprivacy', 'open');
+			}
+			if (inatSelectedTaxonId) params.set('taxon_id', inatSelectedTaxonId);
+			const iconicTaxon = document.getElementById('inat-iconic-taxon')?.value;
+			if (iconicTaxon) params.set('iconic_taxa', iconicTaxon);
+			const quality = document.getElementById('inat-quality')?.value;
+			if (quality) params.set('quality_grade', quality);
+			const d1 = document.getElementById('inat-date-start')?.value;
+			const d2 = document.getElementById('inat-date-end')?.value;
+			if (d1) params.set('d1', d1);
+			if (d2) params.set('d2', d2);
+			if (selectedMonths.length > 0) {params.set('month', selectedMonths.join(','));}
+			if (document.getElementById('inat-captive-filter')?.checked)   params.set('captive', 'false');
+			if (document.getElementById('inat-endemic-filter')?.checked)   params.set('endemic', 'true');
+			if (document.getElementById('inat-threatened-filter')?.checked) params.set('threatened', 'true');
+			const locMode = document.getElementById('inat-location-mode')?.value || 'map';
+			if (locMode === 'radius') {
+				const c = map.getCenter();
+				params.set('lat', c.lat.toFixed(6));
+				params.set('lng', c.lng.toFixed(6));
+				params.set('radius', document.getElementById('inat-radius')?.value || '50');
+			} else if (locMode === 'place' && inatSelectedPlaceId) {
+				params.set('place_id', inatSelectedPlaceId);
+			}
+			return params.toString();
+		}
+
+		// ── Build tile URLs ──────────────────────────────────────────────────────
+		function buildInatTileUrls() {
+			const p = buildInatParams();
+			return {
+				points: `${INAT_TILE_BASE}points/{z}/{x}/{y}.png?${p}`,
+				grid:   `${INAT_TILE_BASE}grid/{z}/{x}/{y}.png?${p}`,
+				heat:   `${INAT_TILE_BASE}heatmap/{z}/{x}/{y}.png?${p}`,
+			};
+		}
+
+		// ── Layer management ─────────────────────────────────────────────────────
+		function addInatLayer() {
+			if (!mapLoaded) return;
+			removeInatLayer();
+			const urls = buildInatTileUrls();
+			const style = document.getElementById('inat-map-style')?.value || 'obs';
+
+			// Add appropriate tile sources/layers based on style
+			if (style === 'heatmap') {
+				map.addSource('inatHeatSrc', { type: 'raster', tiles: [urls.heat], tileSize: 256, maxzoom: 20, attribution: '© iNaturalist' });
+				map.addLayer({ id: 'inatHeatLayer', type: 'raster', source: 'inatHeatSrc', paint: { 'raster-opacity': inatOpacity } }, getInsertionLayer(true));
+			} else if (style === 'points') {
+				map.addSource('inatPointsSrc', { type: 'raster', tiles: [urls.points], tileSize: 256, minzoom: 0, maxzoom: 20, attribution: '© iNaturalist' });
+				map.addLayer({ id: 'inatPointsLayer', type: 'raster', source: 'inatPointsSrc', paint: { 'raster-opacity': inatOpacity } }, getInsertionLayer(true));
+			} else if (style === 'grid') {
+				map.addSource('inatGridSrc', { type: 'raster', tiles: [urls.grid], tileSize: 256, minzoom: 0, maxzoom: 20, attribution: '© iNaturalist' });
+				map.addLayer({ id: 'inatGridLayer', type: 'raster', source: 'inatGridSrc', paint: { 'raster-opacity': inatOpacity } }, getInsertionLayer(true));
+			} else {
+				// 'obs' — grid at low zoom, points at high zoom (just like iNaturalist.org)
+				map.addSource('inatGridSrc', { type: 'raster', tiles: [urls.grid], tileSize: 256, minzoom: 2, maxzoom: 9, attribution: '© iNaturalist' });
+				map.addLayer({ id: 'inatGridLayer', type: 'raster', source: 'inatGridSrc', minzoom: 2, maxzoom: 10, paint: { 'raster-opacity': inatOpacity } }, getInsertionLayer(true));
+				map.addSource('inatPointsSrc', { type: 'raster', tiles: [urls.points], tileSize: 256, minzoom: 10, maxzoom: 20, attribution: '© iNaturalist' });
+				map.addLayer({ id: 'inatPointsLayer', type: 'raster', source: 'inatPointsSrc', minzoom: 10, paint: { 'raster-opacity': inatOpacity } }, getInsertionLayer(true));
+			}
+			updateInatStatus();
+		}
+
+		function removeInatLayer() {
+			['inatHeatLayer','inatGridLayer','inatPointsLayer'].forEach(id => { if (map.getLayer(id)) map.removeLayer(id); });
+			['inatHeatSrc','inatGridSrc','inatPointsSrc'].forEach(id => { if (map.getSource(id)) map.removeSource(id); });
+		}
+
+		function applyInatAndRefresh() {
+			if (!forestTabChecks.inat) return;
+			addInatLayer();
+			updateInatStatus();
+		}
+
+		// ── iNaturalist Observation Popup (UTFGrid click-to-observe) ────────────
+		(function() {
+			// Create the observation popup DOM element
+			const obsPopup = document.createElement('div');
+			obsPopup.id = 'inat-obs-popup';
+			obsPopup.innerHTML = '<span class="inat-obs-close" id="inat-obs-close">✕</span>';
+			document.getElementById('map').appendChild(obsPopup);
+			document.getElementById('inat-obs-close').onclick = () => obsPopup.classList.remove('visible');
+
+			// UTFGrid decode: converts grid.json char → key index
+			function utfDecode(c) {
+				let code = c.charCodeAt(0);
+				if (code >= 93) code--;
+				if (code >= 35) code--;
+				return code - 32;
+			}
+
+			// Fetch UTFGrid tile and resolve the observation id at (lat, lng)
+			async function queryInatUTFGrid(lat, lng, zoom) {
+				const z = Math.min(Math.floor(zoom), 20);
+				const n = Math.pow(2, z);
+				const xtile = Math.floor((lng + 180) / 360 * n);
+				const latRad = lat * Math.PI / 180;
+				const ytile = Math.floor((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * n);
+
+				// pixel within tile
+				const xFrac = ((lng + 180) / 360 * n) - xtile;
+				const yFrac = ((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * n) - ytile;
+				const resolution = 4; // same as iNat_map.html
+				const col = Math.floor(xFrac * 256 / resolution);
+				const row = Math.floor(yFrac * 256 / resolution);
+
+				const p = buildInatParams();
+				const endpoint = z >= 10
+					? `${INAT_API_BASE}points/${z}/${xtile}/${ytile}.grid.json?${p}`
+					: `${INAT_API_BASE}grid/${z}/${xtile}/${ytile}.grid.json?${p}`;
+
+				try {
+					const res = await fetch(endpoint);
+					if (!res.ok) return null;
+					const grid = await res.json();
+					if (!grid.grid || !grid.keys || !grid.data) return null;
+					const rowStr = grid.grid[row];
+					if (!rowStr || col >= rowStr.length) return null;
+					const keyIdx = utfDecode(rowStr[col]);
+					const key = grid.keys[keyIdx];
+					if (!key || key === '') return null;
+					const cellData = grid.data[key];
+					return cellData ? { id: cellData.id, cellCount: cellData.cellCount || 1 } : null;
+				} catch(e) { return null; }
+			}
+
+			// Show observation popup near the click point
+			async function showInatObsPopup(screenPt, lngLat) {
+				if (!forestTabChecks.inat) return;
+				const zoom = map.getZoom();
+
+				const hit = await queryInatUTFGrid(lngLat.lat, lngLat.lng, zoom);
+				if (!hit) { obsPopup.classList.remove('visible'); return; }
+
+				// Fetch full observation details
+				let obs;
+				try {
+					const res = await fetch(`${INAT_API_BASE}observations/${hit.id}`);
+					const json = await res.json();
+					obs = json?.results?.[0];
+				} catch(e) { obsPopup.classList.remove('visible'); return; }
+				if (!obs) { obsPopup.classList.remove('visible'); return; }
+
+				// Build popup HTML
+				const taxon = obs.taxon;
+				const commonName = taxon?.preferred_common_name || '';
+				const sciName = taxon?.name || '[Unknown]';
+				const displayName = commonName ? commonName : sciName;
+				const gradeClass = obs.quality_grade === 'research' ? 'research' : obs.quality_grade === 'needs_id' ? 'needs_id' : 'casual';
+				const gradeLabel = obs.quality_grade === 'research' ? '✅ Research' : obs.quality_grade === 'needs_id' ? '❓ Needs ID' : '💬 Casual';
+				const photo = obs.photos?.[0];
+				const photoHtml = photo
+					? `<img src="${photo.url.replace('square','medium')}" alt="${displayName}" onerror="this.style.display='none'" />`
+					: '';
+				const photoCount = (obs.photos?.length || 0) > 1 ? `<span class="inat-obs-count">+${obs.photos.length - 1} more photo${obs.photos.length > 2 ? 's' : ''}</span>` : '';
+				const observer = obs.user?.login || '';
+				const coordsStr = obs.geojson
+					? `${obs.geojson.coordinates[1].toFixed(5)}, ${obs.geojson.coordinates[0].toFixed(5)}`
+					: '';
+				const accuracy = obs.positional_accuracy ? ` (±${obs.positional_accuracy}m)` : '';
+				const dateStr = obs.time_observed_at
+					? obs.time_observed_at.replace('T', ' ').replace(/([+-]\d{2}:?\d{2}|Z)$/, m => ` (${m === 'Z' ? '±00:00' : m})`)
+					: (obs.observed_on || '');
+				const countNote = hit.cellCount > 1
+					? `<div class="inat-obs-count">This marker also includes ${hit.cellCount - 1} older observation${hit.cellCount > 2 ? 's' : ''}.</div>`
+					: '';
+
+				obsPopup.innerHTML = `
+					<span class="inat-obs-close" id="inat-obs-close">✕</span>
+					${photoHtml}
+					${photoCount}
+					<div>
+						<div class="inat-obs-title">${displayName}</div>
+						${commonName ? `<div class="inat-obs-sciname">${sciName}</div>` : ''}
+					</div>
+					<div class="inat-obs-row">
+						<span class="inat-obs-label">Obs:</span>
+						<a class="inat-obs-link" href="${obs.uri}" target="_blank">#${obs.id}</a>
+						<span class="inat-obs-grade ${gradeClass}">${gradeLabel}</span>
+					</div>
+					${observer ? `<div class="inat-obs-row"><span class="inat-obs-label">By:</span> ${observer}</div>` : ''}
+					${dateStr ? `<div class="inat-obs-row"><span class="inat-obs-label">Date:</span> ${dateStr}</div>` : ''}
+					${coordsStr ? `<div class="inat-obs-row"><span class="inat-obs-label">Coords:</span> ${coordsStr}${accuracy}</div>` : ''}
+					${countNote}
+				`;
+				document.getElementById('inat-obs-close').onclick = () => obsPopup.classList.remove('visible');
+
+				// Position near click but keep in viewport
+				const mapRect = map.getContainer().getBoundingClientRect();
+				let left = screenPt.x + 12;
+				let top = screenPt.y - 20;
+				obsPopup.style.left = '0'; obsPopup.style.top = '0';
+				obsPopup.classList.add('visible');
+				const pw = obsPopup.offsetWidth, ph = obsPopup.offsetHeight;
+				if (left + pw > mapRect.width - 8) left = screenPt.x - pw - 12;
+				if (top + ph > mapRect.height - 8) top = mapRect.height - ph - 8;
+				if (top < 8) top = 8;
+				obsPopup.style.left = left + 'px';
+				obsPopup.style.top = top + 'px';
+			}
+
+			// Hook into map clicks when iNat is active (skip if draggable soil popup owns clicks)
+			map.on('click', async (e) => {
+				if (!forestTabChecks.inat) return;
+				if (popupMode === 'draggable') return;
+				// Show loading state immediately so user knows something is happening
+				obsPopup.innerHTML = `<span class="inat-obs-close" id="inat-obs-close">✕</span><div style="color:#888;font-size:11px;padding:4px 0">🔬 Looking up observation…</div>`;
+				obsPopup.style.left = (e.point.x + 12) + 'px';
+				obsPopup.style.top  = (e.point.y - 20) + 'px';
+				obsPopup.classList.add('visible');
+				document.getElementById('inat-obs-close').onclick = () => obsPopup.classList.remove('visible');
+				await showInatObsPopup(e.point, e.lngLat);
+			});
+
+			// Expose hide so iNat layer toggle can dismiss the popup
+			window._hideInatObsPopup = () => obsPopup.classList.remove('visible');
+			map.on('movestart', () => { obsPopup.classList.remove('visible'); });
+		})();
+
+		function updateInatStatus() {
+			const el = document.getElementById('inat-status'); if (!el) return;
+			const parts = [];
+			if (inatSelectedTaxonName) parts.push(inatSelectedTaxonName);
+			const g = document.getElementById('inat-iconic-taxon')?.value;
+			if (g && !inatSelectedTaxonId) parts.push(g);
+			const q = document.getElementById('inat-quality')?.value;
+			if (q) parts.push(q);
+			const priv = document.getElementById('inat-geoprivacy')?.value;
+			if (priv === 'open') parts.push('open coords');
+			el.textContent = parts.length ? '🔬 ' + parts.join(' · ') : '🔬 All observations';
+		}
+
+		function setInatOpacity(val) {
+			inatOpacity = parseFloat(val);
+			document.getElementById('inat-opacity-val').textContent = Math.round(inatOpacity * 100) + '%';
+			['inatHeatLayer','inatGridLayer','inatPointsLayer'].forEach(id => {
+				if (map.getLayer(id)) map.setPaintProperty(id, 'raster-opacity', inatOpacity);
+			});
+		}
+
+		function onInatLocationModeChange() {
+			const mode = document.getElementById('inat-location-mode').value;
+			document.getElementById('inat-radius-row').style.display = mode === 'radius' ? 'flex' : 'none';
+			document.getElementById('inat-place-row').style.display  = mode === 'place'  ? 'flex' : 'none';
+			applyInatAndRefresh();
+		}
+
+		function enableInatOnSearch() {
+			const inatCheck = document.getElementById('ftab-inat-check');
+			if (!inatCheck.checked) {
+				inatCheck.checked = true;
+				onForestTabCheckChange('inat');
+			}
+		}
+
+		// ── Taxon autocomplete ────────────────────────────────────────────────────
+		function onInatTaxonInput(val) {
+			clearTimeout(_inatTaxonAcTimer);
+			inatTaxonAcIdx = -1;
+			if (!val.trim()) {
+				// Clear selection if field is cleared
+				inatSelectedTaxonId = null; inatSelectedTaxonName = '';
+				document.getElementById('inat-taxon-chip').style.display = 'none';
+				hideInatDropdown('inat-taxon-dropdown');
+				return;
+			}
+			_inatTaxonAcTimer = setTimeout(() => fetchInatTaxonSuggestions(val), 250);
+		}
+
+		async function fetchInatTaxonSuggestions(q) {
+			if (_inatTaxonAcAbort) _inatTaxonAcAbort.abort();
+			_inatTaxonAcAbort = new AbortController();
+			try {
+				const res = await fetch(`${INAT_API_BASE}taxa/autocomplete?q=${encodeURIComponent(q)}&per_page=8`, {
+					signal: _inatTaxonAcAbort.signal
+				});
+				const data = await res.json();
+				renderInatDropdown('inat-taxon-dropdown', (data.results || []).map(t => ({
+					id: t.id,
+					label: t.preferred_common_name ? `${t.preferred_common_name} <em style="color:#888;font-size:10px">(${t.name})</em>` : `<em>${t.name}</em>`,
+					icon: getInatTaxonIcon(t.iconic_taxon_name),
+					sublabel: t.rank,
+					onSelect: () => {
+						inatSelectedTaxonId   = t.id;
+						inatSelectedTaxonName = t.preferred_common_name || t.name;
+						document.getElementById('inat-search').value = inatSelectedTaxonName;
+						const chip = document.getElementById('inat-taxon-chip');
+						document.getElementById('inat-taxon-chip-label').textContent = inatSelectedTaxonName;
+						chip.style.display = 'flex';
+						hideInatDropdown('inat-taxon-dropdown');
+						applyInatAndRefresh();
+						enableInatOnSearch();
+					}
+				})), 'inat-taxon-dropdown', () => inatTaxonAcIdx, v => { inatTaxonAcIdx = v; });
+			} catch(e) { if (e.name !== 'AbortError') console.error(e); }
+		}
+
+		function showInatTaxonDropdown() {
+			const val = document.getElementById('inat-search')?.value.trim();
+			if (val) fetchInatTaxonSuggestions(val);
+		}
+
+		function clearInatTaxon() {
+			inatSelectedTaxonId = null; inatSelectedTaxonName = '';
+			document.getElementById('inat-search').value = '';
+			document.getElementById('inat-taxon-chip').style.display = 'none';
+			applyInatAndRefresh();
+		}
+
+		function onInatSearchKeydown(e) {
+			handleInatDropdownKeydown(e, 'inat-taxon-dropdown', () => inatTaxonAcIdx, v => { inatTaxonAcIdx = v; });
+		}
+
+		function getInatTaxonIcon(iconicTaxon) {
+			const icons = { Plantae:'🌿', Fungi:'🍄', Animalia:'🐾', Mammalia:'🦊', Aves:'🐦',
+				Reptilia:'🦎', Amphibia:'🐸', Actinopterygii:'🐟', Insecta:'🦋',
+				Arachnida:'🕷', Mollusca:'🐚', Chromista:'🔬', Protozoa:'🔬', Bacteria:'🦠' };
+			return icons[iconicTaxon] || '🔬';
+		}
+
+		// Month filter state
+		let selectedMonths = [];
+
+		function toggleMonthFilter(month) {
+			const idx = selectedMonths.indexOf(month);
+			const pill = document.querySelector(`.month-pill[data-month="${month}"]`);
+			if (idx === -1) {
+				selectedMonths.push(month);
+				pill.style.background = '#2563eb';
+				pill.style.color = '#fff';
+				pill.style.borderColor = '#2563eb';
+			} else {
+				selectedMonths.splice(idx, 1);
+				pill.style.background = '#f8f8f8';
+				pill.style.color = '#444';
+				pill.style.borderColor = '#ccc';
+			}
+			applyInatAndRefresh();
+		}
+
+		// ── Place autocomplete ────────────────────────────────────────────────────
+		function onInatPlaceInput(val) {
+			clearTimeout(_inatPlaceAcTimer);
+			inatPlaceAcIdx = -1;
+			if (!val.trim()) {
+				inatSelectedPlaceId = null; inatSelectedPlaceName = '';
+				document.getElementById('inat-place-chip').style.display = 'none';
+				hideInatDropdown('inat-place-dropdown');
+				return;
+			}
+			_inatPlaceAcTimer = setTimeout(() => fetchInatPlaceSuggestions(val), 280);
+		}
+
+		async function fetchInatPlaceSuggestions(q) {
+			if (_inatPlaceAcAbort) _inatPlaceAcAbort.abort();
+			_inatPlaceAcAbort = new AbortController();
+			try {
+				const res = await fetch(`${INAT_API_BASE}places/autocomplete?q=${encodeURIComponent(q)}&per_page=8`, {
+					signal: _inatPlaceAcAbort.signal
+				});
+				const data = await res.json();
+				renderInatDropdown('inat-place-dropdown', (data.results || []).map(p => ({
+					id: p.id,
+					label: p.display_name || p.name,
+					icon: '🏙',
+					sublabel: p.place_type_name || '',
+					onSelect: () => {
+						inatSelectedPlaceId   = p.id;
+						inatSelectedPlaceName = p.display_name || p.name;
+						document.getElementById('inat-place').value = inatSelectedPlaceName;
+						const chip = document.getElementById('inat-place-chip');
+						document.getElementById('inat-place-chip-label').textContent = inatSelectedPlaceName;
+						chip.style.display = 'flex';
+						hideInatDropdown('inat-place-dropdown');
+						applyInatAndRefresh();
+						enableInatOnSearch();
+					}
+				})), 'inat-place-dropdown', () => inatPlaceAcIdx, v => { inatPlaceAcIdx = v; });
+			} catch(e) { if (e.name !== 'AbortError') console.error(e); }
+		}
+
+		function clearInatPlace() {
+			inatSelectedPlaceId = null; inatSelectedPlaceName = '';
+			document.getElementById('inat-place').value = '';
+			document.getElementById('inat-place-chip').style.display = 'none';
+			applyInatAndRefresh();
+		}
+
+		function onInatPlaceKeydown(e) {
+			handleInatDropdownKeydown(e, 'inat-place-dropdown', () => inatPlaceAcIdx, v => { inatPlaceAcIdx = v; });
+		}
+
+		// ── Generic dropdown renderer ──────────────────────────────────────────────
+		function renderInatDropdown(dropdownId, items, _unusedId, getIdx, setIdx) {
+			const dd = document.getElementById(dropdownId); if (!dd) return;
+			dd.innerHTML = '';
+			if (!items.length) { dd.style.display = 'none'; return; }
+			items.forEach((item, i) => {
+				const row = document.createElement('div');
+				row.style.cssText = 'display:flex;align-items:center;gap:7px;padding:6px 10px;cursor:pointer;border-bottom:1px solid #f0f0f0;font-size:11px;transition:background 0.1s';
+				row.dataset.idx = i;
+				row.innerHTML = `<span style="font-size:14px;flex-shrink:0">${item.icon}</span><div style="flex:1;overflow:hidden"><div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${item.label}</div>${item.sublabel?`<div style="font-size:9px;color:#aaa;text-transform:capitalize">${item.sublabel}</div>`:''}</div>`;
+				row.addEventListener('mouseover', () => {
+					setIdx(i);
+					dd.querySelectorAll('[data-idx]').forEach((r,j) => r.style.background = j===i?'#f0f7e8':'');
+				});
+				row.addEventListener('mousedown', e => { e.preventDefault(); item.onSelect(); });
+				dd.appendChild(row);
+			});
+			dd.style.display = 'block';
+		}
+
+		function hideInatDropdown(id) {
+			const dd = document.getElementById(id); if (dd) dd.style.display = 'none';
+		}
+
+		function handleInatDropdownKeydown(e, dropdownId, getIdx, setIdx) {
+			const dd = document.getElementById(dropdownId);
+			if (!dd || dd.style.display === 'none') return;
+			const rows = Array.from(dd.querySelectorAll('[data-idx]'));
+			let idx = getIdx();
+			if (e.key === 'ArrowDown') {
+				e.preventDefault();
+				idx = Math.min(idx + 1, rows.length - 1);
+				setIdx(idx);
+				rows.forEach((r,i) => r.style.background = i===idx?'#f0f7e8':'');
+			} else if (e.key === 'ArrowUp') {
+				e.preventDefault();
+				idx = Math.max(idx - 1, 0);
+				setIdx(idx);
+				rows.forEach((r,i) => r.style.background = i===idx?'#f0f7e8':'');
+			} else if (e.key === 'Enter') {
+				if (idx >= 0 && rows[idx]) { rows[idx].dispatchEvent(new MouseEvent('mousedown')); }
+				else { applyInatAndRefresh(); hideInatDropdown(dropdownId); }
+				e.preventDefault();
+			} else if (e.key === 'Escape') {
+				hideInatDropdown(dropdownId);
+			}
+		}
+
 		// ── Toggle panel minimize ─────────────────────────────────────────────────
 		let treePanelMinimized = true;
 		function toggleTreePanel(){
@@ -2768,15 +3635,17 @@
 			btn.style.transform = 'rotate(180deg)';
 			document.getElementById('tree-panel-body').style.display = 'none';
 			// Set initial tab appearance
-			selectForestTab('species');
+			selectForestTab('inat');
 		})();
 
 		// Re-add overlay layers after map loads
 		map.on('load', function() {
+			if (forestTabChecks.inat)      addInatLayer();
 			if (forestTabChecks.fires)     addFiresLayer();
 			if (forestTabChecks.timber)    addTimberLayer();
 			if (forestTabChecks.landcover) addLandcoverLayer();
 			if (forestTabChecks.riparian)  addRiparianLayer();
+			if (forestTabChecks.padus)     addPadusLayer();
 		});
 
 		loadTreeSlices();
@@ -2917,7 +3786,7 @@
 			popupEl.style.display = 'block';
 			popupVisible = true;
 
-			const hasAnything = tempActive || moistActive || (activeSlices && activeSlices.size > 0) || forestTabChecks.fires || forestTabChecks.timber || forestTabChecks.landcover || forestTabChecks.riparian;
+			const hasAnything = tempActive || moistActive || (activeSlices && activeSlices.size > 0) || forestTabChecks.fires || forestTabChecks.timber || forestTabChecks.landcover || forestTabChecks.riparian || forestTabChecks.padus;
 			if (!hasAnything) {
 				contentEl.innerHTML = '<span style="color:#888;font-size:11px">No layer</span>';
 				return;
@@ -3031,8 +3900,8 @@
 				? rows.join('<br style="margin:1px 0">')
 				: '<span style="color:#888;font-size:11px">No data</span>';
 
-			// ── Async identifies: NLCD + Riparian + Tree (debounced) ─────────────────
-			const needsAsync = forestTabChecks.landcover || forestTabChecks.riparian || (forestTabChecks.species && activeSlices && activeSlices.size > 0);
+			// ── Async identifies: NLCD + Riparian + Padus + Tree (debounced) ─────────────────
+			const needsAsync = forestTabChecks.landcover || forestTabChecks.riparian || forestTabChecks.padus || (forestTabChecks.species && activeSlices && activeSlices.size > 0);
 			if (needsAsync) {
 				clearTimeout(_treeDebounceTimer);
 				const captureLngLat = { lat: lngLat.lat, lng: lngLat.lng };
@@ -3049,6 +3918,20 @@
 					if (forestTabChecks.riparian) {
 						const rip = await identifyRiparian(captureLngLat.lat, captureLngLat.lng);
 						if (rip) asyncRows.push(`<span class="popup-value-row"><span class="popup-swatch" style="background:${(document.getElementById('riparian-color')?.value)||'#1565c0'};width:10px;height:10px;border-radius:2px;flex-shrink:0"></span>💧 <span style="font-size:10px">${rip}</span></span>`);
+					}
+
+					// Public Access (PADUS) identify
+					if (forestTabChecks.padus && map.getLayer('padusLayer-fill')) {
+						const queryPoint = map.project(captureLngLat);
+						const padusFeatures = map.queryRenderedFeatures(queryPoint, { layers: ['padusLayer-fill'] });
+						if (padusFeatures.length > 0) {
+							const p = padusFeatures[0].properties || {};
+							const access = p.Pub_Access || 'Unknown';
+							const accessLabel = access === 'OA' ? 'Open Access' : access === 'RA' ? 'Restricted Access' : access === 'XA' ? 'Closed' : access;
+							const accessColor = access === 'OA' ? (document.getElementById('padus-color-open')?.value||'#2e7d32') : access === 'RA' ? (document.getElementById('padus-color-restricted')?.value||'#f57f17') : (document.getElementById('padus-color-closed')?.value||'#c62828');
+							const unitNm = p.Unit_Nm ? ` · ${p.Unit_Nm}` : '';
+							asyncRows.push(`<span class="popup-value-row"><span class="popup-swatch" style="background:${accessColor};width:10px;height:10px;border-radius:2px;flex-shrink:0"></span>🏛 <span style="font-size:10px">${accessLabel}${unitNm}</span></span>`);
+						}
 					}
 
 					// Tree species identify
