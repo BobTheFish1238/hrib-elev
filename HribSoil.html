@@ -11,6 +11,10 @@
 		<style>
 			html, body, #map { margin: 0; padding: 0; height: 100%; }
 
+			body, html {
+			  overscroll-behavior: none;
+			}
+
 			#controls {
 				position: absolute; top: 12px; left: 12px; z-index: 10;
 				background: rgba(255,255,255,0.96); border-radius: 10px;
@@ -185,13 +189,13 @@
 
 			@media (max-width: 600px) {
 				#controls {
-					max-width: calc(40vw);
+					max-width: calc(41vw);
 					left: 8px;
 					top: 8px;
 					font-size: 12px;
 				}
 				#tree-panel {
-					max-width: calc(44vw);
+					max-width: calc(41vw);
 					right: 8px;
 					top: 8px;
 					font-size: 12px;
@@ -1219,22 +1223,24 @@
 					<div class="section-label" style="font-size:10px;margin:0">
 						<a href="https://services.arcgis.com/v01gqwM5QqNysAAi/ArcGIS/rest/services/PADUS_Public_Access/FeatureServer/0" target="_blank" style="color:#1a73e8;text-decoration:underline;">PAD-US Public Access</a></div>
 					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
-						<label style="min-width:60px;font-weight:600">Open</label>
+						<label style="min-width:82px;font-weight:600">Open access</label>
 						<input type="color" id="padus-color-open" value="#2e7d32"
 							style="width:40px;height:26px;padding:1px 2px;border:1px solid #ccc;border-radius:5px;cursor:pointer;background:none" onchange="refreshPadusLayer()" />
-						<span style="font-size:10px;color:#aaa">Open access</span>
 					</div>
 					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
-						<label style="min-width:60px;font-weight:600">Restricted</label>
+						<label style="min-width:82px;font-weight:600">Restricted</label>
 						<input type="color" id="padus-color-restricted" value="#f57f17"
 							style="width:40px;height:26px;padding:1px 2px;border:1px solid #ccc;border-radius:5px;cursor:pointer;background:none" onchange="refreshPadusLayer()" />
-						<span style="font-size:10px;color:#aaa">Restricted</span>
 					</div>
 					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
-						<label style="min-width:60px;font-weight:600">Closed</label>
+						<label style="min-width:82px;font-weight:600">Closed</label>
 						<input type="color" id="padus-color-closed" value="#c62828"
 							style="width:40px;height:26px;padding:1px 2px;border:1px solid #ccc;border-radius:5px;cursor:pointer;background:none" onchange="refreshPadusLayer()" />
-						<span style="font-size:10px;color:#aaa">Closed</span>
+					</div>
+					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
+						<label style="min-width:82px;font-weight:600">Other/Unknown</label>
+						<input type="color" id="padus-color-unknown" value="#9e9e9e"
+							style="width:40px;height:26px;padding:1px 2px;border:1px solid #ccc;border-radius:5px;cursor:pointer;background:none" onchange="refreshPadusLayer()" />
 					</div>
 					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
 						<label style="min-width:60px;font-weight:600">Opacity</label>
@@ -1247,20 +1253,6 @@
 						<input type="number" id="padus-z" value="4" min="1" max="10" step="1"
 							style="width:52px;padding:3px 5px;border:1px solid #ccc;border-radius:5px;font-size:11px;background:#fafafa;color:#333"
 							onchange="padusZOrder=+this.value; reorderAllLayers()" />
-					</div>
-					<div style="display:flex;flex-direction:column;gap:2px;font-size:10px;color:#666;margin-top:2px">
-						<div style="display:flex;align-items:center;gap:4px">
-							<span id="padus-legend-open" style="width:10px;height:10px;border-radius:2px;background:#2e7d32;display:inline-block"></span> 
-							Open
-						</div>
-						<div style="display:flex;align-items:center;gap:4px">
-							<span id="padus-legend-restricted" style="width:10px;height:10px;border-radius:2px;background:#f57f17;display:inline-block"></span> 
-							Restricted
-						</div>
-						<div style="display:flex;align-items:center;gap:4px">
-							<span id="padus-legend-closed" style="width:10px;height:10px;border-radius:2px;background:#c62828;display:inline-block"></span> 
-							Closed
-						</div>
 					</div>
 					<div id="padus-status" style="font-size:10px;color:#888;text-align:center;padding:2px 0"></div>
 				</div>
@@ -3031,7 +3023,8 @@
 			return ['match', ['get','Pub_Access'],
 				'OA', document.getElementById('padus-color-open')?.value   || '#2e7d32',
 				'RA', document.getElementById('padus-color-restricted')?.value || '#f57f17',
-				document.getElementById('padus-color-closed')?.value || '#c62828'
+				'XA', document.getElementById('padus-color-closed')?.value || '#c62828',
+				document.getElementById('padus-color-unknown')?.value || '#9e9e9e'
 			];
 		}
 
@@ -3082,20 +3075,6 @@
 				console.error('PADUS fetch error:', e);
 				if (statusEl) statusEl.textContent = '⚠ Failed to load';
 			}
-		}
-
-		function updatePadusLegendColors() {
-			const openColor = document.getElementById('padus-color-open')?.value || '#2e7d32';
-			const restrictedColor = document.getElementById('padus-color-restricted')?.value || '#f57f17';
-			const closedColor = document.getElementById('padus-color-closed')?.value || '#c62828';
-			
-			const openLegend = document.getElementById('padus-legend-open');
-			const restrictedLegend = document.getElementById('padus-legend-restricted');
-			const closedLegend = document.getElementById('padus-legend-closed');
-			
-			if (openLegend) openLegend.style.background = openColor;
-			if (restrictedLegend) restrictedLegend.style.background = restrictedColor;
-			if (closedLegend) closedLegend.style.background = closedColor;
 		}
 
 		function refreshPadusLayerColors() {
@@ -3150,7 +3129,7 @@
 			if (map.getSource('padusSource'))   map.removeSource('padusSource');
 			const el = document.getElementById('padus-status'); if (el) el.textContent = '';
 		}
-		function refreshPadusLayer() { refreshPadusLayerColors(); updatePadusLegendColors(); if (forestTabChecks.padus) fetchPadusGeoJson(); }
+		function refreshPadusLayer() { refreshPadusLayerColors(); if (forestTabChecks.padus) fetchPadusGeoJson(); }
 		function setPadusOpacity(val) {
 			document.getElementById('padus-opacity-val').textContent = Math.round(val * 100) + '%';
 			refreshPadusLayerColors();
@@ -3927,8 +3906,11 @@
 						if (padusFeatures.length > 0) {
 							const p = padusFeatures[0].properties || {};
 							const access = p.Pub_Access || 'Unknown';
-							const accessLabel = access === 'OA' ? 'Open Access' : access === 'RA' ? 'Restricted Access' : access === 'XA' ? 'Closed' : access;
-							const accessColor = access === 'OA' ? (document.getElementById('padus-color-open')?.value||'#2e7d32') : access === 'RA' ? (document.getElementById('padus-color-restricted')?.value||'#f57f17') : (document.getElementById('padus-color-closed')?.value||'#c62828');
+							let accessLabel, accessColor;
+							if (access === 'OA') { accessLabel = 'Open Access'; accessColor = document.getElementById('padus-color-open')?.value || '#2e7d32'; }
+							else if (access === 'RA') { accessLabel = 'Restricted Access'; accessColor = document.getElementById('padus-color-restricted')?.value || '#f57f17'; }
+							else if (access === 'XA') { accessLabel = 'Closed'; accessColor = document.getElementById('padus-color-closed')?.value || '#c62828'; }
+							else { accessLabel = 'Unknown Access'; accessColor = document.getElementById('padus-color-unknown')?.value || '#9e9e9e'; }
 							const unitNm = p.Unit_Nm ? ` · ${p.Unit_Nm}` : '';
 							asyncRows.push(`<span class="popup-value-row"><span class="popup-swatch" style="background:${accessColor};width:10px;height:10px;border-radius:2px;flex-shrink:0"></span>🏛 <span style="font-size:10px">${accessLabel}${unitNm}</span></span>`);
 						}
@@ -4280,6 +4262,20 @@
 			const fill = document.createElement('div');
 			fill.className = 'elev-vslider-fill';
 
+			function updateFillGradient() {
+				if (r.gradient && r.enabled) {
+					const color1 = r.c1;
+					const color2 = r.c2;
+					// Gradient from top (high elevation) to bottom (low elevation)
+					fill.style.background = `linear-gradient(to bottom, ${color1}, ${color2})`;
+					fill.style.opacity = '1';
+				} else {
+					fill.style.background = '#2563eb';
+					fill.style.opacity = '0.35';
+				}
+			}
+			updateFillGradient();
+
 			const handleTop = document.createElement('div');    // max handle (top = high elev)
 			handleTop.className = 'elev-vslider-handle';
 			const handleBot = document.createElement('div');    // min handle (bottom = low elev)
@@ -4306,6 +4302,20 @@
 
 			if (middleContent) {
 				middleContent.forEach(el => valsCol.appendChild(el));
+				
+				// Add listeners to update gradient when color/gradient changes
+				const colorInputs = middleContent.filter(el => el.querySelector && el.querySelector('input[type="color"]'));
+				colorInputs.forEach(container => {
+					const colorPicker = container.querySelector('input[type="color"]');
+					const gradientCheck = container.closest('.exp-range-row')?.querySelector('.exp-gradient-row input[type="checkbox"]');
+					
+					if (colorPicker) {
+						colorPicker.addEventListener('input', () => updateFillGradient());
+					}
+					if (gradientCheck) {
+						gradientCheck.addEventListener('change', () => updateFillGradient());
+					}
+				});
 			}
 
 			valsCol.appendChild(rowBot);
@@ -4366,6 +4376,8 @@
 			minInp.oninput = e => { r.min = +e.target.value; positionHandles(); onChangeCallback(); };
 			maxInp.addEventListener('wheel', e => { e.preventDefault(); r.max += e.deltaY<0?(elevUnit==='ft'?10:3):-(elevUnit==='ft'?10:3); positionHandles(); onChangeCallback(); }, {passive:false});
 			minInp.addEventListener('wheel', e => { e.preventDefault(); r.min += e.deltaY<0?(elevUnit==='ft'?10:3):-(elevUnit==='ft'?100:3); positionHandles(); onChangeCallback(); }, {passive:false});
+
+			r._updateFillGradient = updateFillGradient;
 
 			return wrap;
 		}
@@ -4479,6 +4491,8 @@
 					scheduleElevRefresh();
 				},[colorRow, gradRow, lowRow]);
 				div.appendChild(slider);
+				// Apply initial gradient state to the track
+				updateElevTrackGradient(slider._track, r);
 
 				// Wire up per-range enable checkbox
 				const ck = hdr.querySelector('.exp-range-check');
@@ -4533,20 +4547,21 @@
 				// Color / alpha
 				const c1i = colorRow.querySelector('input[type="color"]');
 				const a1i = colorRow.querySelector('input[type="range"]');
-				c1i.oninput = e => { r.c1=e.target.value; scheduleElevRefresh(); };
-				a1i.oninput = e => { r.a1=+e.target.value; colorRow.querySelector('.exp-alpha-val').textContent=Math.round(r.a1*100)+'%'; scheduleElevRefresh(); };
+				c1i.oninput = e => { r.c1 = e.target.value; if (r._updateFillGradient) r._updateFillGradient();scheduleElevRefresh(); };
+				a1i.oninput = e => { r.a1=+e.target.value; colorRow.querySelector('.exp-alpha-val').textContent=Math.round(r.a1*100)+'%'; updateElevTrackGradient(slider._track, r); scheduleElevRefresh(); };
 
 				gradRow.querySelector('input[type="checkbox"]').onchange = e => {
 					r.gradient = e.target.checked;
 					lowRow.classList.toggle('disabled', !r.gradient);
 					lowRow.querySelectorAll('input').forEach(inp => inp.disabled = !r.gradient);
+					if (r._updateFillGradient) r._updateFillGradient();
 					scheduleElevRefresh();
 				};
 
 				const c2i = lowRow.querySelector('input[type="color"]');
 				const a2i = lowRow.querySelector('input[type="range"]');
-				c2i.oninput = e => { r.c2=e.target.value; scheduleElevRefresh(); };
-				a2i.oninput = e => { r.a2=+e.target.value; lowRow.querySelector('.exp-alpha-val').textContent=Math.round(r.a2*100)+'%'; scheduleElevRefresh(); };
+				c2i.oninput = e => { r.c2 = e.target.value; if (r._updateFillGradient) r._updateFillGradient();scheduleElevRefresh(); };
+				a2i.oninput = e => { r.a2=+e.target.value; lowRow.querySelector('.exp-alpha-val').textContent=Math.round(r.a2*100)+'%'; updateElevTrackGradient(slider._track, r); scheduleElevRefresh(); };
 
 				div.querySelector('.exp-remove-btn').onclick = () => {
 					elevRanges.splice(i,1); syncElevMasterCheck(); renderElevRanges(); refreshElevLayer();
@@ -4569,6 +4584,27 @@
 		function scheduleElevRefresh() {
 			clearTimeout(_elevRefreshTimer);
 			_elevRefreshTimer = setTimeout(()=>refreshElevLayer(), 400);
+		}
+
+		// Update the vslider track to reflect gradient state (top=c1/high, bottom=c2/low)
+		function updateElevTrackGradient(track, r) {
+			if (!track) return;
+			if (r.gradient) {
+				const c1 = r.c1 || '#2563eb';
+				const c2 = r.c2 || '#ff0000';
+				// Convert hex to rgba using alpha values
+				const toRgba = (hex, a) => {
+					const n = parseInt(hex.replace('#',''), 16);
+					return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
+				};
+				const top = toRgba(c1, r.a1 ?? 0.7);
+				const bot = toRgba(c2, r.a2 ?? 0.3);
+				track.style.background = `linear-gradient(to bottom, ${top}, ${bot})`;
+				track.style.opacity = '';
+			} else {
+				track.style.background = '';
+				track.style.opacity = '';
+			}
 		}
 
 		function addElevRange() {
@@ -4619,6 +4655,42 @@
 			svg.setAttribute('viewBox',`0 0 ${size} ${size}`);
 			svg.setAttribute('width', size); svg.setAttribute('height', size);
 			svg.className = 'aspect-wheel-svg';
+
+			// Defs — holds the per-arc linear gradient
+			const defs = document.createElementNS(svgNS,'defs');
+			const gradId = 'arc-grad-' + Math.random().toString(36).slice(2);
+			const arcGrad = document.createElementNS(svgNS,'linearGradient');
+			arcGrad.setAttribute('id', gradId);
+			arcGrad.setAttribute('gradientUnits','userSpaceOnUse');
+			const stop1 = document.createElementNS(svgNS,'stop');
+			const stop2 = document.createElementNS(svgNS,'stop');
+			stop1.setAttribute('offset','0%');
+			stop2.setAttribute('offset','100%');
+			arcGrad.appendChild(stop1);
+			arcGrad.appendChild(stop2);
+			defs.appendChild(arcGrad);
+			svg.appendChild(defs);
+
+			// Helper: update gradient stops & geometry from start→end handle positions
+			function updateArcGradient() {
+				const sr = degToRad(r.minDeg), er = degToRad(r.maxDeg);
+				// midpoint angle of arc for gradient direction
+				let sweep = r.maxDeg - r.minDeg; if (sweep <= 0) sweep += 360;
+				const midDeg = r.minDeg + sweep / 2;
+				const midRad = degToRad(midDeg);
+				// gradient runs from start-handle point to end-handle point along the midring
+				const mR = (INNER+OUTER)/2;
+				arcGrad.setAttribute('x1', CX + mR*Math.cos(sr));
+				arcGrad.setAttribute('y1', CY + mR*Math.sin(sr));
+				arcGrad.setAttribute('x2', CX + mR*Math.cos(er));
+				arcGrad.setAttribute('y2', CY + mR*Math.sin(er));
+				const hexToRgba = (hex, a) => {
+					const n = parseInt((hex||'#000000').replace('#',''),16);
+					return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
+				};
+				stop1.setAttribute('stop-color', hexToRgba(r.color, r.alpha));
+				stop2.setAttribute('stop-color', hexToRgba(r.color2||'#000000', r.alpha2??r.alpha));
+			}
 
 			// Background ring (full circle, gray)
 			const bgRing = document.createElementNS(svgNS,'circle');
@@ -4677,8 +4749,14 @@
 
 			function updateWheel() {
 				arcPath.setAttribute('d', buildArcPath(r.minDeg, r.maxDeg));
-				arcPath.setAttribute('fill', r.color);
-				arcPath.setAttribute('opacity', r.alpha);
+				if (r.gradient) {
+					updateArcGradient();
+					arcPath.setAttribute('fill', `url(#${gradId})`);
+					arcPath.removeAttribute('opacity');
+				} else {
+					arcPath.setAttribute('fill', r.color);
+					arcPath.setAttribute('opacity', r.alpha);
+				}
 				const sr=degToRad(r.minDeg), er=degToRad(r.maxDeg);
 				hStart.setAttribute('cx', CX+midR*Math.cos(sr)); hStart.setAttribute('cy', CY+midR*Math.sin(sr));
 				hEnd.setAttribute('cx',   CX+midR*Math.cos(er)); hEnd.setAttribute('cy',   CY+midR*Math.sin(er));
@@ -4718,8 +4796,8 @@
 			wrap.appendChild(svg);
 			updateWheel();
 			
-			// Return both the wheel and the value row container
-			return { wheel: wrap, valueRow: null };
+			// Return wheel wrap, exposed updateWheel for external callers
+			return { wheel: wrap, valueRow: null, updateWheel };
 		}
 
 		// ── Aspect protocol ──────────────────────────────────────────────────────────
@@ -4753,7 +4831,7 @@
 								const dzdy=(getElev(bx,by+1)-getElev(bx,by-1))/dp;
 								const slope=Math.sqrt(dzdx*dzdx+dzdy*dzdy);
 								if(slope<0.005){out.data[(py*sz+px)*4+3]=0;continue;}
-								let aspectDeg=Math.atan2(dzdx,dzdy)*(180/Math.PI)+180;
+								let aspectDeg=Math.atan2(dzdx,-dzdy)*(180/Math.PI)+180;
 								if(aspectDeg<0)aspectDeg+=360; if(aspectDeg>=360)aspectDeg-=360;
 								let matched=false;
 								for(const rng of activeRanges){
@@ -4827,13 +4905,6 @@
 				`;
 				div.appendChild(hdr);
 
-				// Compass wheel and values
-				const { wheel, valueRow } = makeAspectWheel(r, () => {
-					hdr.querySelector('.exp-range-label').textContent = r.minDeg+'°–'+r.maxDeg+'°';
-					scheduleAspectRefresh();
-				});
-				div.appendChild(wheel);
-
 				// Create and append value row separately
 				const valRow = document.createElement('div');
 				valRow.className = 'aspect-wheel-val-row';
@@ -4848,8 +4919,17 @@
 
 				// Set up number inputs
 				const [minNumInp, maxNumInp] = valRow.querySelectorAll('input');
-				minNumInp.oninput = e => { r.minDeg=((+e.target.value)%360+360)%360; scheduleAspectRefresh(); };
-				maxNumInp.oninput = e => { r.maxDeg=((+e.target.value)%360+360)%360; scheduleAspectRefresh(); };
+				minNumInp.oninput = e => { r.minDeg=((+e.target.value)%360+360)%360; updateArcWheel(); scheduleAspectRefresh(); };
+				maxNumInp.oninput = e => { r.maxDeg=((+e.target.value)%360+360)%360; updateArcWheel(); scheduleAspectRefresh(); };
+
+				// Compass wheel and values
+				const { wheel, valueRow, updateWheel: updateArcWheel } = makeAspectWheel(r, () => {
+					hdr.querySelector('.exp-range-label').textContent = r.minDeg+'°–'+r.maxDeg+'°';
+					minNumInp.value = r.minDeg;
+					maxNumInp.value = r.maxDeg;
+					scheduleAspectRefresh();
+				});
+				div.appendChild(wheel);
 
 				// Color + alpha
 				const colorRow = document.createElement('div');
@@ -4970,34 +5050,25 @@
 
 				const ci=colorRow.querySelector('input[type="color"]');
 				const ai=colorRow.querySelector('input[type="range"]');
-				ci.oninput=e=>{ r.color=e.target.value; wheel.querySelector('.aspect-wheel-svg path').setAttribute('fill',r.color); scheduleAspectRefresh(); };
+				ci.oninput=e=>{ r.color=e.target.value; updateArcWheel(); scheduleAspectRefresh(); };
 				ai.oninput = e => { 
 					r.alpha = +e.target.value; 
 					colorRow.querySelector('.exp-alpha-val').textContent = Math.round(r.alpha * 100) + '%'; 
-					const arcPath = wheel.querySelector('svg path');
-					if (arcPath) arcPath.setAttribute('opacity', r.alpha);
-					scheduleAspectRefresh(); 
+					updateArcWheel(); scheduleAspectRefresh(); 
 				};
 
 				gradRow.querySelector('input[type="checkbox"]').onchange = e => {
 					r.gradient = e.target.checked;
 					lowRow.classList.toggle('disabled', !r.gradient);
 					lowRow.querySelectorAll('input').forEach(inp => inp.disabled = !r.gradient);
-					// Also update the gradient styling
-					const arcPath = wheel.querySelector('svg path');
-					if (arcPath && r.gradient) {
-						// Remove opacity from the arc path when gradient is enabled
-						arcPath.removeAttribute('opacity');
-					} else if (arcPath && !r.gradient) {
-						arcPath.setAttribute('opacity', r.alpha);
-					}
+					updateArcWheel();
 					scheduleAspectRefresh();
 				};
 
 				const c2i = lowRow.querySelector('input[type="color"]');
 				const a2i = lowRow.querySelector('input[type="range"]');
-				c2i.oninput=e=>{ r.color2=e.target.value; scheduleAspectRefresh(); };
-				a2i.oninput=e=>{ r.alpha2=+e.target.value; lowRow.querySelector('.exp-alpha-val').textContent=Math.round(r.alpha2*100)+'%'; scheduleAspectRefresh(); };
+				c2i.oninput=e=>{ r.color2=e.target.value; updateArcWheel(); scheduleAspectRefresh(); };
+				a2i.oninput=e=>{ r.alpha2=+e.target.value; lowRow.querySelector('.exp-alpha-val').textContent=Math.round(r.alpha2*100)+'%'; updateArcWheel(); scheduleAspectRefresh(); };
 
 				div.querySelector('.exp-remove-btn').onclick=()=>{ aspectRanges.splice(i,1); syncAspectMasterCheck(); renderAspectRanges(); refreshAspectLayer(); };
 				const aspectZInp = hdr.querySelector('.exp-z-input');
