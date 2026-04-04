@@ -215,8 +215,43 @@
 			.soil-popup.draggable-mode {
 				pointer-events: auto;
 				cursor: grab;
+				user-select: none;
+				-webkit-user-select: none;
+				touch-action: none;
 			}
 			.soil-popup.draggable-mode:active { cursor: grabbing; }
+			.soil-popup.draggable-mode .popup-content,
+			.soil-popup.draggable-mode .popup-content * {
+				user-select: none;
+				-webkit-user-select: none;
+				touch-action: none;
+				pointer-events: none;
+			}
+			.soil-popup.draggable-mode .popup-coords,
+			.soil-popup.draggable-mode .popup-elevation {
+				user-select: none;
+				-webkit-user-select: none;
+				touch-action: none;
+				pointer-events: none;
+			}
+			.popup-copy-flash {
+				pointer-events: none;
+				position: absolute;
+				top: 50%; left: 50%;
+				transform: translate(-50%, -50%);
+				background: rgba(37,99,235,0.82);
+				color: #fff;
+				font-size: 11px;
+				font-weight: 700;
+				padding: 3px 10px;
+				border-radius: 6px;
+				white-space: nowrap;
+				opacity: 0;
+				transition: opacity 0.12s;
+				z-index: 9999;
+				font-family: sans-serif;
+			}
+			.popup-copy-flash.show { opacity: 1; transition: none; }
 			.popup-wrapper {
 				-webkit-backdrop-filter: blur(2px);
 				backdrop-filter: blur(2px);
@@ -278,7 +313,11 @@
 				display: flex;
 				align-items: center;
 				gap: 5px;
+				white-space:wrap;
+				cursor: copy;
 			}
+			.popup-elevation { cursor: copy; }
+			.popup-coords { cursor: copy; }
 			.popup-swatch {
 				width: 10px;
 				height: 10px;
@@ -3664,8 +3703,8 @@
 
 		// ── Format lngLat ─────────────────────────────────────────────────────────
 		function fmtCoords(lngLat) {
-			const lat = lngLat.lat >= 0 ? lngLat.lat.toFixed(3) + '°N' : Math.abs(lngLat.lat).toFixed(3) + '°S';
-			const lng = lngLat.lng >= 0 ? lngLat.lng.toFixed(3) + '°E' : Math.abs(lngLat.lng).toFixed(3) + '°W';
+			const lat = lngLat.lat.toFixed(4);
+			const lng = lngLat.lng.toFixed(4);
 			return `${lat}, ${lng}`;
 		}
 
@@ -3958,18 +3997,94 @@
 		let _isDraggingPopup = false;
 		let _dragOffsetX = 0;
 		let _dragOffsetY = 0;
+		let _dragStartX = 0;
+		let _dragStartY = 0;
+		let _dragMoved = false;  // true if the pointer moved enough to count as a drag
 
-		// Replace the existing popup drag event listeners with this
+		// Inject a flash-copy overlay into the popup wrapper
+		const _popupFlash = document.createElement('div');
+		_popupFlash.className = 'popup-copy-flash';
+		_popupFlash.textContent = 'Copied!';
+		(popupEl.querySelector('.popup-wrapper') || popupEl).appendChild(_popupFlash);
+		let _popupFlashTimer = null;
+
+		function _showCopyFlash() {
+			_popupFlash.classList.add('show');
+			clearTimeout(_popupFlashTimer);
+			_popupFlashTimer = setTimeout(() => {
+				_popupFlash.classList.remove('show');
+			}, 900);
+		}
+
+		// Copy-on-click for popup rows (non-draggable mode only — children have pointer-events)
+		function _bindPopupRowCopy(el) {
+			if (!el || el._copyBound) return;
+			el._copyBound = true;
+			let _rowDownX = 0, _rowDownY = 0;
+			el.addEventListener('pointerdown', ev => {
+				_rowDownX = ev.clientX; _rowDownY = ev.clientY;
+			});
+			el.addEventListener('pointerup', ev => {
+				if (popupMode === 'draggable') return; // handled by endDrag
+				const dist = Math.hypot(ev.clientX - _rowDownX, ev.clientY - _rowDownY);
+				if (dist > 5) return;
+				const text = el.innerText || el.textContent || '';
+				const clean = text.trim().replace(/\s+/g, ' ');
+				if (!clean) return;
+				navigator.clipboard.writeText(clean).then(() => _showCopyFlash()).catch(() => {});
+			});
+			el.style.cursor = 'copy';
+		}
+
+		// In draggable mode, children have pointer-events:none via the CSS class rule
+		// (not inline styles), so restoring inline styles won't help. Instead, briefly
+		// remove the draggable-mode class so the cascade allows hit-testing, then restore.
+		function _copyableAtPoint(x, y) {
+			const candidates = popupEl.querySelectorAll('.popup-value-row, .popup-elevation, .popup-coords');
+			for (const el of candidates) {
+				const r = el.getBoundingClientRect();
+				if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return el;
+			}
+			return null;
+		}
+
+		// Wire up copy on existing popup elements, and observe for new ones
+		function _bindAllPopupCopies() {
+			['popup-elevation', 'popup-coords'].forEach(id => {
+				const el = document.getElementById(id);
+				if (el) _bindPopupRowCopy(el);
+			});
+			// popup-value-row elements are inside popup-content and change dynamically
+			// — handled via MutationObserver below
+		}
+		_bindAllPopupCopies();
+
+		// Watch popup-content for newly rendered value rows
+		const _popupContent = popupEl.querySelector('.popup-content');
+		if (_popupContent) {
+			const _popupRowObserver = new MutationObserver(() => {
+				_popupContent.querySelectorAll('.popup-value-row').forEach(el => _bindPopupRowCopy(el));
+			});
+			_popupRowObserver.observe(_popupContent, { childList: true, subtree: true });
+		}
+
+		// ── Draggable popup: pointer-event based drag with capture ────────────────
+		// Using pointer events + setPointerCapture ensures dragging works even when
+		// the finger starts on text nodes (which would otherwise trigger text
+		// selection and swallow touch/mousemove events on mobile).
 		function startDrag(e) {
 			if (popupMode !== 'draggable') return;
 			e.preventDefault();
 			e.stopPropagation();
 			_isDraggingPopup = true;
-			
-			// Get client coordinates from touch or mouse
-			const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-			const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-			
+			_dragMoved = false;
+
+			const clientX = e.clientX;
+			const clientY = e.clientY;
+
+			_dragStartX = clientX;
+			_dragStartY = clientY;
+
 			const rect = map.getContainer().getBoundingClientRect();
 			const curX = parseFloat(popupEl.style.left);
 			const curY = parseFloat(popupEl.style.top);
@@ -3977,16 +4092,24 @@
 			_dragOffsetY = clientY - rect.top - curY;
 			popupEl.style.cursor = 'grabbing';
 			map.dragPan.disable();
+
+			// Capture the pointer so all subsequent pointer events come here,
+			// even if the finger slides off the element or over text children.
+			try { popupEl.setPointerCapture(e.pointerId); } catch(_) {}
 		}
 
 		function onDragMove(e) {
 			if (!_isDraggingPopup) return;
 			e.preventDefault();
-			
-			// Get client coordinates from touch or mouse
-			const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-			const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-			
+
+			const clientX = e.clientX;
+			const clientY = e.clientY;
+
+			if (!_dragMoved) {
+				const dist = Math.hypot(clientX - _dragStartX, clientY - _dragStartY);
+				if (dist > 4) _dragMoved = true;
+			}
+
 			const rect = map.getContainer().getBoundingClientRect();
 			const newX = clientX - rect.left - _dragOffsetX;
 			const newY = clientY - rect.top - _dragOffsetY;
@@ -3994,24 +4117,37 @@
 			updatePopupAt({ x: newX, y: newY }, dragPopupLngLat);
 		}
 
-		function endDrag() {
+		function endDrag(e) {
 			if (!_isDraggingPopup) return;
 			_isDraggingPopup = false;
 			popupEl.style.cursor = 'grab';
 			map.dragPan.enable();
+			try { popupEl.releasePointerCapture(e.pointerId); } catch(_) {}
+
+			// If pointer barely moved, treat as a tap → copy the row under the pointer
+			if (!_dragMoved) {
+				const copyable = _copyableAtPoint(e.clientX, e.clientY);
+				if (copyable) {
+					const text = copyable.innerText || copyable.textContent || '';
+					const clean = text.trim().replace(/\s+/g, ' ');
+					if (clean) navigator.clipboard.writeText(clean).then(() => _showCopyFlash()).catch(() => {});
+				}
+			}
+			_dragMoved = false;
 		}
 
-		// Remove old event listeners and add new ones
-		popupEl.removeEventListener('mousedown', startDrag);
-		popupEl.addEventListener('mousedown', startDrag);
-		popupEl.addEventListener('touchstart', startDrag, { passive: false });
+		// Use pointer events for unified mouse + touch drag (replaces touchstart/touchmove).
+		// The pointerdown on the wrapper captures all input; children have pointer-events:none
+		// in draggable mode so text never intercepts the touch.
+		popupEl.removeEventListener('pointerdown', startDrag);
+		popupEl.addEventListener('pointerdown', startDrag);
+		popupEl.addEventListener('pointermove', onDragMove);
+		popupEl.addEventListener('pointerup', endDrag);
+		popupEl.addEventListener('pointercancel', endDrag);
 
-		document.removeEventListener('mousemove', onDragMove);
-		document.removeEventListener('mouseup', endDrag);
+		// Keep mouse fallback on document for edge cases (e.g. pointer capture not supported)
 		document.addEventListener('mousemove', onDragMove);
-		document.addEventListener('touchmove', onDragMove, { passive: false });
 		document.addEventListener('mouseup', endDrag);
-		document.addEventListener('touchend', endDrag);
 
 		// ── Mode switching ────────────────────────────────────────────────────────
 		function setPopupMode(mode) {
@@ -4341,10 +4477,10 @@
 			}
 			positionHandles();
 
-			function makeDrag(handle, isMax) {
-				handle.addEventListener('pointerdown', e => {
-					e.preventDefault();
-					e.stopPropagation();
+			function makeDrag(handle, isStart) {
+					handle.addEventListener('touchstart', e => { e.preventDefault(); }, { passive: false });
+					handle.addEventListener('pointerdown', e => {
+						e.preventDefault(); e.stopPropagation();
 					handle.classList.add('dragging');
 					handle.setPointerCapture(e.pointerId);
 					const rect = trackArea.getBoundingClientRect();
@@ -4776,6 +4912,23 @@
 					e.preventDefault(); e.stopPropagation();
 					handle.style.cursor='grabbing';
 					svg.setPointerCapture(e.pointerId);
+
+					// Prevent the scrollable ancestor from scrolling while dragging
+					const _scrollParent = (() => {
+						let el = wrap.parentElement;
+						while (el) {
+							const style = window.getComputedStyle(el);
+							if (/(auto|scroll)/.test(style.overflowY)) return el;
+							el = el.parentElement;
+						}
+						return null;
+					})();
+					const _savedOverflow = _scrollParent ? _scrollParent.style.overflowY : null;
+					if (_scrollParent) _scrollParent.style.overflowY = 'hidden';
+
+					const _blockTouchScroll = ev => ev.cancelable && ev.preventDefault();
+					window.addEventListener('touchmove', _blockTouchScroll, { passive: false });
+
 					const onMove = ev => {
 						const deg = svgPointerToDeg(ev);
 						if (isStart) r.minDeg=deg; else r.maxDeg=deg;
@@ -4783,6 +4936,9 @@
 					};
 					const onUp = () => {
 						handle.style.cursor='grab';
+						// Restore scroll
+						if (_scrollParent) _scrollParent.style.overflowY = _savedOverflow;
+						window.removeEventListener('touchmove', _blockTouchScroll);
 						svg.removeEventListener('pointermove', onMove);
 						svg.removeEventListener('pointerup', onUp);
 					};
