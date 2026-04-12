@@ -47,7 +47,7 @@ Maps and links for mushroom foraging (PNW / US)
 | Global Forest Watch | https://www.globalforestwatch.org/ |
 | GFW Map | https://www.globalforestwatch.org/map/country/USA/48/ |
 | Ecoregions| https://www.epa.gov/eco-research/level-iii-and-iv-ecoregions-continental-united-states |
-| USFS_EDW_NLCD_Landcover_CONUS | https://imagery.geoplatform.gov/iipp/rest/services/Vegetation/USFS_EDW_NLCD_Landcover_CONUS/ImageServer |
+| Landcover | https://imagery.geoplatform.gov/iipp/rest/services/Vegetation/USFS_EDW_NLCD_Landcover_CONUS/ImageServer |
 | Lidar_Hillshade | https://gis.dnr.wa.gov/site1/rest/services/Public_Geology/Lidar_Hillshade/MapServer |
 
 </details>
@@ -65,6 +65,7 @@ Maps and links for mushroom foraging (PNW / US)
 | WA Fires | https://data-wadnr.opendata.arcgis.com/datasets/wadnr::washington-large-fires-1973-2025/about |
 | Fire Severity| https://landfire.gov/fire-regime/pfs |
 | BAER Soil Burn | https://data-usfs.hub.arcgis.com/datasets/usfs::baer-soil-burn-severity-classification-image-service/about |
+| Fire Retardant Avoidance | https://usfs.maps.arcgis.com/home/item.html?id=c073a140f455427c938ec18ddb5855ed |
 
 </details>
 
