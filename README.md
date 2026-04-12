@@ -65,7 +65,8 @@ Maps and links for mushroom foraging (PNW / US)
 | WA Fires | https://data-wadnr.opendata.arcgis.com/datasets/wadnr::washington-large-fires-1973-2025/about |
 | Fire Severity| https://landfire.gov/fire-regime/pfs |
 | BAER Soil Burn | https://data-usfs.hub.arcgis.com/datasets/usfs::baer-soil-burn-severity-classification-image-service/about |
-| Fire Retardant Avoidance | https://usfs.maps.arcgis.com/home/item.html?id=c073a140f455427c938ec18ddb5855ed |
+| Fire Retardant Avoidance Aquatic | https://usfs.maps.arcgis.com/home/item.html?id=7b10436d68eb4ac7bad9079ccd82790c |
+| Fire Retardant Avoidance Terrestrial | https://usfs.maps.arcgis.com/home/item.html?id=c073a140f455427c938ec18ddb5855ed |
 
 </details>
 
