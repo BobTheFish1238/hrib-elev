@@ -1,15 +1,17 @@
 # 🍄 HribLinks
 
-Maps and links for mushroom foraging (PNW / US)
+### Maps and links for mushroom foraging (PNW / US)
+
+<details><summary>⭐ Featured Links</summary>
 
 | Info | Link |
 | :--- | :--- |
 | ⭐HribSoil| https://bobthefish1238.github.io/hrib-elev/HribSoil.html |
 | ⭐HribHabitat | https://bobthefish1238.github.io/hrib-elev/HribHabitat.html |
 
-## 🗺️ Maps & Navigation
+</details>
 
-<details><summary>Expand</summary>
+<details><summary>🗺️ Maps & Navigation</summary>
 
 | Info| Link |
 | :--- | :--- |
@@ -24,9 +26,7 @@ Maps and links for mushroom foraging (PNW / US)
 
 </details>
 
-## 🌲 Habitat & Vegetation
-
-<details><summary>Expand</summary>
+<details><summary>🌲 Habitat & Vegetation</summary>
 
 | Info| Link |
 | :--- | :--- |
@@ -52,9 +52,7 @@ Maps and links for mushroom foraging (PNW / US)
 
 </details>
 
-## 🔥 Fire & Disturbance
-
-<details><summary>Expand</summary>
+<details><summary>🔥 Fire & Disturbance</summary>
 
 | Info | Link |
 | :--- | :--- |
@@ -70,9 +68,7 @@ Maps and links for mushroom foraging (PNW / US)
 
 </details>
 
-## 🌧️ Weather & Soil
-
-<details><summary>Expand</summary>
+<details><summary>🌧️ Weather & Soil</summary>
 
 | Info | Link |
 | :--- | :--- |
@@ -85,9 +81,7 @@ Maps and links for mushroom foraging (PNW / US)
 
 </details>
 
-## 🌳 Logging & Land Use
-
-<details><summary>Expand</summary>
+<details><summary>🌳 Logging & Land Use</summary>
 
 | Info| Link |
 | :--- | :--- |
@@ -100,9 +94,7 @@ Maps and links for mushroom foraging (PNW / US)
 
 </details>
 
-## 🏛️ Land Access
-
-<details><summary>Expand</summary>
+<details><summary>🏛️ Land Access</summary>
 
 | Info | Link |
 | :--- | :--- |
@@ -118,9 +110,7 @@ Maps and links for mushroom foraging (PNW / US)
 
 </details>
 
-## 🧪 GIS Services
-
-<details><summary>Expand</summary>
+<details><summary>🧪 GIS Services</summary>
 
 | Info| Link |
 | :--- | :--- |
@@ -142,9 +132,7 @@ Maps and links for mushroom foraging (PNW / US)
 
 </details>
 
-## 🍄 ID & Learning
-
-<details><summary>Expand</summary>
+<details><summary>🍄 ID & Learning</summary>
 
 | Info| Link |
 | :--- | :--- |
@@ -163,9 +151,7 @@ Maps and links for mushroom foraging (PNW / US)
 
 </details>
 
-## 🔧 Tools
-
-<details><summary>Expand</summary>
+<details><summary>🔧 Tools</summary>
 
 | Info | Link |
 | :--- | :--- |
