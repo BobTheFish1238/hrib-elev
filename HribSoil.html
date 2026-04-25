@@ -763,117 +763,7 @@
 			</select>
 			<hr class="divider" />
 
-			<div class="section-label">Soil Layers
-				<a href="https://maps.open-meteo.com/?domain=ncep_nam_conus&variable=soil_temperature_10_to_40cm"
-				   target="_blank" style="font-size:12px;margin:0 8px 0 8px;color:#4aa3ff;text-decoration:none;text-transform:none;">(Open-Meteo Map)</a>
-			</div>
-			<div class="layer-tabs-wrapper">
-				<div class="layer-tab-bar">
-					<button id="tab-temp" class="active layer-on" style="font-size:9px" onclick="handleLayerTabClick('temp')">
-						<input type="checkbox" id="layer-temp-check" style="margin:0 0 0 10px" checked
-							onclick="event.stopPropagation()"
-							onchange="onLayerCheckChange()" />
-						🌡 Temperature
-					</button>
-					<button id="tab-moist" style="font-size:9px" onclick="handleLayerTabClick('moist')">
-						<input type="checkbox" id="layer-moist-check"
-							onclick="event.stopPropagation()"
-							onchange="onLayerCheckChange()" />
-						💧 Moisture
-					</button>
-				</div>
-				<div class="layer-tab-opacity" id="tab-opacity-row-temp">
-					<label>Opacity</label>
-					<input type="range" id="temp-master-opacity" min="0" max="1" step="0.05" value="0.75" oninput="setMasterOpacity('temp',this.value)" style="max-width:50%" />
-					<span id="temp-opacity-val">75%</span>
-				</div>
-				<div class="layer-tab-opacity" id="tab-opacity-row-moist" style="display:none">
-					<label>Opacity</label>
-					<input type="range" id="moist-master-opacity" min="0" max="1" step="0.05" value="0.75" oninput="setMasterOpacity('moist',this.value)" style="max-width:50%" />
-					<span id="moist-opacity-val">75%</span>
-				</div>
-			</div>
-			<hr class="divider" />
 
-			<div id="temp-section">
-				<div class="section-label" style="margin-bottom:6px">🌡 Temperature</div>
-				<div class="section-label" style="font-size:10px;margin-bottom:2px">Soil Depth</div>
-				<div class="depth-group" id="depth-group-temp">
-					<button data-depth="0_to_10cm"    onclick="setDepth('temp',this)">0 – 10 cm</button>
-					<button class="active" data-depth="10_to_40cm"   onclick="setDepth('temp',this)">10 – 40 cm</button>
-					<button data-depth="40_to_100cm"  onclick="setDepth('temp',this)">40 – 100 cm</button>
-					<button data-depth="100_to_200cm" onclick="setDepth('temp',this)">100 – 200 cm</button>
-				</div>
-				<div style="margin-top:8px">
-					<div class="section-label" style="font-size:10px;margin-bottom:4px">Range</div>
-					<div class="toggle-group" style="margin-bottom:8px">
-						<button id="btn-f" class="active" onclick="setUnit('F')">°F</button>
-						<button id="btn-c" onclick="setUnit('C')">°C</button>
-					</div>
-					<div class="control-row">
-						<label>Min</label><input type="number" id="input-min" value="41" step="1" oninput="scheduleAutoApply()" /><span id="unit-label-min">°F</span>
-					</div>
-					<div class="control-row" style="margin-top:6px">
-						<label>Max</label><input type="number" id="input-max" value="50" step="1" oninput="scheduleAutoApply()" /><span id="unit-label-max">°F</span>
-					</div>
-				</div>
-				<div class="control-row" style="margin-top:8px">
-					<label class="checkbox-label">
-						<input type="checkbox" id="contour-check-temp" checked onchange="syncContourCheck('temp')" />Show contours
-					</label>
-				</div>
-				<div class="control-row" style="margin-top:6px">
-					<label>Z Order</label>
-					<input type="number" id="input-temp-z" value="1" min="1" max="10" step="1" style="width:52px"
-						onchange="tempZOrder=+this.value; reorderAllLayers()" />
-				</div>
-				<div style="margin-top:8px">
-					<div class="color-editor-header" id="temp-color-header" onclick="toggleColorEditor('temp')">
-						<span>Colors</span><span class="chevron">▼</span>
-					</div>
-					<div class="color-rows" id="temp-color-rows"></div>
-				</div>
-			</div>
-
-			<hr class="divider" id="divider-moist" style="display:none" />
-
-			<div id="moist-section" style="display:none">
-				<div class="section-label" style="margin-bottom:6px">💧 Moisture</div>
-				<div class="section-label" style="font-size:10px;margin-bottom:2px">Soil Depth</div>
-				<div class="depth-group" id="depth-group-moist">
-					<button data-depth="0_to_10cm"    onclick="setDepth('moist',this)">0 – 10 cm</button>
-					<button class="active" data-depth="10_to_40cm"   onclick="setDepth('moist',this)">10 – 40 cm</button>
-					<button data-depth="40_to_100cm"  onclick="setDepth('moist',this)">40 – 100 cm</button>
-					<button data-depth="100_to_200cm" onclick="setDepth('moist',this)">100 – 200 cm</button>
-				</div>
-				<div style="margin-top:8px">
-					<div class="section-label" style="font-size:10px;margin-bottom:4px">Range (m³/m³)</div>
-					<div class="control-row">
-						<label>Min</label><input type="number" id="input-moist-min" value="0.2" step="0.01" min="0" max="0.8" oninput="scheduleAutoApply()" /><span>m³/m³</span>
-					</div>
-					<div class="control-row" style="margin-top:6px">
-						<label>Max</label><input type="number" id="input-moist-max" value="0.4" step="0.01" min="0" max="0.8" oninput="scheduleAutoApply()" /><span>m³/m³</span>
-					</div>
-				</div>
-				<div class="control-row" style="margin-top:8px">
-					<label class="checkbox-label">
-						<input type="checkbox" id="contour-check-moist" onchange="syncContourCheck('moist')" />Show contours
-					</label>
-				</div>
-				<div class="control-row" style="margin-top:6px">
-					<label>Z Order</label>
-					<input type="number" id="input-moist-z" value="2" min="1" max="10" step="1" style="width:52px"
-						onchange="moistZOrder=+this.value; reorderAllLayers()" />
-				</div>
-				<div style="margin-top:8px">
-					<div class="color-editor-header" id="moist-color-header" onclick="toggleColorEditor('moist')">
-						<span>Colors</span><span class="chevron">▼</span>
-					</div>
-					<div class="color-rows" id="moist-color-rows"></div>
-				</div>
-			</div>
-
-			<hr class="divider" />
 		</div> <!-- end controls-scroll -->
 	</div>
 
@@ -888,6 +778,16 @@
 
 				<!-- Forest Layer Tab Bar (vertical) -->
 				<div style="display:flex;flex-direction:column;border-radius:7px;overflow:auto;border:1px solid #ccc;margin-bottom:4px">
+					<button id="ftab-temp" onclick="handleForestTabClick('temp')"
+						style="padding:6px 8px;border:none;background:#f0f0f0;color:#555;cursor:pointer;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;border-bottom:1px solid #ccc;text-align:left">
+						<input type="checkbox" id="ftab-temp-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('temp')" style="accent-color:#2563eb;cursor:pointer;width:12px;height:12px;margin:0;flex-shrink:0" />
+						🌡 Temperature
+					</button>
+					<button id="ftab-moist" onclick="handleForestTabClick('moist')"
+						style="padding:6px 8px;border:none;background:#f0f0f0;color:#555;cursor:pointer;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;border-bottom:1px solid #ccc;text-align:left">
+						<input type="checkbox" id="ftab-moist-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('moist')" style="accent-color:#2563eb;cursor:pointer;width:12px;height:12px;margin:0;flex-shrink:0" />
+						💧 Moisture
+					</button>
 					<button id="ftab-inat" onclick="handleForestTabClick('inat')"
 						style="padding:6px 8px;border:none;background:#f0f0f0;color:#555;cursor:pointer;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;border-bottom:1px solid #ccc;text-align:left">
 						<input type="checkbox" id="ftab-inat-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('inat')" style="accent-color:#2563eb;cursor:pointer;width:12px;height:12px;margin:0;flex-shrink:0" />
@@ -933,6 +833,102 @@
 						<input type="checkbox" id="ftab-aspect-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('aspect')" style="accent-color:#2563eb;cursor:pointer;width:12px;height:12px;margin:0;flex-shrink:0" />
 						🧭 Aspect
 					</button>
+				</div>
+
+				<!-- Tab: Temperature (moved from controls) -->
+				<div id="forest-tab-temp" style="display:none;flex-direction:column;gap:6px;max-width:240px">
+					<div class="layer-tab-opacity" id="tab-opacity-row-temp">
+						<label>Opacity</label>
+						<input type="range" id="temp-master-opacity" min="0" max="1" step="0.05" value="0.75" oninput="setMasterOpacity('temp',this.value)" style="max-width:50%" />
+						<span id="temp-opacity-val">75%</span>
+					</div>
+					<div id="temp-section-inner">
+						<div class="section-label" style="font-size:10px;margin-bottom:2px">Soil Depth
+							<a href="https://maps.open-meteo.com/?domain=ncep_nam_conus&variable=soil_temperature_10_to_40cm"
+							   target="_blank" style="font-size:12px;margin:0 8px 0 8px;color:#4aa3ff;text-decoration:none;text-transform:none;">(Open-Meteo Map)</a>
+						</div>
+						<div class="depth-group" id="depth-group-temp">
+							<button data-depth="0_to_10cm"    onclick="setDepth('temp',this)">0 – 10 cm</button>
+							<button class="active" data-depth="10_to_40cm"   onclick="setDepth('temp',this)">10 – 40 cm</button>
+							<button data-depth="40_to_100cm"  onclick="setDepth('temp',this)">40 – 100 cm</button>
+							<button data-depth="100_to_200cm" onclick="setDepth('temp',this)">100 – 200 cm</button>
+						</div>
+						<div style="margin-top:8px">
+							<div class="section-label" style="font-size:10px;margin-bottom:4px">Range</div>
+							<div class="toggle-group" style="margin-bottom:8px">
+								<button id="btn-f" class="active" onclick="setUnit('F')">°F</button>
+								<button id="btn-c" onclick="setUnit('C')">°C</button>
+							</div>
+							<div class="control-row">
+								<label>Min</label><input type="number" id="input-min" value="41" step="1" oninput="scheduleAutoApply()" /><span id="unit-label-min">°F</span>
+							</div>
+							<div class="control-row" style="margin-top:6px">
+								<label>Max</label><input type="number" id="input-max" value="50" step="1" oninput="scheduleAutoApply()" /><span id="unit-label-max">°F</span>
+							</div>
+						</div>
+						<div class="control-row" style="margin-top:8px">
+							<label class="checkbox-label">
+								<input type="checkbox" id="contour-check-temp" checked onchange="syncContourCheck('temp')" />Show contours
+							</label>
+						</div>
+						<div class="control-row" style="margin-top:6px">
+							<label>Z Order</label>
+							<input type="number" id="input-temp-z" value="10" min="1" max="100" step="1" style="width:52px"
+								onchange="tempZOrder=+this.value; reorderAllLayers()" />
+						</div>
+						<div style="margin-top:8px">
+							<div class="color-editor-header" id="temp-color-header" onclick="toggleColorEditor('temp')">
+								<span>Colors</span><span class="chevron">▼</span>
+							</div>
+							<div class="color-rows" id="temp-color-rows"></div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Tab: Moisture (moved from controls) -->
+				<div id="forest-tab-moist" style="display:none;flex-direction:column;gap:6px;max-width:240px">
+					<div class="layer-tab-opacity" id="tab-opacity-row-moist">
+						<label>Opacity</label>
+						<input type="range" id="moist-master-opacity" min="0" max="1" step="0.05" value="0.75" oninput="setMasterOpacity('moist',this.value)" style="max-width:50%" />
+						<span id="moist-opacity-val">75%</span>
+					</div>
+					<div id="moist-section-inner">
+						<div class="section-label" style="font-size:10px;margin-bottom:2px">Soil Depth
+							<a href="https://maps.open-meteo.com/?domain=ncep_nam_conus&variable=soil_temperature_10_to_40cm"
+							   target="_blank" style="font-size:12px;margin:0 8px 0 8px;color:#4aa3ff;text-decoration:none;text-transform:none;">(Open-Meteo Map)</a>
+						</div>
+						<div class="depth-group" id="depth-group-moist">
+							<button data-depth="0_to_10cm"    onclick="setDepth('moist',this)">0 – 10 cm</button>
+							<button class="active" data-depth="10_to_40cm"   onclick="setDepth('moist',this)">10 – 40 cm</button>
+							<button data-depth="40_to_100cm"  onclick="setDepth('moist',this)">40 – 100 cm</button>
+							<button data-depth="100_to_200cm" onclick="setDepth('moist',this)">100 – 200 cm</button>
+						</div>
+						<div style="margin-top:8px">
+							<div class="section-label" style="font-size:10px;margin-bottom:4px">Range (m³/m³)</div>
+							<div class="control-row">
+								<label>Min</label><input type="number" id="input-moist-min" value="0.2" step="0.01" min="0" max="0.8" oninput="scheduleAutoApply()" /><span>m³/m³</span>
+							</div>
+							<div class="control-row" style="margin-top:6px">
+								<label>Max</label><input type="number" id="input-moist-max" value="0.4" step="0.01" min="0" max="0.8" oninput="scheduleAutoApply()" /><span>m³/m³</span>
+							</div>
+						</div>
+						<div class="control-row" style="margin-top:8px">
+							<label class="checkbox-label">
+								<input type="checkbox" id="contour-check-moist" onchange="syncContourCheck('moist')" />Show contours
+							</label>
+						</div>
+						<div class="control-row" style="margin-top:6px">
+							<label>Z Order</label>
+							<input type="number" id="input-moist-z" value="20" min="1" max="100" step="1" style="width:52px"
+								onchange="moistZOrder=+this.value; reorderAllLayers()" />
+						</div>
+						<div style="margin-top:8px">
+							<div class="color-editor-header" id="moist-color-header" onclick="toggleColorEditor('moist')">
+								<span>Colors</span><span class="chevron">▼</span>
+							</div>
+							<div class="color-rows" id="moist-color-rows"></div>
+						</div>
+					</div>
 				</div>
 
 				<!-- Tab: iNaturalist -->
@@ -1084,7 +1080,7 @@
 						<!-- Z Order -->
 						<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#555">
 							<label style="min-width:52px;font-weight:600">Z Order</label>
-							<input type="number" id="inat-z" value="5" min="1" max="10" step="1"
+							<input type="number" id="inat-z" value="30" min="1" max="999" step="10"
 								style="width:52px;padding:3px 4px;border:1px solid #ccc;border-radius:5px;font-size:11px;background:#fafafa;color:#333"
 								onchange="inatZOrder=+this.value; reorderAllLayers()" />
 						</div>
@@ -1155,7 +1151,7 @@
 					</div>
 					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
 						<label style="min-width:60px;font-weight:600">Z Order</label>
-						<input type="number" id="fires-z" value="4" min="1" max="10" step="1"
+						<input type="number" id="fires-z" value="50" min="1" max="999" step="10"
 							style="width:52px;padding:3px 5px;border:1px solid #ccc;border-radius:5px;font-size:11px;background:#fafafa;color:#333"
 							onchange="firesZOrder=+this.value; reorderAllLayers()" />
 					</div>
@@ -1192,7 +1188,7 @@
 					</div>
 					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
 						<label style="min-width:60px;font-weight:600">Z Order</label>
-						<input type="number" id="timber-z" value="4" min="1" max="10" step="1"
+						<input type="number" id="timber-z" value="60" min="1" max="999" step="10"
 							style="width:52px;padding:3px 5px;border:1px solid #ccc;border-radius:5px;font-size:11px;background:#fafafa;color:#333"
 							onchange="timberZOrder=+this.value; reorderAllLayers()" />
 					</div>
@@ -1225,7 +1221,7 @@
 					</div>
 					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
 						<label style="min-width:60px;font-weight:600">Z Order</label>
-						<input type="number" id="landcover-z" value="4" min="1" max="10" step="1"
+						<input type="number" id="landcover-z" value="70" min="1" max="999" step="10"
 							style="width:52px;padding:3px 5px;border:1px solid #ccc;border-radius:5px;font-size:11px;background:#fafafa;color:#333"
 							onchange="landcoverZOrder=+this.value; reorderAllLayers()" />
 					</div>
@@ -1250,7 +1246,7 @@
 					</div>
 					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
 						<label style="min-width:60px;font-weight:600">Z Order</label>
-						<input type="number" id="riparian-z" value="4" min="1" max="10" step="1"
+						<input type="number" id="riparian-z" value="80" min="1" max="999" step="10"
 							style="width:52px;padding:3px 5px;border:1px solid #ccc;border-radius:5px;font-size:11px;background:#fafafa;color:#333"
 							onchange="riparianZOrder=+this.value; reorderAllLayers()" />
 					</div>
@@ -1289,7 +1285,7 @@
 					</div>
 					<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#555">
 						<label style="min-width:60px;font-weight:600">Z Order</label>
-						<input type="number" id="padus-z" value="4" min="1" max="10" step="1"
+						<input type="number" id="padus-z" value="90" min="1" max="999" step="10"
 							style="width:52px;padding:3px 5px;border:1px solid #ccc;border-radius:5px;font-size:11px;background:#fafafa;color:#333"
 							onchange="padusZOrder=+this.value; reorderAllLayers()" />
 					</div>
@@ -1358,44 +1354,20 @@
 		let currentUnit='F', tempDepth='10_to_40cm', moistDepth='10_to_40cm';
 		let tempActive=true, moistActive=false, tempContours=true, moistContours=false;
 		let rangeMinC=5, rangeMaxC=10, mapLoaded=false, tempOpacity=0.75, moistOpacity=0.75;
-		let tempZOrder=1, moistZOrder=2, treeZOrder=3, inatZOrder=5, firesZOrder=4, timberZOrder=4, landcoverZOrder=4, riparianZOrder=4, padusZOrder=4;
+		let tempZOrder=10, moistZOrder=20, treeZOrder=60, inatZOrder=30, firesZOrder=70, timberZOrder=80, landcoverZOrder=90, riparianZOrder=100, padusZOrder=110;
 
 		let minimized=true;
-		let activeLayerTab='temp'; // 'temp' | 'moist'
+		let activeLayerTab='temp'; // kept for compat but temp/moist now in tree-panel
 
 		function handleLayerTabClick(type) {
-			if (activeLayerTab === type) {
-				// Toggle the checkbox when clicking active tab
-				const checkbox = document.getElementById(`layer-${type}-check`);
-				checkbox.checked = !checkbox.checked;
-				onLayerCheckChange();
-			} else {
-				selectLayerTab(type);
-			}
+			// no-op: temp/moist now handled via forest tab system
 		}
 
 		function selectLayerTab(type){
 			activeLayerTab=type;
-			const tabTemp=document.getElementById('tab-temp');
-			const tabMoist=document.getElementById('tab-moist');
-			tabTemp.classList.toggle('active', type==='temp');
-			tabMoist.classList.toggle('active', type==='moist');
-
-			// Preserve layer-on class based on checkbox state
-			tabTemp.classList.toggle('layer-on', document.getElementById('layer-temp-check').checked);
-			tabMoist.classList.toggle('layer-on', document.getElementById('layer-moist-check').checked);
-
-			document.getElementById('tab-opacity-row-temp').style.display=type==='temp'?'':'none';
-			document.getElementById('tab-opacity-row-moist').style.display=type==='moist'?'':'none';
-
-			// Only show section if that layer is actually enabled
-			const tempOn=document.getElementById('layer-temp-check').checked;
-			const moistOn=document.getElementById('layer-moist-check').checked;
-			document.getElementById('temp-section').style.display=(type==='temp'&&tempOn)?'':'none';
-			document.getElementById('moist-section').style.display=(type==='moist'&&moistOn)?'':'none';
-			document.getElementById('divider-moist').style.display='none';
-
-			tempActive=tempOn; moistActive=moistOn;
+			// Sync forest tab state
+			tempActive=document.getElementById('ftab-temp-check') ? document.getElementById('ftab-temp-check').checked : tempActive;
+			moistActive=document.getElementById('ftab-moist-check') ? document.getElementById('ftab-moist-check').checked : moistActive;
 		}
 
 		function toggleMinimize(){
@@ -1417,11 +1389,8 @@
 		})();
 		// Only update section visibility without touching map layers
 		function syncLayerSectionVisibility(){
-			tempActive=document.getElementById('layer-temp-check').checked;
-			moistActive=document.getElementById('layer-moist-check').checked;
-			document.getElementById('temp-section').style.display=(activeLayerTab==='temp'&&tempActive)?'':'none';
-			document.getElementById('moist-section').style.display=(activeLayerTab==='moist'&&moistActive)?'':'none';
-			document.getElementById('divider-moist').style.display='none';
+			tempActive=forestTabChecks.temp;
+			moistActive=forestTabChecks.moist;
 		}
 
 		function setBasemapOverlay(key) {
@@ -1489,10 +1458,11 @@
 		function applyPreset(key){
 			if(!key) return;
 			const p=MUSHROOM_PRESETS[key];
-			document.getElementById('layer-temp-check').checked=true;
-			document.getElementById('layer-moist-check').checked=true;
+			const tempCk = document.getElementById('ftab-temp-check');
+			const moistCk = document.getElementById('ftab-moist-check');
+			if (tempCk) { tempCk.checked=true; onForestTabCheckChange('temp'); }
+			if (moistCk) { moistCk.checked=true; onForestTabCheckChange('moist'); }
 			tempActive=true; moistActive=true;
-			selectLayerTab('temp');
 			const[minF,maxF]=p.tempF;
 			document.getElementById('input-min').value=currentUnit==='F'?minF:round1(toC(minF));
 			document.getElementById('input-max').value=currentUnit==='F'?maxF:round1(toC(maxF));
@@ -1508,22 +1478,11 @@
 		const hexToRgb=hex=>[parseInt(hex.slice(1,3),16),parseInt(hex.slice(3,5),16),parseInt(hex.slice(5,7),16)];
 
 		function onLayerCheckChange(){
-			const prevTemp  = tempActive;
-			const prevMoist = moistActive;
-			tempActive=document.getElementById('layer-temp-check').checked;
-			moistActive=document.getElementById('layer-moist-check').checked;
-
-			// Switch to the tab whose checkbox was just turned on
-			if (tempActive  && !prevTemp)  selectLayerTab('temp');
-			else if (moistActive && !prevMoist) selectLayerTab('moist');
-
-			// Update tab button styling to reflect on/off state
-			document.getElementById('tab-temp').classList.toggle('layer-on', tempActive);
-			document.getElementById('tab-moist').classList.toggle('layer-on', moistActive);
-
-			document.getElementById('temp-section').style.display=(activeLayerTab==='temp'&&tempActive)?'':'none';
-			document.getElementById('moist-section').style.display=(activeLayerTab==='moist'&&moistActive)?'':'none';
-			document.getElementById('divider-moist').style.display='none';
+			// Delegated: temp/moist are now controlled via forest tab checkboxes
+			const tempEl = document.getElementById('ftab-temp-check');
+			const moistEl = document.getElementById('ftab-moist-check');
+			if (tempEl) { forestTabChecks.temp = tempEl.checked; tempActive = tempEl.checked; }
+			if (moistEl) { forestTabChecks.moist = moistEl.checked; moistActive = moistEl.checked; }
 
 			if(mapLoaded){
 				if(!tempActive) removeLayers('omTemp');
@@ -2089,7 +2048,7 @@
 			pctMin: 0.3, pctMax: 0.3,
 			sdn: 2,
 			stMin: 1, stMax: 1088, stMean: 43.2, stStddev: 42.0,
-			zOrder: 3,
+			zOrder: 40,
 		});
 
 		// Slice state: Map<sliceId, {varName, year, settings:{...}}>
@@ -2237,39 +2196,43 @@
 				parseFloat(document.getElementById('input-moist-min').value),
 				parseFloat(document.getElementById('input-moist-max').value)
 			))});
-			activeSlices.forEach((info, id) => layers.push({ z: info.settings.zOrder ?? 3, readd: () => addSliceLayer(id) }));
+			// Only include species slices if the species tab is enabled
+			if (forestTabChecks.species) {
+				activeSlices.forEach((info, id) => layers.push({ z: info.settings.zOrder ?? 40, readd: () => addSliceLayer(id) }));
+			}
 			if (forestTabChecks.inat)      layers.push({ z: inatZOrder,      readd: () => addInatLayer() });
 			if (forestTabChecks.fires)     layers.push({ z: firesZOrder,     readd: () => addFiresLayer() });
 			if (forestTabChecks.timber)    layers.push({ z: timberZOrder,    readd: () => addTimberLayer() });
 			if (forestTabChecks.landcover) layers.push({ z: landcoverZOrder, readd: () => addLandcoverLayer() });
 			if (forestTabChecks.riparian)  layers.push({ z: riparianZOrder,  readd: () => addRiparianLayer() });
 			if (forestTabChecks.padus)     layers.push({ z: padusZOrder,     readd: () => addPadusLayer() });
-			// Elevation: use the minimum zOrder among active ranges (so all ranges render at the right position)
-			if (elevMasterEnabled && elevRanges.some(r => r.enabled)) {
-				const elevZ = Math.min(...elevRanges.filter(r => r.enabled).map(r => r.zOrder ?? 5));
-				layers.push({ z: elevZ, readd: () => refreshElevLayer() });
+			// Elevation: one entry per enabled range so each can have its own z-order
+			if (elevMasterEnabled) {
+				elevRanges.forEach((r, i) => {
+					if (r.enabled) layers.push({ z: r.zOrder ?? 100, readd: () => addElevRangeLayer(i) });
+				});
 			}
-			// Aspect: use the minimum zOrder among active ranges
-			if (aspectMasterEnabled && aspectRanges.some(r => r.enabled)) {
-				const aspectZ = Math.min(...aspectRanges.filter(r => r.enabled).map(r => r.zOrder ?? 6));
-				layers.push({ z: aspectZ, readd: () => refreshAspectLayer() });
+			// Aspect: one entry per enabled range so each can have its own z-order
+			if (aspectMasterEnabled) {
+				aspectRanges.forEach((r, i) => {
+					if (r.enabled) layers.push({ z: r.zOrder ?? 110, readd: () => addAspectRangeLayer(i) });
+				});
 			}
 
 			// Remove all, then re-add in z-order (lowest first = drawn first = appears underneath)
 			if (tempActive)  removeLayers('omTemp');
 			if (moistActive) removeLayers('omMoist');
-			activeSlices.forEach((_, id) => removeSliceLayer(id));
+			// Only remove/readd slice layers when species is active; otherwise leave them hidden
+			if (forestTabChecks.species) activeSlices.forEach((_, id) => removeSliceLayer(id));
 			if (forestTabChecks.inat)      removeInatLayer();
 			if (forestTabChecks.fires)     removeFiresLayer();
 			if (forestTabChecks.timber)    removeTimberLayer();
 			if (forestTabChecks.landcover) removeLandcoverLayer();
 			if (forestTabChecks.riparian)  removeRiparianLayer();
 			if (forestTabChecks.padus)     removePadusLayer();
-			// Remove elev/aspect layers before re-adding in sorted order
-			if (map.getLayer(ELEV_LYR))   { map.removeLayer(ELEV_LYR); }
-			if (map.getSource(ELEV_SRC))  { map.removeSource(ELEV_SRC); }
-			if (map.getLayer(ASPECT_LYR)) { map.removeLayer(ASPECT_LYR); }
-			if (map.getSource(ASPECT_SRC)){ map.removeSource(ASPECT_SRC); }
+			// Remove all per-range elev/aspect layers before re-adding in sorted order
+			removeAllElevRangeLayers();
+			removeAllAspectRangeLayers();
 
 			layers.sort((a, b) => a.z - b.z).forEach(l => l.readd());
 		}
@@ -2339,7 +2302,7 @@
 			div.innerHTML = `
 				<div class="lsd-row">
 					<span class="lsd-label">Z Order</span>
-					<input type="number" value="${s.zOrder ?? 3}" min="1" max="10" step="1" style="max-width:46px"
+					<input type="number" value="${s.zOrder ?? 100}" min="1" max="999" step="10" style="max-width:46px"
 						oninput="updateLayerSetting(${sliceId},'zOrder',+this.value); reorderAllLayers()" />
 				</div>
 				<div class="lsd-section-label">Opacity &amp; Ramp</div>
@@ -2442,12 +2405,14 @@
 			info.settings.rampIdx = rampIdx;
 			refreshSliceLayer(sliceId);
 			updateSelectionSummary();
+			reorderAllLayers();
 		}
 		function flipLayerRamp(sliceId) {
 			const info = activeSlices.get(sliceId); if (!info) return;
 			info.settings.rampFlipped = !info.settings.rampFlipped;
 			refreshSliceLayer(sliceId);
 			updateSelectionSummary();
+			reorderAllLayers();
 		}
 		function updateLayerStretch(sliceId, val) {
 			const info = activeSlices.get(sliceId); if (!info) return;
@@ -2457,11 +2422,13 @@
 			if (pctEl) pctEl.style.display = info.settings.stretchType === 6 ? '' : 'none';
 			if (sdnEl) sdnEl.style.display = info.settings.stretchType === 3 ? '' : 'none';
 			refreshSliceLayer(sliceId);
+			reorderAllLayers();
 		}
 		function updateLayerSetting(sliceId, key, val) {
 			const info = activeSlices.get(sliceId); if (!info) return;
 			info.settings[key] = val;
 			refreshSliceLayer(sliceId);
+			reorderAllLayers();
 		}
 		function updateSummaryRampPreview(sliceId) {
 			const el = document.getElementById(`ramp-prev-${sliceId}`);
@@ -2561,8 +2528,8 @@
 
 		// ── Forest Layers Tab State ───────────────────────────────────────────────
 		let activeForestTab = 'species';
-		const forestTabChecks = { inat: false, species: false, fires: false, timber: false, landcover: false, riparian: false, padus: false, elev: false, aspect: false };
-		const FOREST_TABS = ['inat','species','fires','timber','landcover','riparian','padus','elev','aspect'];
+		const forestTabChecks = { temp: false, moist: false, inat: false, species: false, fires: false, timber: false, landcover: false, riparian: false, padus: false, elev: false, aspect: false };
+		const FOREST_TABS = ['temp','moist','inat','species','fires','timber','landcover','riparian','padus','elev','aspect'];
 
 		function handleForestTabClick(tab) {
 			if (activeForestTab === tab) {
@@ -2592,6 +2559,9 @@
 			});
 		}
 
+		// Species layer visibility memory: stores slice IDs that were visible before toggle-off
+		let _speciesHiddenSlices = null;
+
 		function onForestTabCheckChange(tab) {
 			const checked = document.getElementById('ftab-' + tab + '-check').checked;
 			forestTabChecks[tab] = checked;
@@ -2600,11 +2570,33 @@
 			const isActive = activeForestTab === tab;
 			btn.style.background = isActive ? '#2563eb' : (checked ? '#dbeafe' : '#f0f0f0');
 			btn.style.color      = isActive ? '#fff'    : (checked ? '#1d4ed8' : '#555');
+			if (tab === 'temp') {
+				tempActive = checked;
+				document.getElementById('ftab-temp-check').checked = checked;
+				if (mapLoaded) {
+					if (!checked) removeLayers('omTemp');
+					else { registerProtocol(rangeMinC, rangeMaxC, parseFloat(document.getElementById('input-moist-min').value), parseFloat(document.getElementById('input-moist-max').value)); addTempLayers(buildTempUrl(rangeMinC, rangeMaxC)); }
+				}
+			}
+			if (tab === 'moist') {
+				moistActive = checked;
+				document.getElementById('ftab-moist-check').checked = checked;
+				if (mapLoaded) {
+					if (!checked) removeLayers('omMoist');
+					else { const minV=parseFloat(document.getElementById('input-moist-min').value),maxV=parseFloat(document.getElementById('input-moist-max').value); registerProtocol(rangeMinC,rangeMaxC,minV,maxV); addMoistLayers(buildMoistUrl(minV,maxV)); }
+				}
+			}
 			if (tab === 'species') {
-				activeSlices.forEach((_, id) => {
-					const lyrId = sliceLayerId(id);
-					if (map.getLayer(lyrId)) map.setLayoutProperty(lyrId, 'visibility', checked ? 'visible' : 'none');
-				});
+				if (!checked) {
+					// Remember which slices were active, then fully remove their map layers
+					_speciesHiddenSlices = new Set(activeSlices.keys());
+					activeSlices.forEach((_, id) => removeSliceLayer(id));
+				} else {
+					// Re-add the remembered (or all) slice layers
+					const toShow = _speciesHiddenSlices || new Set(activeSlices.keys());
+					toShow.forEach(id => { if (activeSlices.has(id)) addSliceLayer(id); });
+					_speciesHiddenSlices = null;
+				}
 			}
 			if (tab === 'inat')     { checked ? addInatLayer()     : (removeInatLayer(), window._hideInatObsPopup && window._hideInatObsPopup()); }
 			if (tab === 'fires')     { checked ? addFiresLayer()     : removeFiresLayer(); }
@@ -2936,6 +2928,7 @@
 			clearTimeout(_landcoverRefreshTimer);
 			_landcoverRefreshTimer = setTimeout(() => {
 				if (forestTabChecks.landcover) { removeLandcoverLayer(); addLandcoverLayer(); }
+				reorderAllLayers();
 			}, 600);
 		}
 		function setLandcoverOpacity(val) {
@@ -3026,7 +3019,7 @@
 			document.getElementById('riparian-status').textContent = '';
 		}
 		function refreshRiparianLayer() {
-			if (forestTabChecks.riparian) { removeRiparianLayer(); addRiparianLayer(); }
+			if (forestTabChecks.riparian) { removeRiparianLayer(); addRiparianLayer(); reorderAllLayers();}
 		}
 		function setRiparianOpacity(val) {
 			document.getElementById('riparian-opacity-val').textContent = Math.round(val * 100) + '%';
@@ -3270,6 +3263,7 @@
 			if (!forestTabChecks.inat) return;
 			addInatLayer();
 			updateInatStatus();
+			reorderAllLayers();
 		}
 
 		// ── iNaturalist Observation Popup (UTFGrid click-to-observe) ────────────
@@ -3652,8 +3646,12 @@
 			const btn = document.getElementById('tree-minimize-btn');
 			btn.style.transform = 'rotate(180deg)';
 			document.getElementById('tree-panel-body').style.display = 'none';
-			// Set initial tab appearance
-			selectForestTab('inat');
+			// Default: select temp tab and mark it checked/active
+			forestTabChecks.temp = true;
+			tempActive = true;
+			const tempCk = document.getElementById('ftab-temp-check');
+			if (tempCk) tempCk.checked = true;
+			selectForestTab('temp');
 		})();
 
 		// Re-add overlay layers after map loads
@@ -4232,10 +4230,10 @@
 
 		// Ranges — enabled:false by default
 		let elevRanges = [
-			{ min: 0, max: 3000, c1: '#32CD32', a1: 0.7, c2: '#A020F0', a2: 0.7, gradient: false, enabled: false }
+			{ min: 0, max: 3000, c1: '#32CD32', a1: 0.7, c2: '#A020F0', a2: 0.7, gradient: false, enabled: false, zOrder: 100 }
 		];
 		let aspectRanges = [
-			{ minDeg: 315, maxDeg: 45,  color: '#1565c0', alpha: 0.7, label: 'N', enabled: false }
+			{ minDeg: 315, maxDeg: 45,  color: '#1565c0', alpha: 0.7, label: 'N', enabled: false, zOrder: 110 }
 		];
 
 		function hexToRgbArr(hex) {
@@ -4338,12 +4336,18 @@
 		function setElevMasterOpacity(v) {
 			elevMasterOpacity = parseFloat(v);
 			document.getElementById('elev-opacity-val').textContent = Math.round(elevMasterOpacity*100)+'%';
-			if (map.getLayer(ELEV_LYR)) map.setPaintProperty(ELEV_LYR,'raster-opacity',elevMasterOpacity);
+			for (let i = 0; i < elevRanges.length; i++) {
+				const lyrId = `${ELEV_LYR}-${i}`;
+				if (map.getLayer(lyrId)) map.setPaintProperty(lyrId, 'raster-opacity', elevMasterOpacity);
+			}
 		}
 		function setAspectMasterOpacity(v) {
 			aspectMasterOpacity = parseFloat(v);
 			document.getElementById('aspect-opacity-val').textContent = Math.round(aspectMasterOpacity*100)+'%';
-			if (map.getLayer(ASPECT_LYR)) map.setPaintProperty(ASPECT_LYR,'raster-opacity',aspectMasterOpacity);
+			for (let i = 0; i < aspectRanges.length; i++) {
+				const lyrId = `${ASPECT_LYR}-${i}`;
+				if (map.getLayer(lyrId)) map.setPaintProperty(lyrId, 'raster-opacity', aspectMasterOpacity);
+			}
 		}
 
 		// ── Unit toggle ─────────────────────────────────────────────────────────────
@@ -4477,7 +4481,7 @@
 			}
 			positionHandles();
 
-			function makeDrag(handle, isStart) {
+			function makeDrag(handle, isMax) {
 					handle.addEventListener('touchstart', e => { e.preventDefault(); }, { passive: false });
 					handle.addEventListener('pointerdown', e => {
 						e.preventDefault(); e.stopPropagation();
@@ -4519,10 +4523,11 @@
 		}
 
 		// ── Elevation protocol ───────────────────────────────────────────────────────
-		function registerElevProtocol() {
-			try { maplibregl.removeProtocol('elevrange'); } catch(e) {}
-			maplibregl.addProtocol('elevrange', (params) => {
-				const clean = params.url.replace(/^elevrange:\/\//, '').split('?')[0];
+		function registerElevRangeProtocol(rangeIdx) {
+			const proto = `elevrange-${rangeIdx}`;
+			try { maplibregl.removeProtocol(proto); } catch(e) {}
+			maplibregl.addProtocol(proto, (params) => {
+				const clean = params.url.replace(new RegExp(`^${proto}:\\/\\/`), '').split('?')[0];
 				const parts = clean.split('/');
 				const z = parseInt(parts[0],10), x = parseInt(parts[1],10), y = parseInt(parts[2],10);
 				const tileUrl = TERRARIUM_URL.replace('{z}',z).replace('{x}',x).replace('{y}',y);
@@ -4534,31 +4539,31 @@
 						const ctx = canvas.getContext('2d'); ctx.drawImage(img,0,0,sz,sz);
 						const src = ctx.getImageData(0,0,sz,sz);
 						const out = ctx.createImageData(sz,sz);
-						const activeRanges = elevRanges.filter(r => r.enabled);
+						const rng = elevRanges[rangeIdx];
+						if (!rng || !rng.enabled) {
+							canvas.toBlob(blob=>{ blob.arrayBuffer().then(buf=>resolve({data:buf})); },'image/png');
+							return;
+						}
 						for (let i = 0; i < sz*sz; i++) {
 							const r2=src.data[i*4], g=src.data[i*4+1], b=src.data[i*4+2];
 							const elevM = (r2*256+g+b/256)-32768;
-							let matched=false;
-							for (const rng of activeRanges) {
-								const minM=toM(rng.min), maxM=toM(rng.max);
-								if (elevM>=minM && elevM<=maxM) {
-									let rc,gc2,bc2,ac;
-									if (rng.gradient) {
-										const t=maxM>minM?(elevM-minM)/(maxM-minM):0;
-										// gradient: c1=high color, c2=low color → lerp high→low
-										const col=lerpColor(hexToRgbArr(rng.c1),hexToRgbArr(rng.c2),1-t);
-										const alp=rng.a1+(1-t)*(rng.a2-rng.a1);
-										[rc,gc2,bc2,ac]=[col[0],col[1],col[2],alp];
-									} else {
-										const col=hexToRgbArr(rng.c1);
-										[rc,gc2,bc2,ac]=[col[0],col[1],col[2],rng.a1];
-									}
-									out.data[i*4]=rc; out.data[i*4+1]=gc2; out.data[i*4+2]=bc2;
-									out.data[i*4+3]=Math.round(ac*255);
-									matched=true; break;
+							const minM=toM(rng.min), maxM=toM(rng.max);
+							if (elevM>=minM && elevM<=maxM) {
+								let rc,gc2,bc2,ac;
+								if (rng.gradient) {
+									const t=maxM>minM?(elevM-minM)/(maxM-minM):0;
+									const col=lerpColor(hexToRgbArr(rng.c1),hexToRgbArr(rng.c2),1-t);
+									const alp=rng.a1+(1-t)*(rng.a2-rng.a1);
+									[rc,gc2,bc2,ac]=[col[0],col[1],col[2],alp];
+								} else {
+									const col=hexToRgbArr(rng.c1);
+									[rc,gc2,bc2,ac]=[col[0],col[1],col[2],rng.a1];
 								}
+								out.data[i*4]=rc; out.data[i*4+1]=gc2; out.data[i*4+2]=bc2;
+								out.data[i*4+3]=Math.round(ac*255);
+							} else {
+								out.data[i*4+3]=0;
 							}
-							if (!matched) out.data[i*4+3]=0;
 						}
 						ctx.putImageData(out,0,0);
 						canvas.toBlob(blob=>{ blob.arrayBuffer().then(buf=>resolve({data:buf})); },'image/png');
@@ -4569,15 +4574,41 @@
 			});
 		}
 
-		function refreshElevLayer() {
+		function addElevRangeLayer(rangeIdx) {
 			if (!mapLoaded) return;
-			registerElevProtocol();
+			const srcId = `${ELEV_SRC}-${rangeIdx}`;
+			const lyrId = `${ELEV_LYR}-${rangeIdx}`;
+			if (map.getLayer(lyrId)) map.removeLayer(lyrId);
+			if (map.getSource(srcId)) map.removeSource(srcId);
+			const rng = elevRanges[rangeIdx];
+			if (!rng || !rng.enabled || !elevMasterEnabled) return;
+			registerElevRangeProtocol(rangeIdx);
+			const token = Date.now();
+			const proto = `elevrange-${rangeIdx}`;
+			map.addSource(srcId,{type:'raster',tiles:[`${proto}://{z}/{x}/{y}?t=${token}`],tileSize:256,maxzoom:14,attribution:'Elevation: Tilezen Terrarium'});
+			map.addLayer({id:lyrId,type:'raster',source:srcId,paint:{'raster-opacity':elevMasterOpacity,'raster-resampling':'nearest'}},getInsertionLayer(false));
+		}
+
+		function removeAllElevRangeLayers() {
+			// Remove all possible per-range layers (generous upper bound)
+			for (let i = 0; i < 20; i++) {
+				const lyrId = `${ELEV_LYR}-${i}`;
+				const srcId = `${ELEV_SRC}-${i}`;
+				if (map.getLayer(lyrId)) map.removeLayer(lyrId);
+				if (map.getSource(srcId)) map.removeSource(srcId);
+			}
+			// Also clean up legacy single-layer IDs if present
 			if (map.getLayer(ELEV_LYR)) map.removeLayer(ELEV_LYR);
 			if (map.getSource(ELEV_SRC)) map.removeSource(ELEV_SRC);
-			if (!elevMasterEnabled || elevRanges.filter(r=>r.enabled).length===0) return;
-			const token = Date.now();
-			map.addSource(ELEV_SRC,{type:'raster',tiles:[`elevrange://{z}/{x}/{y}?t=${token}`],tileSize:256,maxzoom:14,attribution:'Elevation: Tilezen Terrarium'});
-			map.addLayer({id:ELEV_LYR,type:'raster',source:ELEV_SRC,paint:{'raster-opacity':elevMasterOpacity,'raster-resampling':'nearest'}},getInsertionLayer(false));
+		}
+
+		function refreshElevLayer() {
+			if (!mapLoaded) return;
+			removeAllElevRangeLayers();
+			if (!elevMasterEnabled) return;
+			elevRanges.forEach((r, i) => {
+				if (r.enabled) addElevRangeLayer(i);
+			});
 		}
 
 		// ── Elevation UI ─────────────────────────────────────────────────────────────
@@ -4593,7 +4624,7 @@
 				hdr.innerHTML = `
 					<input type="checkbox" class="exp-range-check" ${r.enabled?'checked':''} title="Enable this range">
 					<span class="exp-range-label">${r.min} – ${r.max} ${elevUnit==='ft'?'ft':'m'}</span>
-					<label style="font-size:10px;color:#888;display:flex;align-items:center;gap:3px;margin-left:auto">Z<input type="number" class="exp-z-input" value="${r.zOrder??5}" min="1" max="10" step="1" style="width:34px;padding:1px 3px;border:1px solid #ccc;border-radius:4px;font-size:10px" title="Z Order"></label>
+					<label style="font-size:10px;color:#888;display:flex;align-items:center;gap:3px;margin-left:auto">Z<input type="number" class="exp-z-input" value="${r.zOrder??100}" min="1" max="999" step="10" style="width:34px;padding:1px 3px;border:1px solid #ccc;border-radius:4px;font-size:10px" title="Z Order"></label>
 					<button class="exp-remove-btn" title="Remove">✕</button>
 				`;
 				div.appendChild(hdr);
@@ -4719,7 +4750,10 @@
 		let _elevRefreshTimer = null;
 		function scheduleElevRefresh() {
 			clearTimeout(_elevRefreshTimer);
-			_elevRefreshTimer = setTimeout(()=>refreshElevLayer(), 400);
+			_elevRefreshTimer = setTimeout(()=>{
+				refreshElevLayer();
+				reorderAllLayers();
+			}, 400);
 		}
 
 		// Update the vslider track to reflect gradient state (top=c1/high, bottom=c2/low)
@@ -4748,7 +4782,7 @@
 			const last = elevRanges[elevRanges.length-1];
 			const newMin = last ? last.max : 0;
 			const palette = ['#32CD32','#81c784','#ffb74d','#f06292','#ba68c8','#4dd0e1','#aed581'];
-			elevRanges.push({min:newMin, max:newMin+step, c1:palette[elevRanges.length%palette.length], a1:0.7, c2:'#FF0000', a2:0.3, gradient:false, enabled:elevMasterEnabled, zOrder:5});
+			elevRanges.push({min:newMin, max:newMin+step, c1:palette[elevRanges.length%palette.length], a1:0.7, c2:'#FF0000', a2:0.3, gradient:false, enabled:elevMasterEnabled, zOrder:100});
 			syncElevMasterCheck();
 			renderElevRanges();
 			refreshElevLayer();
@@ -4957,10 +4991,11 @@
 		}
 
 		// ── Aspect protocol ──────────────────────────────────────────────────────────
-		function registerAspectProtocol() {
-			try { maplibregl.removeProtocol('aspectrange'); } catch(e) {}
-			maplibregl.addProtocol('aspectrange', (params) => {
-				const clean = params.url.replace(/^aspectrange:\/\//, '').split('?')[0];
+		function registerAspectRangeProtocol(rangeIdx) {
+			const proto = `aspectrange-${rangeIdx}`;
+			try { maplibregl.removeProtocol(proto); } catch(e) {}
+			maplibregl.addProtocol(proto, (params) => {
+				const clean = params.url.replace(new RegExp(`^${proto}:\\/\\/`), '').split('?')[0];
 				const parts = clean.split('/');
 				const z=parseInt(parts[0],10), x=parseInt(parts[1],10), y=parseInt(parts[2],10);
 				const neighbors=[];
@@ -4979,7 +5014,12 @@
 						const out=octx.createImageData(sz,sz);
 						const res=(2*Math.PI*6378137)/(sz*Math.pow(2,z));
 						const dp=2*res;
-						const activeRanges=aspectRanges.filter(rng=>rng.enabled);
+						const rng=aspectRanges[rangeIdx];
+						if (!rng || !rng.enabled) {
+							octx.putImageData(out,0,0);
+							oc.toBlob(blob=>{blob.arrayBuffer().then(buf=>resolve({data:buf}));},'image/png');
+							return;
+						}
 						for(let py=0;py<sz;py++){
 							for(let px=0;px<sz;px++){
 								const bx=px+sz,by=py+sz;
@@ -4989,30 +5029,27 @@
 								if(slope<0.005){out.data[(py*sz+px)*4+3]=0;continue;}
 								let aspectDeg=Math.atan2(dzdx,-dzdy)*(180/Math.PI)+180;
 								if(aspectDeg<0)aspectDeg+=360; if(aspectDeg>=360)aspectDeg-=360;
-								let matched=false;
-								for(const rng of activeRanges){
-									let{minDeg,maxDeg,color,alpha}=rng;
-									minDeg=((minDeg%360)+360)%360; maxDeg=((maxDeg%360)+360)%360;
-									const inRange=minDeg<=maxDeg?(aspectDeg>=minDeg&&aspectDeg<maxDeg):(aspectDeg>=minDeg||aspectDeg<maxDeg);
-									if(inRange){
-										let rc2,gc3,bc3,ac;
-										if(rng.gradient){
-											let sweep=maxDeg-minDeg; if(sweep<=0)sweep+=360;
-											let offset=aspectDeg-minDeg; if(offset<0)offset+=360;
-											const t=sweep>0?offset/sweep:0;
-											const col=lerpColor(hexToRgbArr(rng.color),hexToRgbArr(rng.color2||'#000000'),t);
-											const alp=(rng.alpha)+(t)*((rng.alpha2||rng.alpha)-rng.alpha);
-											[rc2,gc3,bc3,ac]=[col[0],col[1],col[2],alp];
-										} else {
-											const [r2c,g2c,b2c]=hexToRgbArr(rng.color);
-											[rc2,gc3,bc3,ac]=[r2c,g2c,b2c,rng.alpha];
-										}
-										const i4=(py*sz+px)*4;
-										out.data[i4]=rc2;out.data[i4+1]=gc3;out.data[i4+2]=bc3;out.data[i4+3]=Math.round(ac*255);
-										matched=true;break;
+								let{minDeg,maxDeg,color,alpha}=rng;
+								minDeg=((minDeg%360)+360)%360; maxDeg=((maxDeg%360)+360)%360;
+								const inRange=minDeg<=maxDeg?(aspectDeg>=minDeg&&aspectDeg<maxDeg):(aspectDeg>=minDeg||aspectDeg<maxDeg);
+								if(inRange){
+									let rc2,gc3,bc3,ac;
+									if(rng.gradient){
+										let sweep=maxDeg-minDeg; if(sweep<=0)sweep+=360;
+										let offset=aspectDeg-minDeg; if(offset<0)offset+=360;
+										const t=sweep>0?offset/sweep:0;
+										const col=lerpColor(hexToRgbArr(rng.color),hexToRgbArr(rng.color2||'#000000'),t);
+										const alp=(rng.alpha)+(t)*((rng.alpha2||rng.alpha)-rng.alpha);
+										[rc2,gc3,bc3,ac]=[col[0],col[1],col[2],alp];
+									} else {
+										const [r2c,g2c,b2c]=hexToRgbArr(rng.color);
+										[rc2,gc3,bc3,ac]=[r2c,g2c,b2c,rng.alpha];
 									}
+									const i4=(py*sz+px)*4;
+									out.data[i4]=rc2;out.data[i4+1]=gc3;out.data[i4+2]=bc3;out.data[i4+3]=Math.round(ac*255);
+								} else {
+									out.data[(py*sz+px)*4+3]=0;
 								}
-								if(!matched)out.data[(py*sz+px)*4+3]=0;
 							}
 						}
 						octx.putImageData(out,0,0);
@@ -5028,15 +5065,40 @@
 			});
 		}
 
-		function refreshAspectLayer() {
+		function addAspectRangeLayer(rangeIdx) {
 			if (!mapLoaded) return;
-			registerAspectProtocol();
+			const srcId = `${ASPECT_SRC}-${rangeIdx}`;
+			const lyrId = `${ASPECT_LYR}-${rangeIdx}`;
+			if (map.getLayer(lyrId)) map.removeLayer(lyrId);
+			if (map.getSource(srcId)) map.removeSource(srcId);
+			const rng = aspectRanges[rangeIdx];
+			if (!rng || !rng.enabled || !aspectMasterEnabled) return;
+			registerAspectRangeProtocol(rangeIdx);
+			const token = Date.now();
+			const proto = `aspectrange-${rangeIdx}`;
+			map.addSource(srcId,{type:'raster',tiles:[`${proto}://{z}/{x}/{y}?t=${token}`],tileSize:256,maxzoom:12,attribution:'Elevation: Tilezen Terrarium'});
+			map.addLayer({id:lyrId,type:'raster',source:srcId,paint:{'raster-opacity':aspectMasterOpacity,'raster-resampling':'nearest'}},getInsertionLayer(false));
+		}
+
+		function removeAllAspectRangeLayers() {
+			for (let i = 0; i < 20; i++) {
+				const lyrId = `${ASPECT_LYR}-${i}`;
+				const srcId = `${ASPECT_SRC}-${i}`;
+				if (map.getLayer(lyrId)) map.removeLayer(lyrId);
+				if (map.getSource(srcId)) map.removeSource(srcId);
+			}
+			// Also clean up legacy single-layer IDs if present
 			if (map.getLayer(ASPECT_LYR)) map.removeLayer(ASPECT_LYR);
 			if (map.getSource(ASPECT_SRC)) map.removeSource(ASPECT_SRC);
-			if (!aspectMasterEnabled || aspectRanges.filter(r=>r.enabled).length===0) return;
-			const token=Date.now();
-			map.addSource(ASPECT_SRC,{type:'raster',tiles:[`aspectrange://{z}/{x}/{y}?t=${token}`],tileSize:256,maxzoom:12,attribution:'Elevation: Tilezen Terrarium'});
-			map.addLayer({id:ASPECT_LYR,type:'raster',source:ASPECT_SRC,paint:{'raster-opacity':aspectMasterOpacity,'raster-resampling':'nearest'}},getInsertionLayer(false));
+		}
+
+		function refreshAspectLayer() {
+			if (!mapLoaded) return;
+			removeAllAspectRangeLayers();
+			if (!aspectMasterEnabled) return;
+			aspectRanges.forEach((r, i) => {
+				if (r.enabled) addAspectRangeLayer(i);
+			});
 		}
 
 		// ── Aspect UI ────────────────────────────────────────────────────────────────
@@ -5056,7 +5118,7 @@
 						<option value="">–</option>
 						${Object.keys(ASPECT_PRESETS).map(k=>`<option value="${k}"${r.label===k?' selected':''}>${k}</option>`).join('')}
 					</select>
-					<label style="font-size:10px;color:#888;display:flex;align-items:center;gap:3px;margin-left:auto">Z<input type="number" class="exp-z-input" value="${r.zOrder??6}" min="1" max="10" step="1" style="width:34px;padding:1px 3px;border:1px solid #ccc;border-radius:4px;font-size:10px" title="Z Order"></label>
+					<label style="font-size:10px;color:#888;display:flex;align-items:center;gap:3px;margin-left:auto">Z<input type="number" class="exp-z-input" value="${r.zOrder??110}" min="1" max="999" step="10" style="width:34px;padding:1px 3px;border:1px solid #ccc;border-radius:4px;font-size:10px" title="Z Order"></label>
 					<button class="exp-remove-btn" title="Remove">✕</button>
 				`;
 				div.appendChild(hdr);
@@ -5243,12 +5305,15 @@
 		let _aspectRefreshTimer=null;
 		function scheduleAspectRefresh() {
 			clearTimeout(_aspectRefreshTimer);
-			_aspectRefreshTimer=setTimeout(()=>refreshAspectLayer(),500);
+			_aspectRefreshTimer=setTimeout(()=>{
+				refreshAspectLayer();
+				reorderAllLayers();
+			},500);
 		}
 
 		function addAspectRange() {
 			const palette=['#1565c0','#2e7d32','#f57f17','#6a1b9a','#b71c1c','#00695c','#e65100','#0288d1'];
-			aspectRanges.push({minDeg:0,maxDeg:90,color:palette[aspectRanges.length%palette.length],alpha:0.7,label:'',enabled:aspectMasterEnabled,zOrder:6});
+			aspectRanges.push({minDeg:0,maxDeg:90,color:palette[aspectRanges.length%palette.length],alpha:0.7,label:'',enabled:aspectMasterEnabled,zOrder:110});
 			syncAspectMasterCheck(); renderAspectRanges(); scheduleAspectRefresh();
 		}
 
