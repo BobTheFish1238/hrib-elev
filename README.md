@@ -1,4 +1,4 @@
-# 🍄 HribLinks
+# 🍄 Mushroom Megathread
 
 ### Maps and links for mushroom foraging (PNW / US)
 
