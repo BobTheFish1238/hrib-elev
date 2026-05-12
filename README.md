@@ -3,12 +3,12 @@
 ### Here you can find links to websites that could be useful for mushroom foraging in the Pacific Northwest.
 #### Click on the sections you want to expand.<br><br>
 
-<details><summary>⭐ Featured <small><span style="color:gray;">(created by me)</span></small></summary>
+<details><summary>⭐ Featured <sub>&nbsp;(created by me)</sub></summary>
 
 | Info | Link |
 | :--- | :--- |
-| ⭐HribSoil <br><small><span style="color:gray;">Interactive map with multiple terrain layers (e.g. live soil data, tree species, fire perimeters, timber harvests, etc.)</span></small> | https://bobthefish1238.github.io/hrib-elev/HribSoil.html |
-| ⭐HribHabitat <br><small><span style="color:gray;">iNaturalist observations visualized with graphs inculding elevation, soil temperature, soil moisture,<br>slope aspect, and date</span></small> | https://bobthefish1238.github.io/hrib-elev/HribHabitat.html |
+| ⭐HribSoil <br>```Interactive map with multiple terrain layers (e.g. live soil data, tree species, fire perimeters, timber harvests, etc.)``` | https://bobthefish1238.github.io/hrib-elev/HribSoil.html |
+| ⭐HribHabitat <br>```iNaturalist observations visualized with graphs inculding elevation, soil temperature, soil moisture, slope aspect, and date``` | https://bobthefish1238.github.io/hrib-elev/HribHabitat.html |
 
 </details>
 
