@@ -392,6 +392,7 @@
             color: #8B4513;
             font-size: 1.3rem;
             font-weight: 625;
+			white-space: nowrap;
         }
         
 		.directory-content {
@@ -424,7 +425,7 @@
 		.folder-controls {
 			display: flex;
 			gap: 8px;
-			margin-left: 20px;
+			margin-left: 40px;
 		}
 		
 		.control-btn {
@@ -1462,7 +1463,8 @@
 			<!-- NDJSON Data Files container -->
 			<div class="ndjson-directory">
 				<div class="directory-header">
-					<div class="directory-title">Data Files</div>
+					<div class="directory-title">Data Files (iNaturalist)</div>
+					<span class="directory-subtitle" style="color: #888; font-size: 0.7rem; font-weight: 525;">&nbsp;&nbsp;&nbsp;&nbsp;Enable the data by using the all/none buttons or toggle each file individualy.<br>&nbsp;&nbsp;&nbsp;&nbsp;Toggling the color/size checkboxes will override the color/size within that folder.</span>
 					<div class="directory-controls">
 						<button class="control-btn" id="select-all-btn">All</button>
 						<button class="control-btn" id="select-none-btn">None</button>
@@ -1476,7 +1478,8 @@
 			</div>
 			<!-- Data Settings container -->
 			<div class="settings-section">
-				<h3 class="settings-title">Data Settings</h3>
+				<h3 class="settings-title">Data Settings
+					<span class="directory-subtitle" style="color: #888; font-size: 0.7rem; font-weight: 525;">&nbsp;&nbsp;&nbsp;&nbsp;Select how the data should be filtered</span></h3>
 				
 				<div class="setting-group">
 					<div class="setting-row">
@@ -1540,151 +1543,106 @@
 				
 				<button id="apply-settings" style="width: 100%; margin-top: 15px;">Apply Settings</button>
 			</div>
+		</div>
+
+		<div class="content-container">
+			<!-- Main Chart Container -->
+			<div class="graph-container">
+				<div class="chart-header" style="margin-bottom: 5px">
+					<div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+						<h3 class="graph-title" style="margin: 0;">Data Visualization</h3>
+						<button class="fullscreen-chart-btn" data-chart="main" title="Fullscreen chart" style="background: none; border: none; color: #8B4513; font-size: 1.2rem; cursor: pointer; padding: 5px;">
+							<i class="fas fa-expand"></i>
+						</button>
+					</div>
+					<div class="chart-controls">
+						<div class="axis-selectors">
+							<div class="axis-selector">
+								<label for="y-axis">Y-Axis:</label>
+								<select id="y-axis">
+									<option value="elevationFt">Elevation (ft)</option>
+									<option value="soilTemp">Soil Temperature (°F)</option>
+									<option value="soilMoisture">Soil Moisture</option>
+									<option value="slopeDeg">Slope (degrees)</option>
+									<option value="slopeAspectDeg">Aspect (degrees)</option>
+									<option value="monthFraction">Date</option>
+								</select>
+							</div>
+							<div class="axis-selector">
+								<label for="x-axis">X-Axis:</label>
+								<select id="x-axis">
+									<option value="elevationFt">Elevation (ft)</option>
+									<option value="soilTemp">Soil Temperature (°F)</option>
+									<option value="soilMoisture">Soil Moisture</option>
+									<option value="slopeDeg">Slope (degrees)</option>
+									<option value="slopeAspectDeg">Aspect (degrees)</option>
+									<option value="monthFraction">Date</option>
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="chart-wrapper">
+					<canvas id="mainChart"></canvas>
+				</div>
+				<!-- Main Chart Legend Inside Container -->
+				<div class="legend-container" style="margin-top: 15px; padding: 10px; border-top: 1px solid var(--border-color);">
+					<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 5px;">
+						<h4 style="color: var(--header-color); margin: 0; font-size: 14px;">Legend</h4>
+						<div style="display: flex; gap: 5px;">
+							<button class="control-btn legend-control" id="show-main-datasets" style="padding: 3px 8px; font-size: 11px;">Show All</button>
+							<button class="control-btn legend-control" id="hide-main-datasets" style="padding: 3px 8px; font-size: 11px;">Hide All</button>
+						</div>
+					</div>
+					<div id="main-chart-legend-items" style="display: flex; flex-wrap: wrap; gap: 10px; max-height: 120px; overflow-y: auto; padding: 5px;">
+						<!-- Main chart legend items will be populated here -->
+					</div>
+				</div>
 			</div>
 			
-			<div class="input-section">
-				<div class="input-header">
-					<h2 class="input-title">Location Data</h2>
-					<div style="display: flex; gap: 10px;">
-						<label style="display: flex; align-items: center; gap: 5px; white-space: nowrap; max-height: 30px; font-size: 14px;">Added Point:</label>
-						<input type="color" id="user-point-color" value="#FF6B6B" title="User point color">
-						<input type="number" id="user-point-size" value="5" min="1" max="20" title="User point size" style="max-width: 80px; max-height: 30px; align-items: center;">
-						<label style="display: flex; align-items: center; gap: 5px; white-space: nowrap; max-height: 50px; font-size: 14px;">Selected Point:</label>
-						<input type="color" id="highlight-color" value="#FFA500" title="Highlight color">
-						<input type="number" id="highlight-point-size" value="5" min="1" max="20" title="Highlight point size" style="max-width: 80px; max-height: 30px; align-items: center;">
-						<label style="display: flex; align-items: center; gap: 5px; font-size: 12px; margin-left: 10px; margin-right: 10px; white-space: nowrap;">
-							<input type="checkbox" id="disable-scroll"> Disable Scroll
-						</label>
-						<button id="clear-user-points" title="Clear user points" style="max-height: 30px; align-items: center;">🗑️</button>
+			<!-- Histogram Container -->
+			<div class="graph-container">
+				<div class="chart-header" style="margin-bottom: 5px">
+					<div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+						<h3 class="graph-title" style="margin: 0;">Distribution Histogram</h3>
+						<button class="fullscreen-chart-btn" data-chart="histogram" title="Fullscreen chart" style="background: none; border: none; color: #8B4513; font-size: 1.2rem; cursor: pointer; padding: 5px;">
+							<i class="fas fa-expand"></i>
+						</button>
+					</div>
+					<div class="histogram-controls">
+						<select id="histogram-dimension">
+							<option value="elevationFt">Elevation (ft)</option>
+							<option value="soilTemp">Soil Temperature (°F)</option>
+							<option value="soilMoisture">Soil Moisture</option>
+							<option value="slopeDeg">Slope (degrees)</option>
+							<option value="slopeAspectDeg">Aspect (degrees)</option>
+							<option value="month">Month</option>
+							<option value="yearMonth">Year-Month</option>
+						</select>
+						<label for="bin-count" style="font-size: 16px; margin-left: 5px;">Bins:</label>
+						<input type="number" id="bin-count" min="1" max="100" value="30" style="width: 100px;">
+						<label for="bin-offset" style="font-size: 16px; margin-left: 5px;">Offset:</label>
+						<input type="number" id="bin-offset" min="0" max="100" value="0" style="width: 100px;">
 					</div>
 				</div>
-                <p style="font-size: 0.9rem; margin-bottom: 5px;">Enter coordinates manually or click on the map to select a location. The system will retrieve the soil and elevation data from the Open-Meteo Weather API.</p>
-                
-                <div class="input-group">
-                    <div class="input-field" style="flex: 1 1 200px;">
-                        <label for="latitude">Latitude</label>
-                        <input type="number" id="latitude" step="any" placeholder="e.g., 46.744487" value="46.744487" style="width: 100%;">
-                    </div>
-                    
-                    <div class="input-field" style="flex: 1 1 200px;">
-                        <label for="longitude">Longitude</label>
-                        <input type="number" id="longitude" step="any" placeholder="e.g., -121.812952" value="-121.812952" style="width: 100%;">
-                    </div>
-                    
-                    <div class="input-field" style="flex: 1 1 200px;">
-                        <label for="date">Observation Date</label>
-                        <input type="date" id="date" style="width: 100%;">
-                    </div>
-                    
-                    <div class="input-field" style="flex: 1 1 200px;">
-                        <label>&nbsp;</label>
-                        <button id="fetch-data" style="width: 100%;">Get Soil & Elevation Data</button>
-                    </div>
-                </div>
-                
-                <div class="map-container" id="map"></div>
-                
-                <div class="loading" id="loading">Fetching data from Open-Meteo API...</div>
-            </div>
-            
-			<div class="content-container">
-				<!-- Main Chart Container -->
-				<div class="graph-container">
-					<div class="chart-header" style="margin-bottom: 5px">
-						<div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-							<h3 class="graph-title" style="margin: 0;">Data Visualization</h3>
-							<button class="fullscreen-chart-btn" data-chart="main" title="Fullscreen chart" style="background: none; border: none; color: #8B4513; font-size: 1.2rem; cursor: pointer; padding: 5px;">
-								<i class="fas fa-expand"></i>
-							</button>
-						</div>
-						<div class="chart-controls">
-							<div class="axis-selectors">
-								<div class="axis-selector">
-									<label for="y-axis">Y-Axis:</label>
-									<select id="y-axis">
-										<option value="elevationFt">Elevation (ft)</option>
-										<option value="soilTemp">Soil Temperature (°F)</option>
-										<option value="soilMoisture">Soil Moisture</option>
-										<option value="slopeDeg">Slope (degrees)</option>
-										<option value="slopeAspectDeg">Aspect (degrees)</option>
-										<option value="monthFraction">Date</option>
-									</select>
-								</div>
-								<div class="axis-selector">
-									<label for="x-axis">X-Axis:</label>
-									<select id="x-axis">
-										<option value="elevationFt">Elevation (ft)</option>
-										<option value="soilTemp">Soil Temperature (°F)</option>
-										<option value="soilMoisture">Soil Moisture</option>
-										<option value="slopeDeg">Slope (degrees)</option>
-										<option value="slopeAspectDeg">Aspect (degrees)</option>
-										<option value="monthFraction">Date</option>
-									</select>
-								</div>
-							</div>
+				<div class="chart-wrapper">
+					<canvas id="histogramChart"></canvas>
+				</div>
+				<!-- Histogram Legend Inside Container -->
+				<div class="legend-container" style="margin-top: 15px; padding: 10px; border-top: 1px solid var(--border-color);">
+					<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 5px;">
+						<h4 style="color: var(--header-color); margin: 0; font-size: 14px;">Legend</h4>
+						<div style="display: flex; gap: 5px;">
+							<button class="control-btn legend-control" id="show-histogram-datasets" style="padding: 3px 8px; font-size: 11px;">Show All</button>
+							<button class="control-btn legend-control" id="hide-histogram-datasets" style="padding: 3px 8px; font-size: 11px;">Hide All</button>
 						</div>
 					</div>
-					<div class="chart-wrapper">
-						<canvas id="mainChart"></canvas>
-					</div>
-					<!-- Main Chart Legend Inside Container -->
-					<div class="legend-container" style="margin-top: 15px; padding: 10px; border-top: 1px solid var(--border-color);">
-						<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 5px;">
-							<h4 style="color: var(--header-color); margin: 0; font-size: 14px;">Legend</h4>
-							<div style="display: flex; gap: 5px;">
-								<button class="control-btn legend-control" id="show-main-datasets" style="padding: 3px 8px; font-size: 11px;">Show All</button>
-								<button class="control-btn legend-control" id="hide-main-datasets" style="padding: 3px 8px; font-size: 11px;">Hide All</button>
-							</div>
-						</div>
-						<div id="main-chart-legend-items" style="display: flex; flex-wrap: wrap; gap: 10px; max-height: 120px; overflow-y: auto; padding: 5px;">
-							<!-- Main chart legend items will be populated here -->
-						</div>
+					<div id="histogram-legend-items" style="display: flex; flex-wrap: wrap; gap: 10px; max-height: 120px; overflow-y: auto; padding: 5px;">
+						<!-- Histogram legend items will be populated here -->
 					</div>
 				</div>
-				
-				<!-- Histogram Container -->
-				<div class="graph-container">
-					<div class="chart-header" style="margin-bottom: 5px">
-						<div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-							<h3 class="graph-title" style="margin: 0;">Distribution Histogram</h3>
-							<button class="fullscreen-chart-btn" data-chart="histogram" title="Fullscreen chart" style="background: none; border: none; color: #8B4513; font-size: 1.2rem; cursor: pointer; padding: 5px;">
-								<i class="fas fa-expand"></i>
-							</button>
-						</div>
-						<div class="histogram-controls">
-							<select id="histogram-dimension">
-								<option value="elevationFt">Elevation (ft)</option>
-								<option value="soilTemp">Soil Temperature (°F)</option>
-								<option value="soilMoisture">Soil Moisture</option>
-								<option value="slopeDeg">Slope (degrees)</option>
-								<option value="slopeAspectDeg">Aspect (degrees)</option>
-								<option value="month">Month</option>
-								<option value="yearMonth">Year-Month</option>
-							</select>
-							<label for="bin-count" style="font-size: 16px; margin-left: 5px;">Bins:</label>
-							<input type="number" id="bin-count" min="1" max="100" value="30" style="width: 100px;">
-							<label for="bin-offset" style="font-size: 16px; margin-left: 5px;">Offset:</label>
-							<input type="number" id="bin-offset" min="0" max="100" value="0" style="width: 100px;">
-						</div>
-					</div>
-					<div class="chart-wrapper">
-						<canvas id="histogramChart"></canvas>
-					</div>
-					<!-- Histogram Legend Inside Container -->
-					<div class="legend-container" style="margin-top: 15px; padding: 10px; border-top: 1px solid var(--border-color);">
-						<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 5px;">
-							<h4 style="color: var(--header-color); margin: 0; font-size: 14px;">Legend</h4>
-							<div style="display: flex; gap: 5px;">
-								<button class="control-btn legend-control" id="show-histogram-datasets" style="padding: 3px 8px; font-size: 11px;">Show All</button>
-								<button class="control-btn legend-control" id="hide-histogram-datasets" style="padding: 3px 8px; font-size: 11px;">Hide All</button>
-							</div>
-						</div>
-						<div id="histogram-legend-items" style="display: flex; flex-wrap: wrap; gap: 10px; max-height: 120px; overflow-y: auto; padding: 5px;">
-							<!-- Histogram legend items will be populated here -->
-						</div>
-					</div>
-				</div>
-            
+			</div>
+		
 			<div class="info-panel" id="info-panel" style="grid-column: 1 / -1; width: 100%; margin-top: 25px;">
 				<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
 					<h3 class="info-title" style="margin: 0;">Observation Details</h3>
@@ -1699,28 +1657,74 @@
 					<!-- Details will be populated here when a point is clicked -->
 				</div>
 			</div>
-			<div class="graph-container" style="grid-column: 1 / -1; width: 100%; margin-top: 25px;">
-				<h3 class="graph-title">Data Table</h3>
-				<div id="data-table-container" style="overflow-x: auto;">
-					<table id="data-table" style="width: 100%; border-collapse: collapse;">
-						<thead>
-							<tr style="background-color: #8B4513; color: white; position: sticky; top: 0;">
-								<th style="padding: 10px; text-align: center;">Dataset</th>
-								<th style="padding: 10px; text-align: center;">Date</th>
-								<th style="padding: 10px; text-align: center;">Elevation (ft)</th>
-								<th style="padding: 10px; text-align: center;">Soil Temp (°F)</th>
-								<th style="padding: 10px; text-align: center;">Soil Moisture</th>
-								<th style="padding: 10px; text-align: center;">Slope (deg)</th>
-								<th style="padding: 10px; text-align: center;">Aspect (deg)</th>
-							</tr>
-						</thead>
-						<tbody id="table-body">
-							<!-- Data will be populated here -->
-						</tbody>
-					</table>
+		</div>
+		
+		<div class="input-section">
+			<div class="input-header">
+				<h2 class="input-title">Location Data</h2>
+				<div style="display: flex; gap: 10px;">
+					<label style="display: flex; align-items: center; gap: 5px; white-space: nowrap; max-height: 30px; font-size: 14px;">Added Point:</label>
+					<input type="color" id="user-point-color" value="#FF6B6B" title="User point color">
+					<input type="number" id="user-point-size" value="5" min="1" max="20" title="User point size" style="max-width: 80px; max-height: 30px; align-items: center;">
+					<label style="display: flex; align-items: center; gap: 5px; white-space: nowrap; max-height: 50px; font-size: 14px;">Selected Point:</label>
+					<input type="color" id="highlight-color" value="#FFA500" title="Highlight color">
+					<input type="number" id="highlight-point-size" value="5" min="1" max="20" title="Highlight point size" style="max-width: 80px; max-height: 30px; align-items: center;">
+					<label style="display: flex; align-items: center; gap: 5px; font-size: 12px; margin-left: 10px; margin-right: 10px; white-space: nowrap;">
+						<input type="checkbox" id="disable-scroll"> Disable Scroll
+					</label>
+					<button id="clear-user-points" title="Clear user points" style="max-height: 30px; align-items: center;">🗑️</button>
 				</div>
 			</div>
-        </div>
+			<p style="font-size: 0.9rem; margin-bottom: 5px;">Use the tabs on the map to visualize the data with elevation, soil temperature, soil moisture, slope angle, slope aspect, and date.<br><br>(Optional) To add a custom point, enter coordinates manually or click on the map to select a location. The system will retrieve the soil and elevation data from Open-Meteo Weather API.</p>
+			
+			<div class="input-group">
+				<div class="input-field" style="flex: 1 1 200px;">
+					<label for="latitude">Latitude</label>
+					<input type="number" id="latitude" step="any" placeholder="e.g., 46.744487" value="46.744487" style="width: 100%;">
+				</div>
+				
+				<div class="input-field" style="flex: 1 1 200px;">
+					<label for="longitude">Longitude</label>
+					<input type="number" id="longitude" step="any" placeholder="e.g., -121.812952" value="-121.812952" style="width: 100%;">
+				</div>
+				
+				<div class="input-field" style="flex: 1 1 200px;">
+					<label for="date">Observation Date</label>
+					<input type="date" id="date" style="width: 100%;">
+				</div>
+				
+				<div class="input-field" style="flex: 1 1 200px;">
+					<label>&nbsp;</label>
+					<button id="fetch-data" style="width: 100%;">Get Soil & Elevation Data</button>
+				</div>
+			</div>
+			
+			<div class="map-container" id="map"></div>
+			
+			<div class="loading" id="loading">Fetching data from Open-Meteo API...</div>
+		</div>
+
+		<div class="graph-container" style="grid-column: 1 / -1; width: 100%; margin-top: 25px;">
+			<h3 class="graph-title">Data Table</h3>
+			<div id="data-table-container" style="overflow-x: auto;">
+				<table id="data-table" style="width: 100%; border-collapse: collapse;">
+					<thead>
+						<tr style="background-color: #8B4513; color: white; position: sticky; top: 0;">
+							<th style="padding: 10px; text-align: center;">Dataset</th>
+							<th style="padding: 10px; text-align: center;">Date</th>
+							<th style="padding: 10px; text-align: center;">Elevation (ft)</th>
+							<th style="padding: 10px; text-align: center;">Soil Temp (°F)</th>
+							<th style="padding: 10px; text-align: center;">Soil Moisture</th>
+							<th style="padding: 10px; text-align: center;">Slope (deg)</th>
+							<th style="padding: 10px; text-align: center;">Aspect (deg)</th>
+						</tr>
+					</thead>
+					<tbody id="table-body">
+						<!-- Data will be populated here -->
+					</tbody>
+				</table>
+			</div>
+		</div>
     </div>
     
     <footer style="font-size: 0.8rem;">
@@ -3181,7 +3185,7 @@
 								data-folder="${folderKey}" style="width: 50px;" ${'disabled'}>
 							<span class="folder-alpha-percent" data-folder="${folderKey}" style="font-size: 10px;">100%</span>
 						</div>
-						<div style="display: flex; align-items: center; gap: 2px; margin-left: 20px;">
+						<div style="display: flex; align-items: center; gap: 2px; margin-left: 30px;">
 							<input type="checkbox" class="folder-size-control" 
 								data-folder="${folderKey}" ${sizeChecked}>
 							<input type="number" class="folder-point-size" value="${pointSize}" min="1" max="10" 
@@ -4272,8 +4276,8 @@
 						<button data-view="elevation">Elevation</button>
 						<button data-view="temp">Soil Temp</button>
 						<button data-view="moisture">Soil Moisture</button>
-						<button data-view="slope">Slope</button>
-						<button data-view="aspect">Aspect</button>
+						<button data-view="slope">Slope Angle</button>
+						<button data-view="aspect">Slope Aspect</button>
 						<button data-view="month">Date</button>
 					</div>
 					${layerSelectHTML}
