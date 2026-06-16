@@ -9,6 +9,8 @@
 | :--- | :--- |
 | ⭐HribSoil <br>```Interactive map with multiple terrain layers (e.g. live soil data, tree species, fire perimeters, timber harvests, etc.)``` | https://bobthefish1238.github.io/hrib-elev/HribSoil.html |
 | ⭐HribHabitat <br>```iNaturalist observations visualized with graphs inculding elevation, soil temperature, soil moisture, slope aspect, and date``` | https://bobthefish1238.github.io/hrib-elev/HribHabitat.html |
+| ⭐️HribSpot <br>```Quickly save mushroom location, species, and quantity while foraging offline``` | https://github.com/BobTheFish1238/HribSpot |
+| ⭐️iNatGPX <br>```Convert iNaturalist observations csv file into gpx to import into GaiaGPS for offline use``` | https://github.com/BobTheFish1238/iNatGPX |
 
 </details>
 
