@@ -823,15 +823,10 @@
 						<input type="checkbox" id="ftab-padus-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('padus')" style="accent-color:#2563eb;cursor:pointer;width:12px;height:12px;margin:0;flex-shrink:0" />
 						🏛 Public Access
 					</button>
-					<button id="ftab-elev" onclick="handleForestTabClick('elev')"
-						style="padding:6px 8px;border:none;background:#f0f0f0;color:#555;cursor:pointer;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;border-bottom:1px solid #ccc;text-align:left">
-						<input type="checkbox" id="ftab-elev-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('elev')" style="accent-color:#2563eb;cursor:pointer;width:12px;height:12px;margin:0;flex-shrink:0" />
-						⛰️ Elevation
-					</button>
-					<button id="ftab-aspect" onclick="handleForestTabClick('aspect')"
+					<button id="ftab-terrain" onclick="handleForestTabClick('terrain')"
 						style="padding:6px 8px;border:none;background:#f0f0f0;color:#555;cursor:pointer;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;text-align:left">
-						<input type="checkbox" id="ftab-aspect-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('aspect')" style="accent-color:#2563eb;cursor:pointer;width:12px;height:12px;margin:0;flex-shrink:0" />
-						🧭 Aspect
+						<input type="checkbox" id="ftab-terrain-check" onclick="event.stopPropagation()" onchange="onForestTabCheckChange('terrain')" style="accent-color:#2563eb;cursor:pointer;width:12px;height:12px;margin:0;flex-shrink:0" />
+						🏔 Terrain Shading
 					</button>
 				</div>
 
@@ -1292,40 +1287,54 @@
 					<div id="padus-status" style="font-size:10px;color:#888;text-align:center;padding:2px 0"></div>
 				</div>
 
-				<!-- Tab: Elevation Ranges -->
-				<div id="forest-tab-elev" style="display:none;flex-direction:column;gap:6px;max-width:220px">
-					<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-						<div class="exp-unit-toggle">
-							<button id="elev-btn-ft" class="active" onclick="setElevUnit('ft')">ft</button>
-							<button id="elev-btn-m"  onclick="setElevUnit('m')">m</button>
-						</div>
-						<div class="exp-opacity-master" style="flex:1; width: 90%">
-							<label class="exp-master-toggle" title="Enable all elevation ranges">
-								<input type="checkbox" id="elev-master-check" onchange="onElevMasterToggle(this.checked)">
-							</label>
-							<label style="font-size:10px;color:#888;white-space:nowrap">Opacity</label>
-							<input type="range" style="max-width:45%" id="elev-master-opacity" min="0" max="1" step="0.05" value="0.75"
-								oninput="setElevMasterOpacity(this.value)" />
-							<span id="elev-opacity-val">75%</span>
-						</div>
-					</div>
-					<div id="elev-ranges"></div>
-					<button class="exp-add-btn" id="elev-add-btn" onclick="addElevRange()">+ Add Elevation Range</button>
-				</div>
+				<!-- Tab: Terrain Shading (slope + elevation + aspect zones) -->
+				<div id="forest-tab-terrain" style="display:none;flex-direction:column;gap:0;max-width:240px;max-height:420px">
 
-				<!-- Tab: Aspect Ranges -->
-				<div id="forest-tab-aspect" style="display:none;flex-direction:column;gap:6px;max-width:220px">
-					<div class="exp-opacity-master" style="flex:1; max-width:190px">
-						<label class="exp-master-toggle" title="Enable all aspect ranges">
-							<input type="checkbox" id="aspect-master-check" onchange="onAspectMasterToggle(this.checked)">
-						</label>
-						<label style="font-size:10px;color:#888;white-space:nowrap">Opacity</label>
-						<input type="range" style="max-width:45%" id="aspect-master-opacity" min="0" max="1" step="0.05" value="0.75"
-							oninput="setAspectMasterOpacity(this.value)" />
-						<span id="aspect-opacity-val">75%</span>
+					<!-- Opacity + unit row -->
+					<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding-bottom:6px">
+						<div style="display:flex;border-radius:5px;overflow:hidden;border:1px solid #ccc;width:fit-content">
+							<button id="ts-btn-ft" class="active" onclick="tsSetUnit('ft')" style="padding:3px 9px;border:none;background:#f0f0f0;cursor:pointer;font-size:11px;font-weight:600;color:#555;border-right:1px solid #ccc">ft</button>
+							<button id="ts-btn-m"  onclick="tsSetUnit('m')"  style="padding:3px 9px;border:none;background:#f0f0f0;cursor:pointer;font-size:11px;font-weight:600;color:#555">m</button>
+						</div>
 					</div>
-					<div id="aspect-ranges" style="max-width:100%"></div>
-					<button class="exp-add-btn" id="aspect-add-btn" onclick="addAspectRange()">+ Add Aspect Range</button>
+					<div style="display:flex;align-items:center;gap:4px;flex:1;font-size:10px;color:#888">
+						<span style="white-space:nowrap">Opacity</span>
+						<input type="range" id="ts-opacity-slider" min="0" max="100" value="80"
+							style="flex:1;accent-color:#2563eb;max-width:40%"
+							oninput="tsUpdateOpacity(this.value)">
+						<span id="ts-opacity-val" style="min-width:28px;text-align:right">80%</span>
+					</div>
+
+					<!-- Config selector -->
+					<div style="border-bottom:1px solid #e5e5e5;padding-bottom:6px;margin-bottom:6px">
+						<div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px">Shading Presets</div>
+						<div id="ts-preset-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px"></div>
+						<div id="ts-custom-configs-row" style="display:flex;flex-direction:column;gap:3px;margin-top:4px"></div>
+						<button onclick="tsCreateCustomConfig()"
+							style="display:flex;align-items:center;gap:5px;width:100%;margin-top:4px;background:none;border:1px dashed #ccc;border-radius:6px;padding:5px 8px;color:#888;font-size:11px;font-weight:500;cursor:pointer"
+							onmouseover="this.style.borderColor='#2563eb';this.style.color='#2563eb'"
+							onmouseout="this.style.borderColor='#ccc';this.style.color='#888'">
+							<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+							New Custom Config
+						</button>
+					</div>
+
+					<!-- Zone editor -->
+					<div style="font-size:11px;font-weight:600;color:#444;margin-bottom:4px" id="ts-zone-editor-title">Zones</div>
+					<div id="ts-readonly-notice"
+						style="display:none;background:#fffbeb;border:1px solid #fcd34d;border-radius:5px;padding:6px 8px;font-size:10px;color:#92400e;margin-bottom:4px">
+						Built-in presets are read-only.
+						<button onclick="tsDuplicateActive()" style="color:#2563eb;background:none;border:none;cursor:pointer;font-weight:600;padding:0;font-size:10px">Duplicate to edit →</button>
+					</div>
+					<div id="ts-zones-list" style="display:flex;flex-direction:column;gap:6px;max-height:calc(40vh);overflow-y:auto;padding-right:2px"></div>
+					<button id="ts-add-zone-btn" onclick="tsAddZone()"
+						style="display:flex;align-items:center;justify-content:center;gap:5px;margin-top:6px;background:none;border:1px dashed #ccc;border-radius:6px;padding:6px;color:#888;font-size:11px;font-weight:500;cursor:pointer;width:100%"
+						onmouseover="this.style.borderColor='#2563eb';this.style.color='#2563eb'"
+						onmouseout="this.style.borderColor='#ccc';this.style.color='#888'">
+						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+						Add Zone
+					</button>
+					<div id="ts-map-status" style="font-size:10px;color:#888;text-align:center;padding:4px 0;margin-top:2px"></div>
 				</div>
 
 			</div>
@@ -2528,8 +2537,8 @@
 
 		// ── Forest Layers Tab State ───────────────────────────────────────────────
 		let activeForestTab = 'species';
-		const forestTabChecks = { temp: false, moist: false, inat: false, species: false, fires: false, timber: false, landcover: false, riparian: false, padus: false, elev: false, aspect: false };
-		const FOREST_TABS = ['temp','moist','inat','species','fires','timber','landcover','riparian','padus','elev','aspect'];
+		const forestTabChecks = { temp: false, moist: false, inat: false, species: false, fires: false, timber: false, landcover: false, riparian: false, padus: false, terrain: false };
+		const FOREST_TABS = ['temp','moist','inat','species','fires','timber','landcover','riparian','padus','terrain'];
 
 		function handleForestTabClick(tab) {
 			if (activeForestTab === tab) {
@@ -2604,13 +2613,9 @@
 			if (tab === 'landcover') { checked ? addLandcoverLayer() : removeLandcoverLayer(); }
 			if (tab === 'riparian')  { checked ? addRiparianLayer()  : removeRiparianLayer(); }
 			if (tab === 'padus')     { checked ? addPadusLayer()     : removePadusLayer(); }
-			if (tab === 'elev') {
-				onElevMasterToggle(checked);
-				document.getElementById('elev-master-check').checked = checked;
-			}
-			if (tab === 'aspect') {
-				onAspectMasterToggle(checked);
-				document.getElementById('aspect-master-check').checked = checked;
+			if (tab === 'terrain') {
+				tsShadingEnabled = checked;
+				tsScheduleRefresh();
 			}
 			reorderAllLayers();
 		}
@@ -3654,6 +3659,476 @@
 			selectForestTab('temp');
 		})();
 
+		// ═══════════════════════════════════════════════════════════════════════════
+		// TERRAIN SHADING  (slope · elevation · aspect zone renderer)
+		// Ported from slope-shading.html — all identifiers prefixed "ts" to avoid
+		// conflicts with the existing HribSoil variables.
+		// ═══════════════════════════════════════════════════════════════════════════
+
+		// ── State ────────────────────────────────────────────────────────────────
+		const TS_M_TO_FT = 3.28084;
+		let tsUnit = 'ft';
+		let tsShadingEnabled = false;          // driven by the ftab-terrain checkbox
+		let tsOpacity = 0.80;
+		let tsActiveConfigIds = new Set(['avalanche-terrain']);
+		let tsFocusedConfigId = 'avalanche-terrain';
+		let tsOpenZoneId = null;
+
+		// ── Helpers ──────────────────────────────────────────────────────────────
+		function tsHueToRGB(h) {
+			const t=((h%1)+1)%1, n=1-Math.abs(6*t%2-1);
+			let r=0,g=0,b=0;
+			if(t<1/6){r=1;g=n;}else if(t<2/6){r=n;g=1;}else if(t<3/6){g=1;b=n;}
+			else if(t<4/6){g=n;b=1;}else if(t<5/6){b=1;r=n;}else{r=1;b=n;}
+			return{r:Math.round(r*255),g:Math.round(g*255),b:Math.round(b*255)};
+		}
+		function tsRgbToHex(c){return'#'+[c.r,c.g,c.b].map(v=>v.toString(16).padStart(2,'0')).join('');}
+		function tsAspectLabel(deg){const dirs=['N','NE','E','SE','S','SW','W','NW'];return dirs[Math.round(deg/45)%8];}
+		function tsBuildAspectZones(){
+			const zones=[];
+			for(let i=0;i<16;i++){
+				const minA=22.5*i,maxA=Math.min((i+1)*22.5,360);
+				const col=tsHueToRGB((minA+maxA)/2/360);
+				zones.push({id:`aspect-${i}`,aspects:[{minAspect:minA,maxAspect:maxA,label:tsAspectLabel(minA)}],minSlope:2,maxSlope:null,minElev:null,maxElev:null,color:tsRgbToHex(col)});
+			}
+			return zones;
+		}
+		function tsHexToRgb(hex){const v=parseInt(hex.replace('#',''),16);return[(v>>16)&255,(v>>8)&255,v&255];}
+		function tsToMeters(v){return tsUnit==='ft'?v/TS_M_TO_FT:v;}
+		function tsUnitLabel(){return tsUnit==='ft'?'ft':'m';}
+
+		// ── Built-in presets ─────────────────────────────────────────────────────
+		const TS_BUILTIN_PRESETS=[
+			{id:'avalanche-terrain',name:'Avalanche Terrain',readonly:true,zones:[
+				{id:'avy-25-29',minSlope:25,maxSlope:29,minElev:null,maxElev:null,aspects:[],color:'#f1cc38'},
+				{id:'avy-29-31',minSlope:29,maxSlope:31,minElev:null,maxElev:null,aspects:[],color:'#ff922e'},
+				{id:'avy-31-34',minSlope:31,maxSlope:34,minElev:null,maxElev:null,aspects:[],color:'#ff5f2b'},
+				{id:'avy-34-45',minSlope:34,maxSlope:45,minElev:null,maxElev:null,aspects:[],color:'#d7070f'},
+				{id:'avy-45-50',minSlope:45,maxSlope:50,minElev:null,maxElev:null,aspects:[],color:'#4d279d'},
+				{id:'avy-50-59',minSlope:50,maxSlope:59,minElev:null,maxElev:null,aspects:[],color:'#00319b'},
+				{id:'avy-59p',  minSlope:59,maxSlope:null,minElev:null,maxElev:null,aspects:[],color:'#000000'},
+			]},
+			{id:'aspect-color-wheel',name:'Aspect',readonly:true,zones:tsBuildAspectZones()},
+			{id:'flat-terrain',name:'Flat',readonly:true,zones:[
+				{id:'flat-0-1',minSlope:0,maxSlope:1,minElev:null,maxElev:null,aspects:[],color:'#00ff44'}
+			]},
+		];
+		let tsCustomConfigs=[];
+
+		function tsGetConfig(id){return TS_BUILTIN_PRESETS.find(p=>p.id===id)||tsCustomConfigs.find(c=>c.id===id)||null;}
+		function tsGetActiveConfigs(){return[...tsActiveConfigIds].map(id=>tsGetConfig(id)).filter(Boolean);}
+		function tsGetActiveConfig(){
+			if(tsActiveConfigIds.size===0)return null;
+			if(tsFocusedConfigId&&tsActiveConfigIds.has(tsFocusedConfigId))return tsGetConfig(tsFocusedConfigId);
+			return tsGetConfig([...tsActiveConfigIds][0]);
+		}
+		function tsGetActiveZones(){return tsGetActiveConfigs().flatMap(cfg=>cfg.zones);}
+		function tsIsReadonly(id){return TS_BUILTIN_PRESETS.some(p=>p.id===id);}
+
+		// ── Unit ─────────────────────────────────────────────────────────────────
+		function tsSetUnit(u){
+			if(tsUnit===u)return;
+			tsCustomConfigs.forEach(cfg=>cfg.zones.forEach(z=>{
+				if(z.minElev!==null)z.minElev=u==='ft'?z.minElev*TS_M_TO_FT:z.minElev/TS_M_TO_FT;
+				if(z.maxElev!==null)z.maxElev=u==='ft'?z.maxElev*TS_M_TO_FT:z.maxElev/TS_M_TO_FT;
+			}));
+			tsUnit=u;
+			document.getElementById('ts-btn-ft').style.background=u==='ft'?'#2563eb':'#f0f0f0';
+			document.getElementById('ts-btn-ft').style.color=u==='ft'?'#fff':'#555';
+			document.getElementById('ts-btn-m').style.background=u==='m'?'#2563eb':'#f0f0f0';
+			document.getElementById('ts-btn-m').style.color=u==='m'?'#fff':'#555';
+			tsRenderAll();tsScheduleRefresh();
+		}
+
+		// ── Opacity ──────────────────────────────────────────────────────────────
+		function tsUpdateOpacity(val){
+			tsOpacity=val/100;
+			document.getElementById('ts-opacity-val').textContent=val+'%';
+			if(map.getLayer('ts-slope-layer'))map.setPaintProperty('ts-slope-layer','raster-opacity',tsOpacity);
+		}
+
+		// ── Status ───────────────────────────────────────────────────────────────
+		let tsPendingTiles=0;
+		function tsUpdateStatus(){
+			const el=document.getElementById('ts-map-status');
+			if(!el)return;
+			if(!tsShadingEnabled){el.innerHTML='Shading <b>off</b> — enable with checkbox';return;}
+			const active=tsGetActiveConfigs();
+			if(active.length===0){el.innerHTML='No config selected';return;}
+			const totalZones=active.reduce((n,c)=>n+c.zones.length,0);
+			if(tsPendingTiles>0)el.innerHTML=`Processing <b>${tsPendingTiles}</b> tile${tsPendingTiles>1?'s':''}…`;
+			else if(active.length===1)el.innerHTML=`<b>${active[0].name}</b> · ${totalZones} zone${totalZones!==1?'s':''}`;
+			else el.innerHTML=`<b>${active.length} configs</b> · ${totalZones} zones`;
+		}
+
+		// ── Terrain math (reused from slope-shading.html) ────────────────────────
+		const TS_TERRAIN_URL='https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png';
+		const TS_MAX_ZOOM=14;
+		const tsTileCache=new Map();
+		const tsTileOrder=[];
+		const TS_CACHE_SIZE=100;
+
+		function tsDeg2rad(d){return d*Math.PI/180;}
+		function tsHaversine(la1,lo1,la2,lo2){
+			const dLat=tsDeg2rad(la2-la1),dLon=tsDeg2rad(lo2-lo1);
+			const a=Math.sin(dLat/2)**2+Math.cos(tsDeg2rad(la1))*Math.cos(tsDeg2rad(la2))*Math.sin(dLon/2)**2;
+			return 2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))*6371000;
+		}
+		function tsTile2lon(x,z){return x/2**z*360-180;}
+		function tsTile2lat(y,z){const n=Math.PI-2*Math.PI*y/2**z;return 180/Math.PI*Math.atan(0.5*(Math.exp(n)-Math.exp(-n)));}
+
+		async function tsFetchElevTile(z,x,y){
+			const key=`${z}/${x}/${y}`;
+			if(tsTileCache.has(key)){const i=tsTileOrder.indexOf(key);if(i>-1)tsTileOrder.splice(i,1);tsTileOrder.unshift(key);return tsTileCache.get(key);}
+			const url=TS_TERRAIN_URL.replace('{z}',z).replace('{x}',x).replace('{y}',y);
+			try{
+				const res=await fetch(url);if(!res.ok)return null;
+				const blob=await res.blob();
+				const bmp=await createImageBitmap(blob);
+				const c=new OffscreenCanvas(256,256);const ctx=c.getContext('2d');
+				ctx.drawImage(bmp,0,0);
+				const raw=ctx.getImageData(0,0,256,256).data;
+				const grid=new Float32Array(256*256);
+				for(let i=0;i<256*256;i++)grid[i]=raw[i*4]*256+raw[i*4+1]+raw[i*4+2]/256-32768;
+				tsTileOrder.unshift(key);
+				if(tsTileOrder.length>TS_CACHE_SIZE){const ev=tsTileOrder.pop();tsTileCache.delete(ev);}
+				tsTileCache.set(key,grid);return grid;
+			}catch{return null;}
+		}
+
+		async function tsGetNeighbourTiles(z,x,y){
+			const w=(tx)=>((tx%2**z)+2**z)%2**z;
+			const cl=(ty)=>Math.max(0,Math.min(2**z-1,ty));
+			const[c,u,d,l,r,ul,ur,dl,dr]=await Promise.all([
+				tsFetchElevTile(z,x,y),
+				tsFetchElevTile(z,w(x),cl(y-1)),tsFetchElevTile(z,w(x),cl(y+1)),
+				tsFetchElevTile(z,w(x-1),cl(y)),tsFetchElevTile(z,w(x+1),cl(y)),
+				tsFetchElevTile(z,w(x-1),cl(y-1)),tsFetchElevTile(z,w(x+1),cl(y-1)),
+				tsFetchElevTile(z,w(x-1),cl(y+1)),tsFetchElevTile(z,w(x+1),cl(y+1)),
+			]);
+			return{center:c,up:u,down:d,left:l,right:r,upLeft:ul,upRight:ur,downLeft:dl,downRight:dr};
+		}
+
+		function tsGetElevN(px,py,tiles){
+			const{center,up,down,left,right,upLeft,upRight,downLeft,downRight}=tiles;
+			if(!center)return null;
+			const ox=px<0?-1:px>=256?1:0,oy=py<0?-1:py>=256?1:0;
+			const rpx=((px%256)+256)%256,rpy=((py%256)+256)%256;
+			let g;
+			if(oy===-1)g=ox===-1?upLeft:ox===0?up:upRight;
+			else if(oy===0)g=ox===-1?left:ox===0?center:right;
+			else g=ox===-1?downLeft:ox===0?down:downRight;
+			if(!g){const cx=Math.max(0,Math.min(255,px)),cy=Math.max(0,Math.min(255,py));return center[cy*256+cx];}
+			const v=g[rpy*256+rpx];return isNaN(v)?null:v;
+		}
+
+		function tsComputeSlope(win,csX,csY){
+			const dzdx=(win[2]+2*win[5]+win[8]-win[0]-2*win[3]-win[6])/(8*csX);
+			const dzdy=(win[6]+2*win[7]+win[8]-win[0]-2*win[1]-win[2])/(8*csY);
+			return Math.atan(Math.sqrt(dzdx*dzdx+dzdy*dzdy))*180/Math.PI;
+		}
+		function tsComputeAspect(win){
+			const dzdx=win[2]+2*win[5]+win[8]-win[0]-2*win[3]-win[6];
+			const dzdy=win[6]+2*win[7]+win[8]-win[0]-2*win[1]-win[2];
+			if(dzdx===0&&dzdy===0)return NaN;
+			let a=180/Math.PI*Math.atan2(dzdy,-dzdx);
+			a=a>90?450-a:90-a;if(a===360)a=0;return a;
+		}
+		function tsAspectInRange(aspect,def){
+			if(isNaN(aspect))return false;
+			if(def.wrap||def.minAspect>def.maxAspect)return aspect>=def.minAspect||aspect<=def.maxAspect;
+			return aspect>=def.minAspect&&aspect<=def.maxAspect;
+		}
+
+		async function tsGenerateSlopeTile(z,x,y,zones){
+			const tiles=await tsGetNeighbourTiles(z,x,y);
+			if(!tiles.center)return null;
+			const lat1=tsTile2lat(y,z),lat2=tsTile2lat(y+1,z);
+			const lon1=tsTile2lon(x,z),lon2=tsTile2lon(x+1,z);
+			const csX=tsHaversine((lat1+lat2)/2,lon1,(lat1+lat2)/2,lon2)/256;
+			const csY=tsHaversine(lat1,(lon1+lon2)/2,lat2,(lon1+lon2)/2)/256;
+			const px4=new Uint8ClampedArray(256*256*4);
+			const OFF=[[-1,-1],[0,-1],[1,-1],[-1,0],[0,0],[1,0],[-1,1],[0,1],[1,1]];
+			for(let py=0;py<256;py++)for(let px=0;px<256;px++){
+				const center=tsGetElevN(px,py,tiles);if(center===null)continue;
+				const win=OFF.map(([ox,oy])=>{const v=tsGetElevN(px+ox,py+oy,tiles);return v!==null?v:center;});
+				const slope=tsComputeSlope(win,csX,csY);
+				const aspect=tsComputeAspect(win);
+				const elevM=center;
+				for(const zone of zones){
+					const elevMin=zone.minElev!==null&&zone.minElev!==undefined?tsToMeters(zone.minElev):-Infinity;
+					const elevMax=zone.maxElev!==null&&zone.maxElev!==undefined?tsToMeters(zone.maxElev):Infinity;
+					if(elevM<elevMin||elevM>elevMax)continue;
+					if(zone.minSlope!==null&&zone.minSlope!==undefined&&slope<zone.minSlope)continue;
+					if(zone.maxSlope!==null&&zone.maxSlope!==undefined&&slope>zone.maxSlope)continue;
+					if(zone.aspects&&zone.aspects.length>0){if(!zone.aspects.some(a=>tsAspectInRange(aspect,a)))continue;}
+					const[r,g,b]=tsHexToRgb(zone.color);
+					const i=(py*256+px)*4;px4[i]=r;px4[i+1]=g;px4[i+2]=b;px4[i+3]=255;break;
+				}
+			}
+			const canvas=new OffscreenCanvas(256,256);
+			canvas.getContext('2d').putImageData(new ImageData(px4,256,256),0,0);
+			const blob=await canvas.convertToBlob({type:'image/png'});
+			return blob.arrayBuffer();
+		}
+
+		// ── Map layer ────────────────────────────────────────────────────────────
+		function tsInitMapLayer(){
+			maplibregl.addProtocol('tsslope',async(params)=>{
+				const url=new URL(params.url.replace('tsslope://','http://tsslope/'));
+				const parts=url.pathname.replace(/^\//,'').split('/');
+				const z=parseInt(parts[0]),x=parseInt(parts[1]),y=parseInt(parts[2].replace('.png','').split('?')[0]);
+				const empty=async()=>{
+					const c=new OffscreenCanvas(256,256);
+					c.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(256*256*4),256,256),0,0);
+					return{data:await(await c.convertToBlob({type:'image/png'})).arrayBuffer()};
+				};
+				if(!tsShadingEnabled)return empty();
+				const zones=tsGetActiveZones();
+				if(zones.length===0)return empty();
+				tsPendingTiles++;tsUpdateStatus();
+				try{
+					const data=await tsGenerateSlopeTile(z,x,y,zones);
+					tsPendingTiles--;tsUpdateStatus();
+					return{data:data||new ArrayBuffer(0)};
+				}catch(e){tsPendingTiles--;tsUpdateStatus();return empty();}
+			});
+			map.addSource('ts-slope-src',{type:'raster',tiles:['tsslope://{z}/{x}/{y}.png'],tileSize:256,minzoom:0,maxzoom:TS_MAX_ZOOM});
+			map.addLayer({id:'ts-slope-layer',type:'raster',source:'ts-slope-src',paint:{'raster-opacity':tsOpacity}});
+			tsUpdateStatus();
+		}
+
+		let tsRefreshTimer=null;
+		function tsScheduleRefresh(){
+			clearTimeout(tsRefreshTimer);
+			tsRefreshTimer=setTimeout(()=>{
+				if(!map.getSource('ts-slope-src'))return;
+				tsTileCache.clear();tsTileOrder.length=0;
+				map.getSource('ts-slope-src').setTiles(['tsslope://{z}/{x}/{y}.png?_t='+Date.now()]);
+				tsUpdateStatus();
+			},400);
+		}
+
+		// ── Compass SVG ──────────────────────────────────────────────────────────
+		const TS_ASPECT_DEFS=[
+			{label:'N', minAspect:337.5,maxAspect:22.5, wrap:true},
+			{label:'NE',minAspect:22.5, maxAspect:67.5},
+			{label:'E', minAspect:67.5, maxAspect:112.5},
+			{label:'SE',minAspect:112.5,maxAspect:157.5},
+			{label:'S', minAspect:157.5,maxAspect:202.5},
+			{label:'SW',minAspect:202.5,maxAspect:247.5},
+			{label:'W', minAspect:247.5,maxAspect:292.5},
+			{label:'NW',minAspect:292.5,maxAspect:337.5},
+		];
+		function tsBuildCompassSVG(zoneId,activeAspects){
+			const R=70,cx=76,cy=76,sliceAngle=45;
+			function pt(angleDeg){const rad=(angleDeg-90)*Math.PI/180;return[cx+R*Math.cos(rad),cy+R*Math.sin(rad)];}
+			const dirs=['N','NE','E','SE','S','SW','W','NW'];
+			let paths='',labels='';
+			const labelR=50;
+			dirs.forEach((dir,i)=>{
+				const startAngle=i*sliceAngle-sliceAngle/2,endAngle=startAngle+sliceAngle;
+				const[x1,y1]=pt(startAngle),[x2,y2]=pt(endAngle);
+				const isActive=activeAspects.includes(dir);
+				const fill=isActive?'#2563eb':'#e5e7eb',textFill=isActive?'#fff':'#6b7280';
+				const midAngle=(startAngle+endAngle)/2;
+				const[lx,ly]=[cx+labelR*Math.cos((midAngle-90)*Math.PI/180),cy+labelR*Math.sin((midAngle-90)*Math.PI/180)];
+				paths+=`<path d="M ${cx} ${cy} L ${x1} ${y1} A ${R} ${R} 0 0 1 ${x2} ${y2} Z" fill="${fill}" stroke="#fff" stroke-width="2" style="cursor:pointer;transition:fill 0.15s" onmouseenter="this.style.opacity='0.8'" onmouseleave="this.style.opacity='1'" onclick="tsToggleAspect('${zoneId}','${dir}')"/>`;
+				labels+=`<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" style="font-size:10px;font-weight:600;fill:${textFill};pointer-events:none;user-select:none">${dir}</text>`;
+			});
+			return`<svg width="130" height="130" viewBox="0 0 152 152" xmlns="http://www.w3.org/2000/svg"><circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#e5e7eb" stroke-width="2"/>${paths}${labels}<circle cx="${cx}" cy="${cy}" r="11" fill="#fff" stroke="#e5e7eb" stroke-width="1.5"/></svg>`;
+		}
+
+		// ── Preset thumbnail ─────────────────────────────────────────────────────
+		function tsBuildThumb(cfg){
+			if(cfg.id==='aspect-color-wheel'){
+				const segs=cfg.zones.map(z=>`<span style="flex:1;background:${z.color};display:inline-block;height:100%"></span>`).join('');
+				return`<div style="width:44px;height:28px;border-radius:3px;overflow:hidden;display:flex;border:1px solid rgba(0,0,0,0.1)">${segs}</div>`;
+			}
+			const segs=cfg.zones.map(z=>`<span style="flex:1;background:${z.color};display:inline-block;height:100%"></span>`).join('');
+			return`<div style="width:44px;height:28px;border-radius:3px;overflow:hidden;display:flex;border:1px solid rgba(0,0,0,0.1)">${segs}</div>`;
+		}
+
+		// ── Render ───────────────────────────────────────────────────────────────
+		function tsRenderAll(){tsRenderConfigSelector();tsRenderZoneEditor();}
+
+		function tsRenderConfigSelector(){
+			const grid=document.getElementById('ts-preset-grid');
+			if(!grid)return;
+			grid.innerHTML=TS_BUILTIN_PRESETS.map(p=>{
+				const isActive=tsActiveConfigIds.has(p.id),isFocused=tsFocusedConfigId===p.id;
+				return`<button onclick="tsToggleConfig('${p.id}')"
+					style="background:${isActive?'#eff4ff':'#f9fafb'};border:${isActive?'2px solid #2563eb':'1px solid #e5e7eb'};border-radius:7px;padding:6px 3px;cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px;${isFocused?'box-shadow:0 0 0 2px rgba(37,99,235,0.4)':''}">
+					${tsBuildThumb(p)}
+					<span style="font-size:9px;font-weight:600;color:${isActive?'#2563eb':'#6b7280'};line-height:1.2">${p.name}</span>
+				</button>`;
+			}).join('');
+			const row=document.getElementById('ts-custom-configs-row');
+			if(!row)return;
+			if(tsCustomConfigs.length===0){row.innerHTML='';return;}
+			row.innerHTML=tsCustomConfigs.map((c,i)=>{
+				const isActive=tsActiveConfigIds.has(c.id),isFocused=tsFocusedConfigId===c.id;
+				return`<div onclick="tsToggleConfig('${c.id}')" style="display:flex;align-items:center;gap:5px;padding:5px 7px;border-radius:5px;border:${isActive?'1px solid #2563eb':'1px solid transparent'};background:${isActive?'#eff4ff':'transparent'};cursor:pointer;${isFocused?'box-shadow:0 0 0 2px rgba(37,99,235,0.3)':''}">
+					<span style="font-size:10px;font-weight:700;color:${isActive?'#2563eb':'#9ca3af'};background:${isActive?'rgba(37,99,235,0.12)':'#e5e7eb'};border-radius:3px;padding:1px 5px;min-width:17px;text-align:center">${i+1}</span>
+					<span style="flex:1;font-size:11px;font-weight:500;color:${isActive?'#2563eb':'#111827'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.name}</span>
+					<button onclick="tsDeleteConfig(event,'${c.id}')" style="background:none;border:none;color:#9ca3af;cursor:pointer;padding:1px 3px;font-size:13px;border-radius:3px" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#9ca3af'">✕</button>
+				</div>`;
+			}).join('');
+		}
+
+		function tsRenderZoneEditor(){
+			const activeList=tsGetActiveConfigs();
+			if(activeList.length>0&&!tsActiveConfigIds.has(tsFocusedConfigId))tsFocusedConfigId=activeList[0].id;
+			const cfg=tsGetActiveConfig();
+			const readonly=cfg?tsIsReadonly(cfg.id):false;
+			const title=document.getElementById('ts-zone-editor-title');
+			if(title)title.textContent=cfg?cfg.name:'Zones';
+			const notice=document.getElementById('ts-readonly-notice');
+			if(notice)notice.style.display=readonly?'block':'none';
+			const addBtn=document.getElementById('ts-add-zone-btn');
+			if(addBtn)addBtn.style.display=readonly?'none':'';
+			const list=document.getElementById('ts-zones-list');
+			if(!list)return;
+			list.innerHTML='';
+			if(!cfg)return;
+			cfg.zones.forEach(zone=>{
+				const activeAspects=zone.aspects.map(a=>a.label||tsAspectLabel(a.minAspect));
+				const slopeSummary=(()=>{const lo=zone.minSlope??0,hi=zone.maxSlope??'∞';return`${lo}° – ${hi}°`;})();
+				const card=document.createElement('div');
+				card.style.cssText='border:1px solid #e5e7eb;border-radius:7px;overflow:hidden;background:#fff;flex-shrink:0';
+				card.dataset.id=zone.id;
+				const isOpen=tsOpenZoneId===zone.id;
+				card.innerHTML=`
+				<div onclick="tsToggleZoneCard('${zone.id}')" style="display:flex;align-items:center;gap:7px;padding:7px 9px;cursor:pointer;background:#f9fafb;user-select:none">
+					<div class="zone-swatch" style="width:20px;height:20px;border-radius:4px;border:2px solid rgba(0,0,0,0.08);flex-shrink:0;position:relative;background:${zone.color}">
+						${!readonly?`<input type="color" value="${zone.color}" oninput="tsSetZoneColor('${zone.id}',this.value)" onclick="event.stopPropagation()" style="opacity:0;position:absolute;inset:0;width:100%;height:100%;cursor:pointer;border:none;padding:0">`:''}
+					</div>
+					<div style="flex:1;font-size:11px;color:#6b7280;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${slopeSummary}${activeAspects.length?' · '+activeAspects.join(','):''}</div>
+					${!readonly?`<button onclick="tsDeleteZone(event,'${zone.id}')" style="background:none;border:none;color:#d1d5db;cursor:pointer;font-size:13px;padding:1px 3px;border-radius:3px" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#d1d5db'">✕</button>`:''}
+					<button id="ts-chev-${zone.id}" style="background:none;border:none;color:#d1d5db;font-size:9px;cursor:pointer;padding:2px;transform:${isOpen?'rotate(90deg)':'rotate(0)'};transition:transform 0.2s">▶</button>
+				</div>
+				<div id="ts-zbody-${zone.id}" style="display:${isOpen?'flex':'none'};flex-direction:column;gap:10px;padding:9px 11px;border-top:1px solid #e5e7eb;${readonly?'opacity:0.5;pointer-events:none':''}">
+					<div style="display:flex;flex-direction:column;gap:3px">
+						<span style="font-size:11px;font-weight:500;color:#111827">Angle (slope)</span>
+						<div style="display:flex;align-items:center;gap:5px">
+							<input type="number" min="0" max="90" step="1" placeholder="Min" value="${zone.minSlope??''}"
+								oninput="tsSetZoneNum('${zone.id}','minSlope',this.value)"
+								style="flex:1;height:32px;border:1px solid #e5e7eb;border-radius:6px;padding:0 8px;font-size:12px;color:#111827;background:#fff;outline:none">
+							<span style="font-size:11px;color:#9ca3af">–</span>
+							<input type="number" min="0" max="90" step="1" placeholder="Max" value="${zone.maxSlope??''}"
+								oninput="tsSetZoneNum('${zone.id}','maxSlope',this.value)"
+								style="flex:1;height:32px;border:1px solid #e5e7eb;border-radius:6px;padding:0 8px;font-size:12px;color:#111827;background:#fff;outline:none">
+							<span style="font-size:11px;color:#6b7280">°</span>
+						</div>
+					</div>
+					<div style="display:flex;flex-direction:column;gap:3px">
+						<span style="font-size:11px;font-weight:500;color:#111827">Elevation (${tsUnitLabel()})</span>
+						<div style="display:flex;align-items:center;gap:3px;width:100%">
+							<input type="number" step="10" placeholder="Min" value="${zone.minElev!==null&&zone.minElev!==undefined?Math.round(zone.minElev):''}"
+								oninput="tsSetZoneNum('${zone.id}','minElev',this.value)"
+								style="flex:1 1 0;min-width:0;height:32px;border:1px solid #e5e7eb;border-radius:6px;padding:0 6px;font-size:12px;color:#111827;background:#fff;outline:none;box-sizing:border-box;">
+							<span style="flex:0 0 auto;font-size:11px;color:#9ca3af">–</span>
+							<input type="number" step="10" placeholder="Max" value="${zone.maxElev!==null&&zone.maxElev!==undefined?Math.round(zone.maxElev):''}"
+								oninput="tsSetZoneNum('${zone.id}','maxElev',this.value)"
+								style="flex:1 1 0;min-width:0;height:32px;border:1px solid #e5e7eb;border-radius:6px;padding:0 6px;font-size:12px;color:#111827;background:#fff;outline:none;box-sizing:border-box;">
+							<span style="flex:0 0 auto;font-size:11px;color:#6b7280">${tsUnitLabel()}</span>
+						</div>
+					</div>
+					<div style="display:flex;flex-direction:column;gap:3px;align-items:center">
+						<span style="font-size:11px;font-weight:500;color:#111827;align-self:flex-start">Aspect</span>
+						${tsBuildCompassSVG(zone.id,activeAspects)}
+						<span style="font-size:10px;color:#9ca3af;text-align:center">Click segments to filter by direction</span>
+					</div>
+				</div>`;
+				list.appendChild(card);
+			});
+		}
+
+		// ── Config management ─────────────────────────────────────────────────────
+		function tsToggleConfig(id){
+			if(!tsActiveConfigIds.has(id)){tsActiveConfigIds.add(id);tsFocusedConfigId=id;tsOpenZoneId=null;}
+			else if(tsFocusedConfigId!==id){tsFocusedConfigId=id;tsOpenZoneId=null;}
+			else{tsActiveConfigIds.delete(id);tsOpenZoneId=null;if(tsActiveConfigIds.size>0)tsFocusedConfigId=[...tsActiveConfigIds][0];else tsFocusedConfigId=null;}
+			tsRenderAll();tsScheduleRefresh();
+		}
+		function tsCreateCustomConfig(){
+			const id='custom-'+Date.now();
+			const cfg={id,name:'Custom Slope Shading',readonly:false,zones:[{id:'z1',minSlope:0,maxSlope:30,minElev:null,maxElev:null,aspects:[],color:'#90ee90'}]};
+			tsCustomConfigs.push(cfg);tsActiveConfigIds.add(id);tsFocusedConfigId=id;tsOpenZoneId=null;
+			tsRenderAll();tsScheduleRefresh();
+		}
+		function tsDeleteConfig(e,id){
+			e.stopPropagation();
+			tsCustomConfigs=tsCustomConfigs.filter(c=>c.id!==id);tsActiveConfigIds.delete(id);
+			tsRenderAll();tsScheduleRefresh();
+		}
+		function tsDuplicateActive(){
+			const src=tsGetActiveConfig();if(!src)return;
+			const id=src.id+'-copy-'+Date.now();
+			const copy=JSON.parse(JSON.stringify(src));copy.id=id;copy.name=src.name+' (Copy)';copy.readonly=false;
+			tsCustomConfigs.push(copy);tsActiveConfigIds.add(id);tsFocusedConfigId=id;tsOpenZoneId=null;
+			tsRenderAll();tsScheduleRefresh();
+		}
+
+		// ── Zone management ───────────────────────────────────────────────────────
+		function tsToggleZoneCard(zoneId){
+			tsOpenZoneId=tsOpenZoneId===zoneId?null:zoneId;
+			document.querySelectorAll('[id^="ts-zbody-"]').forEach(el=>{el.style.display=el.id===`ts-zbody-${tsOpenZoneId}`?'flex':'none';});
+			document.querySelectorAll('[id^="ts-chev-"]').forEach(el=>{el.style.transform=el.id===`ts-chev-${tsOpenZoneId}`?'rotate(90deg)':'rotate(0)';});
+		}
+		function tsSetZoneColor(zoneId,color){
+			const cfg=tsGetActiveConfig();if(!cfg)return;
+			const z=cfg.zones.find(z=>z.id===zoneId);if(!z)return;
+			z.color=color;
+			const swatch = document.querySelector(`[data-id="${zoneId}"] .zone-swatch`);
+			if (swatch) swatch.style.background = color;
+			tsScheduleRefresh();
+		}
+		function tsSetZoneNum(zoneId,field,raw){
+			const cfg=tsGetActiveConfig();if(!cfg)return;
+			const z=cfg.zones.find(z=>z.id===zoneId);if(!z)return;
+			z[field]=raw===''?null:parseFloat(raw);
+			const card=document.querySelector(`[data-id="${zoneId}"]`);
+			if(card){const sum=card.querySelector('div>div:nth-child(2)');if(sum){const lo=z.minSlope??0,hi=z.maxSlope??'∞';const aa=z.aspects.map(a=>a.label||tsAspectLabel(a.minAspect));sum.textContent=`${lo}° – ${hi}°${aa.length?' · '+aa.join(','):''}`;}}
+			tsScheduleRefresh();
+		}
+		function tsDeleteZone(e,zoneId){
+			e.stopPropagation();
+			const cfg=tsGetActiveConfig();if(!cfg)return;
+			cfg.zones=cfg.zones.filter(z=>z.id!==zoneId);
+			if(tsOpenZoneId===zoneId)tsOpenZoneId=null;
+			tsRenderZoneEditor();tsScheduleRefresh();
+		}
+		function tsAddZone(){
+			const cfg=tsGetActiveConfig();if(!cfg||tsIsReadonly(cfg.id))return;
+			const colors=['#66bb6a','#ffa726','#ab47bc','#26c6da','#ec407a','#8d6e63','#78909c'];
+			const color=colors[cfg.zones.length%colors.length];
+			const z={id:'z'+Date.now(),minSlope:null,maxSlope:null,minElev:null,maxElev:null,aspects:[],color};
+			cfg.zones.push(z);tsOpenZoneId=z.id;tsRenderZoneEditor();tsScheduleRefresh();
+		}
+		function tsToggleAspect(zoneId,dirLabel){
+			const cfg=tsGetActiveConfig();if(!cfg||tsIsReadonly(cfg.id))return;
+			const z=cfg.zones.find(z=>z.id===zoneId);if(!z)return;
+			const def=TS_ASPECT_DEFS.find(a=>a.label===dirLabel);if(!def)return;
+			const existing=z.aspects.findIndex(a=>(a.label||tsAspectLabel(a.minAspect))===dirLabel);
+			if(existing>=0)z.aspects.splice(existing,1);else z.aspects.push({...def});
+			const body=document.getElementById(`ts-zbody-${zoneId}`);
+			if(body){
+				const activeAspects=z.aspects.map(a=>a.label||tsAspectLabel(a.minAspect));
+				const wrap=body.querySelector('.ts-compass-wrap');
+				if(wrap)wrap.innerHTML=tsBuildCompassSVG(zoneId,activeAspects)+`<span style="font-size:10px;color:#9ca3af;text-align:center">Click segments to filter by direction</span>`;
+				// update summary
+				const card=document.querySelector(`[data-id="${zoneId}"]`);
+				if(card){const sum=card.querySelector('div>div:nth-child(2)');if(sum){const lo=z.minSlope??0,hi=z.maxSlope??'∞';sum.textContent=`${lo}° – ${hi}°${activeAspects.length?' · '+activeAspects.join(','):''}`;}}
+			}
+			tsRenderZoneEditor();
+			tsScheduleRefresh();
+		}
+
+		// ── Initial render ────────────────────────────────────────────────────────
+		tsRenderAll();
+		tsUpdateStatus();
+
 		// Re-add overlay layers after map loads
 		map.on('load', function() {
 			if (forestTabChecks.inat)      addInatLayer();
@@ -3662,6 +4137,8 @@
 			if (forestTabChecks.landcover) addLandcoverLayer();
 			if (forestTabChecks.riparian)  addRiparianLayer();
 			if (forestTabChecks.padus)     addPadusLayer();
+			// Terrain shading protocol + layer
+			tsInitMapLayer();
 		});
 
 		loadTreeSlices();
@@ -5319,9 +5796,6 @@
 
 		renderAspectRanges();
 		syncAspectMasterLock();
-
-
-
 		</script>
 	</body>
 </html>
