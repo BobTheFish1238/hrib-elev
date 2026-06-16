@@ -1,7 +1,7 @@
-# 🍄 Mushroom Megathread
+# 🍄 Mushroom Utility Megathread
 
 ### Here you can find links to websites that could be useful for mushroom foraging in the Pacific Northwest.
-#### Click on the sections you want to expand.<br><br>
+#### Click the sections to expand.<br><br>
 
 <details><summary>⭐ Featured <sub>&nbsp;(created by me)</sub></summary>
 
